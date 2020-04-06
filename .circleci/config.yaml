@@ -1,0 +1,31 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: microsoft/azure-cli
+    environment:
+      TERRAFORM_VERSION: 0.12.20
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install Terraform
+          command: |
+            apt-get install -y wget zip
+            wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
+
+      - run:
+          name: Configure test cluster env
+          command: |
+            echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
+            echo 'export TF_VAR_filestore_disabled="true"' >> $BASH_ENV
+            echo 'export TF_VAR_allow_local_ip_access="true"' >> $BASH_ENV
+            echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+            echo ${CLOUDSDK_SERVICE_KEY} > /tmp/gcp-${CIRCLE_BUILD_NUM}.json
+
+      - run:
+          name: Terraform fmt
+          command: terraform fmt -check

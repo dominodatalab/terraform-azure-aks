@@ -1,0 +1,168 @@
+provider "azurerm" {
+  # The "feature" block is required for AzureRM provider 2.x. 
+  # If you are using version 1.x, the "features" block is not allowed.
+  version = ">=2.3.0"
+  features {}
+}
+
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "dominoterraform"
+    storage_account_name = "dominoterraformstorage"
+    container_name       = "tfstate"
+    key                  = "dev.terraform.tfstate"
+  }
+}
+
+locals {
+  cluster_name = var.cluster_name != null ? var.cluster_name : terraform.workspace
+}
+
+data "azurerm_subscription" "current" {
+  subscription_id = var.subscription_id
+}
+
+resource "azurerm_resource_group" "k8s" {
+  name     = local.cluster_name
+  location = var.location
+}
+
+resource "random_id" "log_analytics_workspace_name_suffix" {
+  byte_length = 8
+}
+
+resource "azurerm_log_analytics_workspace" "logs" {
+  # The WorkSpace name has to be unique across the whole of azure, not just the current subscription/tenant.
+  name                = "${var.log_analytics_workspace_name}-${random_id.log_analytics_workspace_name_suffix.dec}"
+  location            = var.log_analytics_workspace_location
+  resource_group_name = azurerm_resource_group.k8s.name
+  sku                 = var.log_analytics_workspace_sku
+}
+
+resource "azurerm_log_analytics_solution" "logs" {
+  solution_name         = "ContainerInsights"
+  location              = azurerm_log_analytics_workspace.logs.location
+  resource_group_name   = azurerm_resource_group.k8s.name
+  workspace_resource_id = azurerm_log_analytics_workspace.logs.id
+  workspace_name        = azurerm_log_analytics_workspace.logs.name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/ContainerInsights"
+  }
+}
+
+resource "azuread_application" "app" {
+  name = local.cluster_name
+
+
+  app_role {
+    allowed_member_types = [
+      "User",
+      "Application",
+    ]
+
+    description  = "Admins can manage roles and perform all task actions"
+    display_name = "Admin"
+    is_enabled   = true
+    value        = "Admin"
+  }
+}
+
+resource "random_password" "aks" {
+  length  = 24
+  special = true
+}
+
+resource "azuread_service_principal" "sp" {
+  application_id = azuread_application.app.application_id
+
+  tags = [local.cluster_name]
+}
+
+resource "azuread_service_principal_password" "sp" {
+  service_principal_id = azuread_service_principal.sp.id
+  value                = random_password.aks.result
+  end_date             = "2099-01-01T01:00:00Z"
+}
+
+resource "azurerm_role_assignment" "sp" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Owner"
+  principal_id         = azuread_service_principal.sp.object_id
+}
+
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = local.cluster_name
+  location            = azurerm_resource_group.k8s.location
+  resource_group_name = azurerm_resource_group.k8s.name
+  dns_prefix          = var.dns_prefix
+
+  linux_profile {
+    admin_username = "ubuntu"
+
+    ssh_key {
+      key_data = file(var.ssh_public_key)
+    }
+  }
+
+  default_node_pool {
+    name                = "platform"
+    node_count          = var.node_pools.platform.cluster_auto_scaling_max_count
+    vm_size             = var.node_pools.platform.vm_size
+    availability_zones  = var.node_pools.platform.zones
+    max_pods            = 250
+    os_disk_size_gb     = 128
+    node_taints         = var.node_pools.platform.taints
+    enable_auto_scaling = var.node_pools.platform.cluster_auto_scaling
+    min_count           = var.node_pools.platform.cluster_auto_scaling_min_count
+    max_count           = var.node_pools.platform.cluster_auto_scaling_max_count
+  }
+
+  service_principal {
+    client_id     = azuread_service_principal.sp.application_id
+    client_secret = azuread_service_principal_password.sp.value
+  }
+
+  addon_profile {
+    oms_agent {
+      enabled                    = true
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
+    }
+  }
+
+  network_profile {
+    load_balancer_sku  = "standard"
+    network_plugin     = "azure"
+    network_policy     = "calico"
+    dns_service_ip     = "10.0.0.10"
+    docker_bridge_cidr = "172.17.0.1/16"
+    service_cidr       = "10.0.0.0/16"
+  }
+
+  tags = {
+    Environment = "Development"
+  }
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "aks" {
+  for_each = {
+    # Create all node pools except for 'platform' because it is the AKS default
+    for key, value in var.node_pools :
+    key => value
+    if key != "platform"
+  }
+
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  name                  = each.key
+  node_count            = each.value.cluster_auto_scaling_max_count
+  vm_size               = each.value.vm_size
+  availability_zones    = each.value.zones
+  max_pods              = 250
+  os_disk_size_gb       = 128
+  os_type               = each.value.node_os
+  node_taints           = each.value.taints
+  enable_auto_scaling   = each.value.cluster_auto_scaling
+  min_count             = each.value.cluster_auto_scaling_min_count
+  max_count             = each.value.cluster_auto_scaling_max_count
+}
