@@ -32,9 +32,9 @@ jobs:
           name: AKS install kubectl
           command: az aks install-cli
 
-      - run:
-          name: Login
-          command: az login --service-principal -u ${AZURE_SERVICE_PRINCIPAL} -p ${AZURE_PASSWORD} -t ${AZURE_TENANT}
+      # - run:
+      #     name: Login
+      #     command: az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} -t ${ARM_TENANT_ID}
 
       - run:
           name: Terraform init
