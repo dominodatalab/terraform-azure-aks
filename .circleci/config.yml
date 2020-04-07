@@ -23,7 +23,6 @@ jobs:
             echo 'export TF_VAR_filestore_disabled="true"' >> $BASH_ENV
             echo 'export TF_VAR_allow_local_ip_access="true"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
-            echo ${CLOUDSDK_SERVICE_KEY} > /tmp/gcp-${CIRCLE_BUILD_NUM}.json
 
       - run:
           name: Terraform fmt
@@ -37,29 +36,29 @@ jobs:
           name: Login
           command: az login --service-principal -u ${AZURE_SERVICE_PRINCIPAL} -p ${AZURE_PASSWORD} -t ${AZURE_TENANT}
 
-      # - run:
-      #     name: Terraform init
-      #     command: terraform init
+      - run:
+          name: Terraform init
+          command: terraform init
 
-      # - run:
-      #     name: Terraform workspace create
-      #     command: terraform workspace new ${WORKSPACE}
+      - run:
+          name: Terraform workspace create
+          command: terraform workspace new ${WORKSPACE}
 
-      # - run:
-      #     name: Terraform apply
-      #     command: terraform apply -auto-approve
+      - run:
+          name: Terraform apply
+          command: terraform apply -auto-approve
 
-      # - run:
-      #     name: Terraform plan
-      #     command: terraform plan -detailed-exitcode
+      - run:
+          name: Terraform plan
+          command: terraform plan -detailed-exitcode
 
-      # - run:
-      #     name: Terraform destroy
-      #     command: terraform destroy -auto-approve || (sleep 5m && terraform destroy -auto-approve)
-      #     when: always
+      - run:
+          name: Terraform destroy
+          command: terraform destroy -auto-approve || (sleep 5m && terraform destroy -auto-approve)
+          when: always
 
-      # - run:
-      #     name: Terraform workspace delete
-      #     command: terraform workspace select default && terraform workspace delete ${WORKSPACE}
-      #     when: always
+      - run:
+          name: Terraform workspace delete
+          command: terraform workspace select default && terraform workspace delete ${WORKSPACE}
+          when: always
 
