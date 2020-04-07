@@ -1,6 +1,4 @@
 
-variable "service_principal_name" {}
-variable "service_principal_secret" {}
 
 variable "agent_count" {
   default = 3
