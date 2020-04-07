@@ -32,10 +32,6 @@ jobs:
           name: AKS install kubectl
           command: az aks install-cli
 
-      # - run:
-      #     name: Login
-      #     command: az login --service-principal -u ${ARM_CLIENT_ID} -p ${ARM_CLIENT_SECRET} -t ${ARM_TENANT_ID}
-
       - run:
           name: Terraform init
           command: terraform init
@@ -44,13 +40,14 @@ jobs:
           name: Terraform workspace create
           command: terraform workspace new ${WORKSPACE}
 
-      - run:
-          name: Terraform apply
-          command: terraform apply -auto-approve
+      # TODO: Find the appropriate permissions for the Service Principal
+      # - run:
+      #     name: Terraform apply
+      #     command: terraform apply -auto-approve
 
-      - run:
-          name: Terraform plan
-          command: terraform plan -detailed-exitcode
+      # - run:
+      #     name: Terraform plan
+      #     command: terraform plan -detailed-exitcode
 
       - run:
           name: Terraform destroy
