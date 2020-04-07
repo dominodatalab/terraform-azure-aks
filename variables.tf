@@ -55,7 +55,7 @@ variable "node_pools" {
       node_os                        = "Linux"
       taints                         = null
       cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 0
+      cluster_auto_scaling_min_count = 1
       cluster_auto_scaling_max_count = 4
     }
     gpu = {
@@ -64,7 +64,7 @@ variable "node_pools" {
       node_os                        = "Linux"
       taints                         = null
       cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 0
+      cluster_auto_scaling_min_count = 1
       cluster_auto_scaling_max_count = 1
     }
     platform = {

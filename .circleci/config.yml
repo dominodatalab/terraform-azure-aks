@@ -28,3 +28,11 @@ jobs:
       - run:
           name: Terraform fmt
           command: terraform fmt -check
+
+      - run:
+          name: AKS install kubectl
+          command: az aks install-cli
+
+      - run:
+          name: Login
+          command: az login --service-principal -u ${AZURE_SERVICE_PRINCIPAL} -p ${AZURE_PASSWORD} -t ${AZURE_TENANT}
