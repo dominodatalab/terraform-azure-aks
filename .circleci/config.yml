@@ -36,3 +36,30 @@ jobs:
       - run:
           name: Login
           command: az login --service-principal -u ${AZURE_SERVICE_PRINCIPAL} -p ${AZURE_PASSWORD} -t ${AZURE_TENANT}
+
+      - run:
+          name: Terraform init
+          command: terraform init
+
+      - run:
+          name: Terraform workspace create
+          command: terraform workspace new ${WORKSPACE}
+
+      - run:
+          name: Terraform apply
+          command: terraform apply -auto-approve
+
+      - run:
+          name: Terraform plan
+          command: terraform plan -detailed-exitcode
+
+      - run:
+          name: Terraform destroy
+          command: terraform destroy -auto-approve || (sleep 5m && terraform destroy -auto-approve)
+          when: always
+
+      - run:
+          name: Terraform workspace delete
+          command: terraform workspace select default && terraform workspace delete ${WORKSPACE}
+          when: always
+
