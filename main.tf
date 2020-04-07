@@ -93,6 +93,12 @@ resource "azurerm_role_assignment" "sp" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
+  lifecycle {
+    ignore_changes = [
+      default_node_pool[0].node_count
+    ]
+  }
+
   name                = local.cluster_name
   location            = azurerm_resource_group.k8s.location
   resource_group_name = azurerm_resource_group.k8s.name
@@ -140,12 +146,22 @@ resource "azurerm_kubernetes_cluster" "aks" {
     service_cidr       = "10.0.0.0/16"
   }
 
+  windows_profile {
+    admin_username = "azureuser"
+  }
+
   tags = {
     Environment = "Development"
   }
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
+  lifecycle {
+    ignore_changes = [
+      node_count
+    ]
+  }
+
   for_each = {
     # Create all node pools except for 'platform' because it is the AKS default
     for key, value in var.node_pools :
