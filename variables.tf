@@ -10,14 +10,6 @@ variable "cluster_name" {
   description = "The Domino cluster name for the K8s cluster and resource group"
 }
 
-variable "ssh_public_key" {
-  default = "~/.ssh/id_rsa.pub"
-}
-
-variable "dns_prefix" {
-  default = "k8stest"
-}
-
 variable "location" {
   default = "West US 2"
 }
