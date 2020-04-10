@@ -32,6 +32,7 @@ variable "node_pools" {
   type = map(object({
     vm_size                        = string
     zones                          = list(string)
+    node_labels                    = map(string)
     node_os                        = string
     taints                         = list(string)
     cluster_auto_scaling           = bool
@@ -40,8 +41,13 @@ variable "node_pools" {
   }))
   default = {
     compute = {
-      vm_size                        = "Standard_DS2_v2"
-      zones                          = ["1", "2", "3"]
+      vm_size = "Standard_DS3_v2"
+      zones   = ["1", "2", "3"]
+      node_labels = {
+        "domino/build-node"            = "true"
+        "dominodatalab.com/build-node" = "true"
+        "dominodatalab.com/node-pool"  = "default"
+      }
       node_os                        = "Linux"
       taints                         = null
       cluster_auto_scaling           = true
@@ -49,8 +55,9 @@ variable "node_pools" {
       cluster_auto_scaling_max_count = 4
     }
     gpu = {
-      vm_size                        = "Standard_DS2_v2"
+      vm_size                        = "Standard_DS3_v2"
       zones                          = ["1", "2", "3"]
+      node_labels                    = {}
       node_os                        = "Linux"
       taints                         = null
       cluster_auto_scaling           = true
@@ -58,8 +65,9 @@ variable "node_pools" {
       cluster_auto_scaling_max_count = 1
     }
     platform = {
-      vm_size                        = "Standard_DS2_v2"
+      vm_size                        = "Standard_DS3_v2"
       zones                          = ["1", "2", "3"]
+      node_labels                    = {}
       node_os                        = "Linux"
       taints                         = null
       cluster_auto_scaling           = true

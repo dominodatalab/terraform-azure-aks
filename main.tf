@@ -107,6 +107,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name                = "platform"
     node_count          = var.node_pools.platform.cluster_auto_scaling_max_count
+    node_labels         = merge({ "dominodatalab.com/node-pool" : "platform" }, var.node_pools.platform.node_labels)
     vm_size             = var.node_pools.platform.vm_size
     availability_zones  = var.node_pools.platform.zones
     max_pods            = 250
@@ -138,10 +139,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     service_cidr       = "10.0.0.0/16"
   }
 
-  windows_profile {
-    admin_username = "azureuser"
-  }
-
   tags = {
     Environment = "Development"
   }
@@ -169,6 +166,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   max_pods              = 250
   os_disk_size_gb       = 128
   os_type               = each.value.node_os
+  node_labels           = merge({ "dominodatalab.com/node-pool" : each.key }, each.value.node_labels)
   node_taints           = each.value.taints
   enable_auto_scaling   = each.value.cluster_auto_scaling
   min_count             = each.value.cluster_auto_scaling_min_count
