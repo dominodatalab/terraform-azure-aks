@@ -41,38 +41,38 @@ variable "node_pools" {
   }))
   default = {
     compute = {
-      vm_size = "Standard_DS3_v2"
+      vm_size = "Standard_DS4_v2"
       zones   = ["1", "2", "3"]
       node_labels = {
         "domino/build-node"            = "true"
         "dominodatalab.com/build-node" = "true"
         "dominodatalab.com/node-pool"  = "default"
       }
-      node_os                        = "Linux"
-      taints                         = null
-      cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 1
-      cluster_auto_scaling_max_count = 4
+      node_os             = "Linux"
+      node_taints         = null
+      enable_auto_scaling = true
+      min_count           = 1
+      max_count           = 4
     }
     gpu = {
-      vm_size                        = "Standard_DS3_v2"
-      zones                          = ["1", "2", "3"]
-      node_labels                    = {}
-      node_os                        = "Linux"
-      taints                         = null
-      cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 1
-      cluster_auto_scaling_max_count = 1
+      vm_size             = "Standard_DS3_v2"
+      zones               = ["1", "2", "3"]
+      node_labels         = {}
+      node_os             = "Linux"
+      node_taints         = null
+      enable_auto_scaling = true
+      min_count           = 1
+      max_count           = 1
     }
     platform = {
-      vm_size                        = "Standard_DS3_v2"
-      zones                          = ["1", "2", "3"]
-      node_labels                    = {}
-      node_os                        = "Linux"
-      taints                         = null
-      cluster_auto_scaling           = true
-      cluster_auto_scaling_min_count = 1
-      cluster_auto_scaling_max_count = 4
+      vm_size             = "Standard_DS5_v2"
+      zones               = ["1", "2", "3"]
+      node_labels         = {}
+      node_os             = "Linux"
+      node_taints         = null
+      enable_auto_scaling = true
+      min_count           = 1
+      max_count           = 4
     }
   }
 }

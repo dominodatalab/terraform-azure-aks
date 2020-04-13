@@ -1,6 +1,4 @@
 provider "azurerm" {
-  # The "feature" block is required for AzureRM provider 2.x. 
-  # If you are using version 1.x, the "features" block is not allowed.
   version = ">=2.3.0"
   features {}
 }
@@ -112,10 +110,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     availability_zones  = var.node_pools.platform.zones
     max_pods            = 250
     os_disk_size_gb     = 128
-    node_taints         = var.node_pools.platform.taints
-    enable_auto_scaling = var.node_pools.platform.cluster_auto_scaling
-    min_count           = var.node_pools.platform.cluster_auto_scaling_min_count
-    max_count           = var.node_pools.platform.cluster_auto_scaling_max_count
+    node_taints         = var.node_pools.platform.node_taints
+    enable_auto_scaling = var.node_pools.platform.enable_auto_scaling
+    min_count           = var.node_pools.platform.min_count
+    max_count           = var.node_pools.platform.max_count
   }
 
   service_principal {
@@ -136,7 +134,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     network_policy     = "calico"
     dns_service_ip     = "10.0.0.10"
     docker_bridge_cidr = "172.17.0.1/16"
-    service_cidr       = "10.0.0.0/16"
+    service_cidr       = "10.97.0.0/16"
   }
 
   tags = {
@@ -160,15 +158,15 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
 
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   name                  = each.key
-  node_count            = each.value.cluster_auto_scaling_max_count
+  node_count            = each.value.max_count
   vm_size               = each.value.vm_size
   availability_zones    = each.value.zones
   max_pods              = 250
   os_disk_size_gb       = 128
   os_type               = each.value.node_os
   node_labels           = merge({ "dominodatalab.com/node-pool" : each.key }, each.value.node_labels)
-  node_taints           = each.value.taints
-  enable_auto_scaling   = each.value.cluster_auto_scaling
-  min_count             = each.value.cluster_auto_scaling_min_count
-  max_count             = each.value.cluster_auto_scaling_max_count
+  node_taints           = each.value.node_taints
+  enable_auto_scaling   = each.value.enable_auto_scaling
+  min_count             = each.value.min_count
+  max_count             = each.value.max_count
 }
