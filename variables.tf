@@ -4,6 +4,18 @@ variable "agent_count" {
   default = 3
 }
 
+variable "api_server_authorized_ip_ranges" {
+  type        = list(string)
+  description = "The IP ranges to whitelist for incoming traffic to the masters"
+  default = [
+    "12.245.82.18/32",   # domino-hq
+    "52.206.158.130/32", # aviatrix-east
+    "52.25.178.121/32",  # aviatrix-west
+    "52.56.39.158/32",   # aviatrix-eu
+    "13.126.91.85/32",   # aviatrix-ap
+  ]
+}
+
 variable "cluster_name" {
   type        = string
   default     = null
