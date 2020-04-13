@@ -104,7 +104,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name                = "platform"
-    node_count          = var.node_pools.platform.cluster_auto_scaling_max_count
+    node_count          = var.node_pools.platform.max_count
     node_labels         = merge({ "dominodatalab.com/node-pool" : "platform" }, var.node_pools.platform.node_labels)
     vm_size             = var.node_pools.platform.vm_size
     availability_zones  = var.node_pools.platform.zones

@@ -30,14 +30,14 @@ variable "log_analytics_workspace_sku" {
 
 variable "node_pools" {
   type = map(object({
-    vm_size                        = string
-    zones                          = list(string)
-    node_labels                    = map(string)
-    node_os                        = string
-    taints                         = list(string)
-    cluster_auto_scaling           = bool
-    cluster_auto_scaling_min_count = number
-    cluster_auto_scaling_max_count = number
+    vm_size             = string
+    zones               = list(string)
+    node_labels         = map(string)
+    node_os             = string
+    node_taints         = list(string)
+    enable_auto_scaling = bool
+    min_count           = number
+    max_count           = number
   }))
   default = {
     compute = {
@@ -49,7 +49,7 @@ variable "node_pools" {
         "dominodatalab.com/node-pool"  = "default"
       }
       node_os             = "Linux"
-      node_taints         = null
+      node_taints         = []
       enable_auto_scaling = true
       min_count           = 1
       max_count           = 4
@@ -59,7 +59,7 @@ variable "node_pools" {
       zones               = ["1", "2", "3"]
       node_labels         = {}
       node_os             = "Linux"
-      node_taints         = null
+      node_taints         = []
       enable_auto_scaling = true
       min_count           = 1
       max_count           = 1
@@ -69,7 +69,7 @@ variable "node_pools" {
       zones               = ["1", "2", "3"]
       node_labels         = {}
       node_os             = "Linux"
-      node_taints         = null
+      node_taints         = []
       enable_auto_scaling = true
       min_count           = 1
       max_count           = 4
