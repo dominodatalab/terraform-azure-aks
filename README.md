@@ -26,6 +26,15 @@ Run the Terraform deployment
 Access AKS cluster
 1. `az aks get-credentials --resource-group [cluster-name] --name [cluster-name]`
 
+### Troubleshooting
+
+1. No access to Azure backend store
+  In this case you would need to override the backend configuration. This can be done
+  via the command line:
+  ```
+  terraform init -backend-config="storage_account_name=<YourAzureStorageAccountName>" -backend-config="container_name=tfstate" -backend-config="access_key=<YourStorageAccountAccessKey>" -backend-config="key=codelab.microsoft.tfstate"
+  ```
+
 ## Development
 
 Please submit any feature enhancements, bug fixes, or ideas via pull requests or issues.
