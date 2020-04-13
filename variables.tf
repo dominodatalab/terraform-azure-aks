@@ -54,16 +54,22 @@ variable "node_pools" {
       min_count           = 1
       max_count           = 4
     }
-    gpu = {
-      vm_size             = "Standard_DS3_v2"
-      zones               = ["1", "2", "3"]
-      node_labels         = {}
-      node_os             = "Linux"
-      node_taints         = []
-      enable_auto_scaling = true
-      min_count           = 1
-      max_count           = 1
-    }
+    # Example GPU Configuration
+    # gpu = {
+    #   vm_size = "Standard_DS3_v2"
+    #   zones   = ["1", "2", "3"]
+    #   node_labels = {
+    #     "dominodatalab.com/node-pool" = "default-gpu"
+    #     "nvidia.com/gpu"              = "true"
+    #   }
+    #   node_os = "Linux"
+    #   node_taints = [
+    #     "nvidia.com/gpu=true"
+    #   ]
+    #   enable_auto_scaling = true
+    #   min_count           = 1
+    #   max_count           = 1
+    # }
     platform = {
       vm_size             = "Standard_DS5_v2"
       zones               = ["1", "2", "3"]
