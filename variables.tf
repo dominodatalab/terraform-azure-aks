@@ -30,19 +30,21 @@ variable "log_analytics_workspace_sku" {
 
 variable "node_pools" {
   type = map(object({
-    vm_size             = string
-    zones               = list(string)
-    node_labels         = map(string)
-    node_os             = string
-    node_taints         = list(string)
-    enable_auto_scaling = bool
-    min_count           = number
-    max_count           = number
+    enable_node_public_ip = bool
+    vm_size               = string
+    zones                 = list(string)
+    node_labels           = map(string)
+    node_os               = string
+    node_taints           = list(string)
+    enable_auto_scaling   = bool
+    min_count             = number
+    max_count             = number
   }))
   default = {
     compute = {
-      vm_size = "Standard_DS4_v2"
-      zones   = ["1", "2", "3"]
+      enable_node_public_ip = false
+      vm_size               = "Standard_DS4_v2"
+      zones                 = ["1", "2", "3"]
       node_labels = {
         "domino/build-node"            = "true"
         "dominodatalab.com/build-node" = "true"
@@ -71,14 +73,15 @@ variable "node_pools" {
     #   max_count           = 1
     # }
     platform = {
-      vm_size             = "Standard_DS5_v2"
-      zones               = ["1", "2", "3"]
-      node_labels         = {}
-      node_os             = "Linux"
-      node_taints         = []
-      enable_auto_scaling = true
-      min_count           = 1
-      max_count           = 4
+      enable_node_public_ip = false
+      vm_size               = "Standard_DS5_v2"
+      zones                 = ["1", "2", "3"]
+      node_labels           = {}
+      node_os               = "Linux"
+      node_taints           = []
+      enable_auto_scaling   = true
+      min_count             = 1
+      max_count             = 4
     }
   }
 }

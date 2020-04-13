@@ -97,23 +97,29 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ]
   }
 
-  name                = local.cluster_name
-  location            = azurerm_resource_group.k8s.location
-  resource_group_name = azurerm_resource_group.k8s.name
-  dns_prefix          = local.cluster_name
+  name                       = local.cluster_name
+  enable_pod_security_policy = false
+  location                   = azurerm_resource_group.k8s.location
+  resource_group_name        = azurerm_resource_group.k8s.name
+  dns_prefix                 = local.cluster_name
+  private_link_enabled       = false
+
+  api_server_authorized_ip_ranges = []
 
   default_node_pool {
-    name                = "platform"
-    node_count          = var.node_pools.platform.max_count
-    node_labels         = merge({ "dominodatalab.com/node-pool" : "platform" }, var.node_pools.platform.node_labels)
-    vm_size             = var.node_pools.platform.vm_size
-    availability_zones  = var.node_pools.platform.zones
-    max_pods            = 250
-    os_disk_size_gb     = 128
-    node_taints         = var.node_pools.platform.node_taints
-    enable_auto_scaling = var.node_pools.platform.enable_auto_scaling
-    min_count           = var.node_pools.platform.min_count
-    max_count           = var.node_pools.platform.max_count
+    enable_node_public_ip = var.node_pools.platform.enable_node_public_ip
+    name                  = "platform"
+    node_count            = var.node_pools.platform.max_count
+    node_labels           = merge({ "dominodatalab.com/node-pool" : "platform" }, var.node_pools.platform.node_labels)
+    vm_size               = var.node_pools.platform.vm_size
+    availability_zones    = var.node_pools.platform.zones
+    max_pods              = 250
+    os_disk_size_gb       = 128
+    node_taints           = var.node_pools.platform.node_taints
+    enable_auto_scaling   = var.node_pools.platform.enable_auto_scaling
+    min_count             = var.node_pools.platform.min_count
+    max_count             = var.node_pools.platform.max_count
+    tags                  = {}
   }
 
   service_principal {
@@ -129,16 +135,20 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   network_profile {
-    load_balancer_sku  = "standard"
+    load_balancer_sku  = "Standard"
     network_plugin     = "azure"
     network_policy     = "calico"
-    dns_service_ip     = "10.0.0.10"
+    dns_service_ip     = "100.97.0.10"
     docker_bridge_cidr = "172.17.0.1/16"
     service_cidr       = "100.97.0.0/16"
   }
 
   tags = {
     Environment = "Development"
+  }
+
+  windows_profile {
+    admin_username = "azureuser"
   }
 }
 
@@ -156,6 +166,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
     if key != "platform"
   }
 
+  enable_node_public_ip = each.value.enable_node_public_ip
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   name                  = each.key
   node_count            = each.value.max_count
@@ -169,4 +180,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   enable_auto_scaling   = each.value.enable_auto_scaling
   min_count             = each.value.min_count
   max_count             = each.value.max_count
+  tags                  = {}
 }
