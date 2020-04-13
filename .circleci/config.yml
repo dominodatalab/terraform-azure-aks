@@ -1,4 +1,10 @@
 version: 2
+
+# CI/CD Service Principal Permissions
+# - http://aksPrincipal/user_impersonation
+# - https://graph.windows.net/Application.ReadWrite.OwnedBy
+# - https://graph.microsoft.com/Application.ReadWrite.OwnedBy
+
 jobs:
   build:
     docker:
@@ -40,14 +46,13 @@ jobs:
           name: Terraform workspace create
           command: terraform workspace new ${WORKSPACE}
 
-      # TODO: Find the appropriate permissions for the Service Principal
-      # - run:
-      #     name: Terraform apply
-      #     command: terraform apply -auto-approve
+      - run:
+          name: Terraform apply
+          command: terraform apply -auto-approve
 
-      # - run:
-      #     name: Terraform plan
-      #     command: terraform plan -detailed-exitcode
+      - run:
+          name: Terraform plan
+          command: terraform plan -detailed-exitcode
 
       - run:
           name: Terraform destroy
