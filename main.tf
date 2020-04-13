@@ -104,7 +104,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix                 = local.cluster_name
   private_link_enabled       = false
 
-  api_server_authorized_ip_ranges = []
+  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
   default_node_pool {
     enable_node_public_ip = var.node_pools.platform.enable_node_public_ip
