@@ -147,9 +147,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     Environment = "Development"
   }
 
-  windows_profile {
-    admin_username = "azureuser"
-  }
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
