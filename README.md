@@ -5,7 +5,7 @@ Terraform module for deploying a Domino on AKS
 
 ### Create a Domino development AKS cluster
 ```hcl
-module "gke_cluster" {
+module "aks_cluster" {
   source  = "github.com/cerebrotech/terraform-azure-aks"
 
   cluster = "cluster-name"
