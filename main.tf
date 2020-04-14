@@ -16,6 +16,10 @@ locals {
   cluster_name = var.cluster_name != null ? var.cluster_name : terraform.workspace
 }
 
+data "azurerm_subscription" "current" {
+  subscription_id = var.subscription_id
+}
+
 resource "azurerm_resource_group" "k8s" {
   name     = local.cluster_name
   location = var.location
