@@ -97,9 +97,3 @@ variable "node_pools" {
     }
   }
 }
-
-variable subscription_id {
-  type        = string
-  default     = "de806df8-4359-4802-b814-b8a7699cfaa5" # Domino Engineering Platform Dev
-  description = "An existing Subscription ID to add the deployment"
-}
