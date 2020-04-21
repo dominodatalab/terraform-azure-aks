@@ -7,13 +7,6 @@ variable "agent_count" {
 variable "api_server_authorized_ip_ranges" {
   type        = list(string)
   description = "The IP ranges to whitelist for incoming traffic to the masters"
-  default = [
-    "12.245.82.18/32",   # domino-hq
-    "52.206.158.130/32", # aviatrix-east
-    "52.25.178.121/32",  # aviatrix-west
-    "52.56.39.158/32",   # aviatrix-eu
-    "13.126.91.85/32",   # aviatrix-ap
-  ]
 }
 
 variable "cluster_name" {
@@ -100,6 +93,5 @@ variable "node_pools" {
 
 variable subscription_id {
   type        = string
-  default     = "de806df8-4359-4802-b814-b8a7699cfaa5" # Domino Engineering Platform Dev
   description = "An existing Subscription ID to add the deployment"
 }
