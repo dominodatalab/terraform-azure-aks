@@ -1,7 +1,7 @@
 
 variable "aks_tags" {
-  type = map(string),
-  default = {},
+  type        = map(string)
+  default     = {}
   description = "AKS Key=Value tags"
 }
 
