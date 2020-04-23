@@ -143,9 +143,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     service_cidr       = "100.97.0.0/16"
   }
 
-  tags = {
-    Environment = "Development"
-  }
+  tags = merge({Environment = "Development"}, var.aks_tags)
 
 }
 
