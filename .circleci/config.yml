@@ -30,7 +30,7 @@ jobs:
 
       - run:
           name: Terraform fmt
-          command: echo ${TF_VAR_aks_tags} && terraform fmt -check
+          command: echo ${TF_VAR_aks_tags} && echo here zane && terraform fmt -check
 
       - run:
           name: AKS install kubectl
