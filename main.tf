@@ -82,6 +82,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     type = "SystemAssigned"
   }
 
+  windows_profile {
+    admin_username = "azureuser" # default, here for consistency on dry reprovisions, may not need after going back to 2.3.0+ TODO
+  }
+
   addon_profile {
     oms_agent {
       enabled                    = true
