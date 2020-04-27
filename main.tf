@@ -13,10 +13,17 @@ terraform {
 }
 
 locals {
-  cluster_name = var.cluster_name != null ? var.cluster_name : terraform.workspace
+  cluster_name   = var.cluster_name != null ? var.cluster_name : terraform.workspace
+  resource_group = var.resource_group_name != null ? data.azurerm_resource_group.k8s[0] : azurerm_resource_group.k8s[0]
+}
+
+data "azurerm_resource_group" "k8s" {
+  count = var.resource_group_name != null ? 1 : 0
+  name  = var.resource_group_name
 }
 
 resource "azurerm_resource_group" "k8s" {
+  count    = var.resource_group_name == null ? 1 : 0
   name     = local.cluster_name
   location = var.location
 }
@@ -29,14 +36,14 @@ resource "azurerm_log_analytics_workspace" "logs" {
   # The WorkSpace name has to be unique across the whole of azure, not just the current subscription/tenant.
   name                = "${var.log_analytics_workspace_name}-${random_id.log_analytics_workspace_name_suffix.dec}"
   location            = var.log_analytics_workspace_location
-  resource_group_name = azurerm_resource_group.k8s.name
+  resource_group_name = local.resource_group.name
   sku                 = var.log_analytics_workspace_sku
 }
 
 resource "azurerm_log_analytics_solution" "logs" {
   solution_name         = "ContainerInsights"
   location              = azurerm_log_analytics_workspace.logs.location
-  resource_group_name   = azurerm_resource_group.k8s.name
+  resource_group_name   = local.resource_group.name
   workspace_resource_id = azurerm_log_analytics_workspace.logs.id
   workspace_name        = azurerm_log_analytics_workspace.logs.name
 
@@ -55,8 +62,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   name                       = local.cluster_name
   enable_pod_security_policy = false
-  location                   = azurerm_resource_group.k8s.location
-  resource_group_name        = azurerm_resource_group.k8s.name
+  location                   = local.resource_group.location
+  resource_group_name        = local.resource_group.name
   dns_prefix                 = local.cluster_name
   private_cluster_enabled    = false
 

@@ -20,6 +20,12 @@ variable "cluster_name" {
   description = "The Domino cluster name for the K8s cluster and resource group"
 }
 
+variable "resource_group_name" {
+  type        = string
+  default     = null
+  description = "Name of optional pre-existing resource group to install AKS in"
+}
+
 variable "location" {
   default = "West US 2"
 }
