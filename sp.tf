@@ -32,6 +32,10 @@ resource "random_password" "aks" {
 resource "azuread_service_principal" "sp" {
   application_id = azuread_application.app.application_id
 
+  provisioner "local-exec" {
+    command = "sleep 15"
+  }
+
   tags = [local.cluster_name]
 }
 
@@ -39,6 +43,10 @@ resource "azuread_service_principal_password" "sp" {
   service_principal_id = azuread_service_principal.sp.id
   value                = random_password.aks.result
   end_date             = "2099-01-01T01:00:00Z"
+
+  provisioner "local-exec" {
+    command = "sleep 15"
+  }
 }
 
 resource "azurerm_role_assignment" "sp" {
