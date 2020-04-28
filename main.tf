@@ -146,9 +146,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   tags                  = {}
 }
 
-locals {
-}
-
 resource "azurerm_storage_account" "domino" {
   name                     = local.storage_account_name
   resource_group_name      = local.resource_group.name
