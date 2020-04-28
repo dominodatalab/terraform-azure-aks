@@ -18,7 +18,7 @@ locals {
 
   # Terraform doesn't accept backslash escapes inside the replace function here for some reason,
   # nor does it allow for single quotes. This does, somehow, work, but messes up syntax highlighting.
-  storage_account_name = var.storage_account_name != null ? var.storage_account_name : substr("${replace(var.cluster_name, "/[_-]/", "")}dominostorage", 0, 24)
+  storage_account_name = var.storage_account_name != null ? var.storage_account_name : substr("${replace(local.cluster_name, "/[_-]/", "")}dominostorage", 0, 24)
 }
 #" this comment is to fix syntax highlighting
 
@@ -162,7 +162,7 @@ resource "azurerm_storage_container" "domino_containers" {
     key => value
   }
 
-  name                  = substr("${var.cluster_name}-${each.key}", 0, 63)
+  name                  = substr("${local.cluster_name}-${each.key}", 0, 63)
   storage_account_name  = azurerm_storage_account.domino.name
   container_access_type = each.value.container_access_type
 
