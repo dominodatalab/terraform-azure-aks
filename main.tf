@@ -91,10 +91,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     tags                  = {}
   }
 
-#  Commented out until we fix loadbalancer public ip provisioning issue, see sp.tf
-#  identity {
-#    type = "SystemAssigned"
-#  }
+  #  Commented out until we fix loadbalancer public ip provisioning issue, see sp.tf
+  #  identity {
+  #    type = "SystemAssigned"
+  #  }
 
   service_principal {
     client_id     = azuread_service_principal.sp.application_id

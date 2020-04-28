@@ -3,8 +3,8 @@
 # Assume there's a way around this, yet need to land this ASAP, so cordoning this off ito this
 # file. We should fix the issue with the managed identity and nuke all this.
 
-data "azurerm_subscription" "current" {	
-  subscription_id = var.subscription_id	
+data "azurerm_subscription" "current" {
+  subscription_id = var.subscription_id
 }
 
 resource "azuread_application" "app" {
