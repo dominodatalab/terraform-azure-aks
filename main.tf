@@ -15,7 +15,13 @@ terraform {
 locals {
   cluster_name   = var.cluster_name != null ? var.cluster_name : terraform.workspace
   resource_group = var.resource_group_name != null ? data.azurerm_resource_group.k8s[0] : azurerm_resource_group.k8s[0]
+
+  # Terraform doesn't accept backslash escapes inside the replace function here for some reason,
+  # nor does it allow for single quotes. This does, somehow, work, but messes up syntax highlighting.
+  storage_account_name = var.storage_account_name != null ? var.storage_account_name : substr("${replace(var.cluster_name, "/[_-]/", "")}dominostorage", 0, 24)
 }
+#" this comment is to fix syntax highlighting
+
 
 data "azurerm_resource_group" "k8s" {
   count = var.resource_group_name != null ? 1 : 0
@@ -138,4 +144,34 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   min_count             = each.value.min_count
   max_count             = each.value.max_count
   tags                  = {}
+}
+
+locals {
+}
+
+resource "azurerm_storage_account" "domino" {
+  name                     = local.storage_account_name
+  resource_group_name      = local.resource_group.name
+  location                 = local.resource_group.location
+  account_kind             = "StorageV2"
+  account_tier             = var.storage_account_tier
+  account_replication_type = var.storage_account_replication_type
+  access_tier              = "Hot"
+}
+
+resource "azurerm_storage_container" "domino_containers" {
+  for_each = {
+    for key, value in var.containers :
+    key => value
+  }
+
+  name                  = substr("${var.cluster_name}-${each.key}", 0, 63)
+  storage_account_name  = azurerm_storage_account.domino.name
+  container_access_type = each.value.container_access_type
+
+  lifecycle {
+    ignore_changes = [
+      name
+    ]
+  }
 }

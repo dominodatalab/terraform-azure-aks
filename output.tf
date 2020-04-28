@@ -5,3 +5,11 @@ output "kubeconfig" {
 output "resource_group" {
   value = local.resource_group
 }
+
+output "storage_account" {
+  value = azurerm_storage_account.domino
+}
+
+output "containers" {
+  value = azurerm_storage_container.domino_containers
+}

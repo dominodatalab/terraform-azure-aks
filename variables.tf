@@ -101,3 +101,34 @@ variable "node_pools" {
     }
   }
 }
+
+variable "storage_account_name" {
+  type = string
+  default = null
+  description = "Optional custom name for Azure storage account"
+}
+
+variable "storage_account_tier" {
+  type = string
+  default = "Standard"
+}
+
+variable "storage_account_replication_type" {
+  type = string
+  default = "LRS"
+}
+
+variable "containers" {
+  type = map(object({
+    container_access_type = string
+  }))
+
+  default = {
+    registry = {
+      container_access_type = "private"
+    }
+    backups = {
+      container_access_type = "private"
+    }
+  }
+}
