@@ -103,18 +103,18 @@ variable "node_pools" {
 }
 
 variable "storage_account_name" {
-  type = string
-  default = null
+  type        = string
+  default     = null
   description = "Optional custom name for Azure storage account"
 }
 
 variable "storage_account_tier" {
-  type = string
+  type    = string
   default = "Standard"
 }
 
 variable "storage_account_replication_type" {
-  type = string
+  type    = string
   default = "LRS"
 }
 
