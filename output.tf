@@ -13,3 +13,11 @@ output "resource_group" {
 output "storage_account" {
   value = azurerm_storage_account.domino
 }
+
+output "managed_identity" {
+  value = azurerm_kubernetes_cluster.aks.identity
+}
+
+output "subscription_id" {
+  value = data.azurerm_subscription.current.subscription_id
+}

@@ -118,6 +118,12 @@ variable "storage_account_replication_type" {
   default = "LRS"
 }
 
+variable "subscription_id" {
+  type        = string
+  description = "An existing Subscription ID to add the deployment"
+  default     = ""
+}
+
 variable "containers" {
   type = map(object({
     container_access_type = string
