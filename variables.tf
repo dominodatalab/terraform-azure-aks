@@ -20,6 +20,21 @@ variable "cluster_name" {
   description = "The Domino cluster name for the K8s cluster and resource group"
 }
 
+variable "containers" {
+  type = map(object({
+    container_access_type = string
+  }))
+
+  default = {
+    registry = {
+      container_access_type = "private"
+    }
+    backups = {
+      container_access_type = "private"
+    }
+  }
+}
+
 variable "resource_group_name" {
   type        = string
   default     = null
@@ -122,19 +137,4 @@ variable "subscription_id" {
   type        = string
   description = "An existing Subscription ID to add the deployment"
   default     = ""
-}
-
-variable "containers" {
-  type = map(object({
-    container_access_type = string
-  }))
-
-  default = {
-    registry = {
-      container_access_type = "private"
-    }
-    backups = {
-      container_access_type = "private"
-    }
-  }
 }
