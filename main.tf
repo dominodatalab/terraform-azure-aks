@@ -40,12 +40,8 @@ resource "azurerm_resource_group" "k8s" {
   tags     = local.tags
 }
 
-data "azurerm_subscription" "current" {
-  subscription_id = var.subscription_id
-}
-
 resource "azurerm_role_assignment" "sp" {
-  scope                = data.azurerm_subscription.current.id
-  role_definition_name = "Network Contributor"
+  scope                = var.resource_group_name != null ? data.azurerm_resource_group.k8s[0].id : azurerm_resource_group.k8s[0].id
+  role_definition_name = "Contributor"
   principal_id         = azurerm_kubernetes_cluster.aks.identity[0].principal_id
 }
