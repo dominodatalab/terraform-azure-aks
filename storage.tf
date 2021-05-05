@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "domino" {
   name                     = local.storage_account_name
-  resource_group_name      = local.resource_group.name
-  location                 = local.resource_group.location
+  resource_group_name      = data.azurerm_resource_group.k8s.name
+  location                 = data.azurerm_resource_group.k8s.location
   account_kind             = "StorageV2"
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_account_replication_type

@@ -24,8 +24,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   name                    = local.cluster_name
-  location                = local.resource_group.location
-  resource_group_name     = local.resource_group.name
+  location                = data.azurerm_resource_group.k8s.location
+  resource_group_name     = data.azurerm_resource_group.k8s.name
   dns_prefix              = local.cluster_name
   private_cluster_enabled = false
   sku_tier                = var.cluster_sku_tier

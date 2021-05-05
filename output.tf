@@ -7,7 +7,7 @@ output "kubeconfig" {
 }
 
 output "resource_group" {
-  value = local.resource_group
+  value = data.azurerm_resource_group.k8s
 }
 
 output "storage_account" {
