@@ -38,12 +38,12 @@ jobs:
           command: az aks install-cli
 
       - run:
-          name: Terraform workspace create
-          command: terraform workspace new ${WORKSPACE}
-
-      - run:
           name: Terraform init
           command: terraform init -backend-config=key=$WORKSPACE.tfstate
+
+      - run:
+          name: Terraform workspace create
+          command: terraform workspace new ${WORKSPACE}
 
       - run:
           name: Terraform validate
