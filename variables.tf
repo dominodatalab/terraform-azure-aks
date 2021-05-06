@@ -143,3 +143,9 @@ variable "tags" {
   default     = {}
   description = "Tags to apply to resources"
 }
+
+variable "kubernetes_version" {
+  type        = string
+  default     = null
+  description = "Optional Kubernetes version to provision"
+}

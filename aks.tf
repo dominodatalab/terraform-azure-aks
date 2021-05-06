@@ -23,6 +23,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix              = local.cluster_name
   private_cluster_enabled = false
   sku_tier                = var.cluster_sku_tier
+  kubernetes_version      = var.kubernetes_version
 
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
