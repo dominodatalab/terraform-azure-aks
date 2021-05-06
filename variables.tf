@@ -147,5 +147,5 @@ variable "tags" {
 variable "kubernetes_version" {
   type        = string
   default     = null
-  description = "Optional Kubernetes version to provision"
+  description = "Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm_kubernetes_service_versions."
 }
