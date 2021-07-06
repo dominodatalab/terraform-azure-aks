@@ -13,3 +13,11 @@ output "resource_group" {
 output "storage_account" {
   value = azurerm_storage_account.domino
 }
+
+output "aks_identity" {
+  value = azurerm_kubernetes_cluster.aks.kubelet_identity[0]
+}
+
+output "domino_acr" {
+  value = azurerm_container_registry.domino
+}
