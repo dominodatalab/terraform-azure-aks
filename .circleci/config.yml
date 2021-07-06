@@ -8,7 +8,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: microsoft/azure-cli
+      - image: mcr.microsoft.com/azure-cli
     environment:
       TERRAFORM_VERSION: 0.12.30
 
