@@ -102,7 +102,7 @@ variable "node_pools" {
       node_taints         = []
       enable_auto_scaling = true
       min_count           = 1
-      max_count           = 3
+      max_count           = 4
       initial_count       = 1
       max_pods            = 60
       os_disk_size_gb     = 128
