@@ -16,9 +16,8 @@ locals {
 }
 
 data "azurerm_kubernetes_service_versions" "selected" {
-  location        = data.azurerm_resource_group.aks.location
-  version_prefix  = var.kubernetes_version
-  include_preview = true
+  location       = data.azurerm_resource_group.aks.location
+  version_prefix = var.kubernetes_version
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
@@ -44,17 +43,18 @@ resource "azurerm_kubernetes_cluster" "aks" {
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
   default_node_pool {
-    enable_node_public_ip = false
-    name                  = "system"
-    node_count            = 1
-    vm_size               = "Standard_D8s_v4"
-    zones                 = ["1", "2", "3"]
-    os_disk_size_gb       = 128
-    enable_auto_scaling   = true
-    min_count             = 1
-    max_count             = 10
-    max_pods              = 60
-    tags                  = var.tags
+    enable_node_public_ip        = false
+    only_critical_addons_enabled = true
+    name                         = "system"
+    node_count                   = 1
+    vm_size                      = "standard_ds4_v2"
+    zones                        = ["1", "2", "3"]
+    os_disk_size_gb              = 128
+    enable_auto_scaling          = true
+    min_count                    = 1
+    max_count                    = 6
+    max_pods                     = 60
+    tags                         = var.tags
   }
   identity {
     type = "SystemAssigned"
@@ -84,12 +84,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 }
 
+
+
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
-  for_each = { for ng in local.zonal_node_pools : "${ng.node_pool_name}-${ng.node_pool_zone}" => ng }
+  for_each = { for ng in local.zonal_node_pools : "${ng.node_pool_name}${ng.node_pool_zone}" => ng }
 
   enable_node_public_ip = each.value.node_pool_spec.enable_node_public_ip
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  name                  = each.value.node_pool_name
+  name                  = each.key
   node_count            = each.value.node_pool_spec.initial_count
   vm_size               = each.value.node_pool_spec.vm_size
   zones                 = [each.value.node_pool_zone]

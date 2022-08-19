@@ -6,12 +6,12 @@ terraform {
     }
   }
 
-  # backend "azurerm" {
-  #   resource_group_name  = "dominoterraform"
-  #   storage_account_name = "dominoterraformstorage"
-  #   container_name       = "tfstate"
-  #   key                  = "dev.terraform.tfstate"
-  # }
+  backend "azurerm" {
+    resource_group_name  = "dominoterraform"
+    storage_account_name = "dominoterraformstorage"
+    container_name       = "tfstate"
+    key                  = "dev.terraform.tfstate"
+  }
 }
 
 provider "azurerm" {
@@ -20,16 +20,10 @@ provider "azurerm" {
 
 variable "api_server_authorized_ip_ranges" {
   type    = list(string)
-  default = ["0.0.0.0/0"]
 }
 
 variable "tags" {
   type = map(string)
-  default = {
-    "deploy_id"   = "mhaks"
-    "deploy_type" = "dev-azure-aks"
-    "user_email"  = "miguel.harmant@dominodatalab.com"
-  }
 }
 
 resource "azurerm_resource_group" "ci" {
