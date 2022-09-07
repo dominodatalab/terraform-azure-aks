@@ -6,12 +6,12 @@ terraform {
     }
   }
 
-  backend "azurerm" {
-    resource_group_name  = "dominoterraform"
-    storage_account_name = "dominoterraformstorage"
-    container_name       = "tfstate"
-    key                  = "dev.terraform.tfstate"
-  }
+  # backend "azurerm" {
+  #   resource_group_name  = "dominoterraform"
+  #   storage_account_name = "dominoterraformstorage"
+  #   container_name       = "tfstate"
+  #   key                  = "dev.terraform.tfstate"
+  # }
 }
 
 provider "azurerm" {
@@ -20,10 +20,14 @@ provider "azurerm" {
 
 variable "api_server_authorized_ip_ranges" {
   type    = list(string)
+  default = ["0.0.0.0/0"]
 }
 
 variable "tags" {
   type = map(string)
+  default = {
+    "key" = "value"
+  }
 }
 
 resource "azurerm_resource_group" "ci" {
@@ -35,7 +39,7 @@ resource "azurerm_resource_group" "ci" {
 module "aks" {
   source = "./.."
 
-  cluster_name                    = terraform.workspace
+  deploy_id                    = terraform.workspace
   resource_group                  = azurerm_resource_group.ci.id
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   tags                            = var.tags
