@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "domino" {
-  name                     = "${substr(replace(var.deploy_id, "/[_-]/", ""), 0, 11)}dominostorage"
+  name                     = replace(var.deploy_id, "/[_-]/", "")
   location                 = data.azurerm_resource_group.aks.location
   resource_group_name      = data.azurerm_resource_group.aks.name
   account_kind             = "StorageV2"
