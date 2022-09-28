@@ -1,9 +1,5 @@
 locals {
-  node_pools = {
-    for node_pool, attrs in var.node_pools :
-    node_pool => merge(attrs, lookup(var.node_pool_overrides, node_pool, {}))
-  }
-
+  node_pools = merge(var.node_pools, var.additional_node_pools)
   zonal_node_pools = flatten([for name, spec in local.node_pools : [
     for zone in spec.zones :
     {
@@ -32,13 +28,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ]
   }
 
-  name                    = var.deploy_id
-  location                = data.azurerm_resource_group.aks.location
-  resource_group_name     = data.azurerm_resource_group.aks.name
-  dns_prefix              = var.deploy_id
-  private_cluster_enabled = false
-  sku_tier                = var.cluster_sku_tier
-  kubernetes_version      = data.azurerm_kubernetes_service_versions.selected.latest_version
+  name                              = var.deploy_id
+  location                          = data.azurerm_resource_group.aks.location
+  resource_group_name               = data.azurerm_resource_group.aks.name
+  dns_prefix                        = var.deploy_id
+  private_cluster_enabled           = false
+  sku_tier                          = var.cluster_sku_tier
+  kubernetes_version                = data.azurerm_kubernetes_service_versions.selected.latest_version
+  role_based_access_control_enabled = true
 
   api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
 
@@ -46,14 +43,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
     enable_node_public_ip        = false
     only_critical_addons_enabled = true
     name                         = "system"
-    node_count                   = 1
-    vm_size                      = "standard_ds4_v2"
-    zones                        = ["1", "2", "3"]
-    os_disk_size_gb              = 128
+    node_labels                  = var.default_node_pool.node_labels
+    vm_size                      = var.default_node_pool.vm_size
+    zones                        = var.default_node_pool.zones
+    os_disk_size_gb              = var.default_node_pool.os_disk_size_gb
     enable_auto_scaling          = true
-    min_count                    = 1
-    max_count                    = 6
-    max_pods                     = 60
+    min_count                    = var.default_node_pool.min_count
+    max_count                    = var.default_node_pool.max_count
+    node_count                   = var.default_node_pool.initial_count
+    max_pods                     = var.default_node_pool.max_pods
     tags                         = var.tags
   }
   identity {
@@ -106,5 +104,4 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   lifecycle {
     ignore_changes = [node_count, max_count, tags]
   }
-
 }
