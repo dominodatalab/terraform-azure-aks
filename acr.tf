@@ -9,11 +9,22 @@ resource "azurerm_container_registry" "domino" {
   # Premium only
   public_network_access_enabled = var.registry_tier == "Premium" ? false : true
 
+  retention_policy {
+    # Premium only
+    enabled = var.registry_tier == "Premium"
+  }
+
   tags = var.tags
 }
 
 resource "azurerm_role_assignment" "aks_domino_acr" {
   scope                = azurerm_container_registry.domino.id
-  role_definition_name = "AcrPush"
+  role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+}
+
+resource "azurerm_role_assignment" "hephaestus_acr" {
+  scope                = azurerm_container_registry.domino.id
+  role_definition_name = "AcrPush"
+  principal_id         = azurerm_user_assigned_identity.hephaestus.principal_id
 }

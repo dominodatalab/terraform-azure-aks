@@ -37,7 +37,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
   target_resource_id         = azurerm_kubernetes_cluster.aks.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
 
-  log {
+  enabled_log {
     category = "cloud-controller-manager"
 
     retention_policy {
@@ -46,7 +46,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-  log {
+  enabled_log {
     category = "cluster-autoscaler"
 
     retention_policy {
@@ -55,7 +55,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-  log {
+  enabled_log {
     category = "csi-azuredisk-controller"
 
     retention_policy {
@@ -64,7 +64,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-  log {
+  enabled_log {
     category = "csi-azurefile-controller"
 
     retention_policy {
@@ -73,7 +73,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-  log {
+  enabled_log {
     category = "csi-snapshot-controller"
 
     retention_policy {
@@ -82,17 +82,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-  log {
-    category = "guard"
-    enabled  = false
-
-    retention_policy {
-      enabled = false
-      days    = 0
-    }
-  }
-
-  log {
+  enabled_log {
     category = "kube-apiserver"
 
     retention_policy {
@@ -101,28 +91,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-
-  log {
-    category = "kube-audit"
-    enabled  = false
-
-    retention_policy {
-      enabled = false
-      days    = 0
-    }
-  }
-
-  log {
-    category = "kube-audit-admin"
-    enabled  = false
-
-    retention_policy {
-      enabled = false
-      days    = 0
-    }
-  }
-
-  log {
+  enabled_log {
     category = "kube-controller-manager"
 
     retention_policy {
@@ -131,7 +100,7 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
     }
   }
 
-  log {
+  enabled_log {
     category = "kube-scheduler"
 
     retention_policy {

@@ -37,7 +37,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
   kubernetes_version                = data.azurerm_kubernetes_service_versions.selected.latest_version
   role_based_access_control_enabled = true
 
-  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  api_server_access_profile {
+    authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  }
 
   default_node_pool {
     name                         = "system"
@@ -58,6 +60,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
     type = "SystemAssigned"
   }
 
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
 
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id

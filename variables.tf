@@ -198,3 +198,8 @@ variable "registry_tier" {
   type        = string
   default     = "Standard"
 }
+
+variable "namespaces" {
+  type        = object({ platform = string, compute = string })
+  description = "Namespace that are used for generating the service account bindings"
+}

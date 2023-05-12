@@ -1,57 +1,159 @@
-version: 2
+version: 2.1
 
-# CI/CD Service Principal Permissions
-# - http://aksPrincipal/user_impersonation
-# - https://graph.windows.net/Application.ReadWrite.OwnedBy
-# - https://graph.microsoft.com/Application.ReadWrite.OwnedBy
+parameters:
+  terraform_version:
+    default: "1.4.5"
+    type: string
 
-jobs:
-  build:
-    docker:
-      - image: mcr.microsoft.com/azure-cli
-    environment:
-      TERRAFORM_VERSION: 1.3.6
+orbs:
+  terraform: circleci/terraform@3.2.0
 
+environment: &default_environment
+  WORKSPACE: << parameters.workspace >>
+
+commands:
+  set_env_vars:
     steps:
-      - checkout
-
-      - run:
-          name: Install Terraform
-          command: |
-            wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
-
       - run:
           name: Configure test cluster env
           command: |
-            echo 'export TF_VAR_tags=\{\"CIRCLE_BUILD_URL\"=\"${CIRCLE_BUILD_URL}\",\"CIRCLE_PR_NUMBER\"=\"${CIRCLE_PR_NUMBER}\",\"CIRCLE_PULL_REQUEST\"=\"${CIRCLE_PULL_REQUEST}\",\"CIRCLE_REPOSITORY_URL\"=\"${CIRCLE_REPOSITORY_URL}\"\}' >> $BASH_ENV
+            echo export TF_VAR_deploy_id=\"${WORKSPACE}\" >> $BASH_ENV
+            echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
-
+  install_tf:
+    parameters:
+      terraform_version:
+        type: string
+        default: << pipeline.parameters.terraform_version >>
+    steps:
+      - terraform/install:
+          terraform_version: << parameters.terraform_version >>
+  tf_init_apply:
+    steps:
       - run:
-          name: Terraform fmt
-          command: terraform fmt -check
-
-      - run:
-          name: Test Terraform
+          name: Terraform init/validate/apply
+          working_directory: tests
           command: |
-            cd tests
+            echo "Current dir: $(pwd)"
             terraform init
             terraform validate
             terraform workspace new ${WORKSPACE}
             terraform apply -auto-approve
-            terraform plan -detailed-exitcode
-
+  tf_destroy:
+    steps:
       - run:
           name: Terraform destroy
+          working_directory: tests
           command: |
-            cd tests
-            terraform destroy -auto-approve || (sleep 5m && terraform destroy -auto-approve)
+            echo "Current dir: $(pwd)"
+            terraform destroy --auto-approve || terraform destroy --auto-approve --refresh=false
           when: always
-
+  tf_ws_delete:
+    steps:
       - run:
           name: Terraform workspace delete
+          working_directory: tests
           command: |
-            cd tests
+            echo "Current dir: $(pwd)"
             terraform workspace select default
             terraform workspace delete ${WORKSPACE}
           when: always
+
+jobs:
+  pre-commit:
+    docker:
+      - image: cimg/python:3.11.1
+    parameters:
+      terraform_version:
+        type: string
+      workspace:
+        type: string
+        default: ci-<< pipeline.number >>
+    environment: *default_environment
+
+    steps:
+      - checkout
+      - install_tf
+      - run:
+          name: pre-commit
+          command: |
+            curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+            curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+            curl -L https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-amd64.tar.gz | tar -C /tmp -xzf - && chmod +x /tmp/terraform-docs && sudo mv /tmp/terraform-docs /usr/local/bin
+            pip3 install checkov pre-commit
+            SKIP=no-commit-to-branch pre-commit run --all-files
+
+  test-deploy:
+    docker:
+      - image: mcr.microsoft.com/azure-cli
+    parameters:
+      terraform_version:
+        type: string
+      workspace:
+        type: string
+        default: ci-<< pipeline.number >>
+    environment: *default_environment
+    steps:
+      - checkout
+      - install_tf
+      - set_env_vars
+      - tf_init_apply
+      - run:
+          name: Check drift
+          working_directory: tests
+          command: |
+            terraform plan -detailed-exitcode
+      - tf_destroy
+      - tf_ws_delete
+
+  test-upgrade:
+    docker:
+      - image: mcr.microsoft.com/azure-cli
+    parameters:
+      workspace:
+        type: string
+        default: ci-<< pipeline.number >>-update
+      terraform_version:
+        type: string
+    environment: *default_environment
+    steps:
+      - checkout
+      - install_tf
+      - set_env_vars
+      - run:
+          name: "Set module source to latest published release"
+          working_directory: tests
+          command: |
+            latest_tag="$(git tag | tail -1)"
+            export MOD_SOURCE="github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git?ref=${latest_tag}"
+            echo "Latest published release tag is: ${latest_tag}"
+            echo "Setting module source to: ${MOD_SOURCE}"
+            mv modules.tf.json modules.ori
+            jq --arg mod "$MOD_SOURCE" -e '.module.aks.source=$mod | del(.module.aks.namespaces)' modules.ori > modules.tf.json
+      - tf_init_apply
+      - run:
+          name: "Upgrade module by applying this commit"
+          working_directory: tests
+          command: |
+            echo "Testing terraform module upgrade"
+            cp modules.ori modules.tf.json
+            terraform init --reconfigure --upgrade
+            terraform validate
+            # https://github.com/hashicorp/terraform-provider-azurerm/issues/21805
+            terraform apply --auto-approve || terraform apply --auto-approve
+      - tf_destroy
+      - tf_ws_delete
+
+workflows:
+  test-deploy-workflow:
+    jobs:
+      - pre-commit:
+          terraform_version: << pipeline.parameters.terraform_version >>
+      - test-deploy:
+          terraform_version: << pipeline.parameters.terraform_version >>
+          requires:
+            - pre-commit
+      - test-upgrade:
+          terraform_version: << pipeline.parameters.terraform_version >>
+          requires:
+            - pre-commit
