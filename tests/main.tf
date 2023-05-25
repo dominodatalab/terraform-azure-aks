@@ -24,13 +24,3 @@ resource "azurerm_resource_group" "ci" {
   location = "westus2"
   tags     = var.tags
 }
-
-module "aks" {
-  source = "./.."
-
-  deploy_id                       = terraform.workspace
-  resource_group                  = azurerm_resource_group.ci.id
-  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
-  tags                            = var.tags
-  kubeconfig_output_path          = "${path.cwd}/kubeconfig"
-}

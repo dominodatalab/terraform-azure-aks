@@ -17,3 +17,10 @@ output "domino_acr" {
   description = "Azure Container Registry details"
   value       = azurerm_container_registry.domino
 }
+
+output "workload_identities" {
+  description = "service identities"
+  value = {
+    "hephaestus" = azurerm_user_assigned_identity.hephaestus
+  }
+}
