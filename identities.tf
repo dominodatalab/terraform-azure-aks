@@ -10,5 +10,5 @@ resource "azurerm_federated_identity_credential" "hephaestus" {
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
   parent_id           = azurerm_user_assigned_identity.hephaestus.id
-  subject             = "system:serviceaccount:${var.namespaces.platform}:hephaestus"
+  subject             = "system:serviceaccount:${var.namespaces.compute}:hephaestus"
 }
