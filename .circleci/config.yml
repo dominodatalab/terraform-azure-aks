@@ -121,10 +121,10 @@ jobs:
       - install_tf
       - set_env_vars
       - run:
-          name: "Set module source to latest published release"
+          name: "Set module source to latest domino release"
           working_directory: tests
           command: |
-            latest_tag="$(git tag | tail -1)"
+            latest_tag="v2.1.1"
             export MOD_SOURCE="github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git?ref=${latest_tag}"
             echo "Latest published release tag is: ${latest_tag}"
             echo "Setting module source to: ${MOD_SOURCE}"
