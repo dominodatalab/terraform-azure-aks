@@ -50,6 +50,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     zones                        = var.node_pools.system.zones
     os_disk_size_gb              = var.node_pools.system.os_disk_size_gb
     enable_auto_scaling          = var.node_pools.system.enable_auto_scaling
+    orchestrator_version         = data.azurerm_kubernetes_service_versions.selected.latest_version
     min_count                    = var.node_pools.system.min_count
     max_count                    = var.node_pools.system.max_count
     node_count                   = var.node_pools.system.initial_count
@@ -100,6 +101,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   node_labels           = each.value.node_pool_spec.node_labels
   node_taints           = each.value.node_pool_spec.node_taints
   enable_auto_scaling   = each.value.node_pool_spec.enable_auto_scaling
+  orchestrator_version  = azurerm_kubernetes_cluster.aks.kubernetes_version
   min_count             = each.value.node_pool_spec.min_count
   max_count             = each.value.node_pool_spec.max_count
   max_pods              = each.value.node_pool_spec.max_pods
