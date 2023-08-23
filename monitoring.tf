@@ -31,3 +31,46 @@ resource "azurerm_log_analytics_solution" "logs" {
     ]
   }
 }
+
+resource "azurerm_monitor_diagnostic_setting" "control_plane" {
+  name                       = "AKS Control Plane Logging"
+  target_resource_id         = azurerm_kubernetes_cluster.aks.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
+
+  enabled_log {
+    category = "cloud-controller-manager"
+  }
+
+  enabled_log {
+    category = "cluster-autoscaler"
+  }
+
+  enabled_log {
+    category = "csi-azuredisk-controller"
+  }
+
+  enabled_log {
+    category = "csi-azurefile-controller"
+  }
+
+  enabled_log {
+    category = "csi-snapshot-controller"
+  }
+
+  enabled_log {
+    category = "kube-apiserver"
+  }
+
+  enabled_log {
+    category = "kube-controller-manager"
+  }
+
+  enabled_log {
+    category = "kube-scheduler"
+  }
+
+  metric {
+    category = "AllMetrics"
+    enabled  = false
+  }
+}
