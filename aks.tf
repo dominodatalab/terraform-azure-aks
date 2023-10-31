@@ -23,6 +23,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
       default_node_pool[0].node_count,
       default_node_pool[0].max_count,
       default_node_pool[0].tags,
+      default_node_pool[0].upgrade_settings,
       # VM Size changes cause recreation of the entire cluster
       default_node_pool[0].vm_size
     ]
@@ -97,7 +98,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   vm_size               = each.value.node_pool_spec.vm_size
   zones                 = [each.value.node_pool_zone]
   os_disk_size_gb       = each.value.node_pool_spec.os_disk_size_gb
-  os_type               = each.value.node_pool_spec.node_os
+  os_type               = "Linux"
+  os_sku                = each.value.node_pool_spec.node_os
   node_labels           = each.value.node_pool_spec.node_labels
   node_taints           = each.value.node_pool_spec.node_taints
   enable_auto_scaling   = each.value.node_pool_spec.enable_auto_scaling
