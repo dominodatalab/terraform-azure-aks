@@ -83,7 +83,7 @@ variable "node_pools" {
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default"
       })
-      node_os             = optional(string, "Linux")
+      node_os             = optional(string, "AzureLinux")
       node_taints         = optional(list(string), [])
       enable_auto_scaling = optional(bool, true)
       min_count           = optional(number, 0)
@@ -99,7 +99,7 @@ variable "node_pools" {
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "platform"
       })
-      node_os             = optional(string, "Linux")
+      node_os             = optional(string, "AzureLinux")
       node_taints         = optional(list(string), [])
       enable_auto_scaling = optional(bool, true)
       min_count           = optional(number, 1)
@@ -116,7 +116,7 @@ variable "node_pools" {
         "dominodatalab.com/node-pool" = "default-gpu"
         "nvidia.com/gpu"              = "true"
       })
-      node_os = optional(string, "Linux")
+      node_os = optional(string, "AzureLinux")
       node_taints = optional(list(string), [
         "nvidia.com/gpu=true:NoExecute"
       ])
@@ -132,7 +132,7 @@ variable "node_pools" {
       vm_size               = optional(string, "standard_ds4_v2")
       zones                 = optional(list(string), ["1", "2", "3"])
       node_labels           = optional(map(string), {})
-      node_os               = optional(string, "Linux")
+      node_os               = optional(string, "AzureLinux")
       node_taints           = optional(list(string), [])
       enable_auto_scaling   = optional(bool, true)
       min_count             = optional(number, 1)
@@ -157,7 +157,7 @@ variable "additional_node_pools" {
     vm_size               = string
     zones                 = list(string)
     node_labels           = map(string)
-    node_os               = optional(string, "Linux")
+    node_os               = optional(string, "AzureLinux")
     node_taints           = optional(list(string), [])
     enable_auto_scaling   = optional(bool, true)
     min_count             = optional(number, 0)

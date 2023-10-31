@@ -2,6 +2,7 @@ resource "azurerm_user_assigned_identity" "hephaestus" {
   name                = "hephaestus"
   location            = data.azurerm_resource_group.aks.location
   resource_group_name = data.azurerm_resource_group.aks.name
+  tags                = var.tags
 }
 
 resource "azurerm_federated_identity_credential" "hephaestus" {
