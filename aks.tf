@@ -69,6 +69,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.logs.id
   }
 
+  auto_scaler_profile {
+    balance_similar_node_groups = true
+  }
+
   network_profile {
     load_balancer_sku = "standard"
     network_plugin    = "azure"
