@@ -203,3 +203,14 @@ variable "namespaces" {
   type        = object({ platform = string, compute = string })
   description = "Namespace that are used for generating the service account bindings"
 }
+
+variable "kubernetes_nat_gateway" {
+  type = object({
+    idle_timeout_in_minutes   = optional(number, 4)
+    managed_outbound_ip_count = number
+    }
+  )
+  default     = null
+  nullable    = true
+  description = "Managed NAT Gateway configuration"
+}

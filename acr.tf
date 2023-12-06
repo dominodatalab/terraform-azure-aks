@@ -9,6 +9,8 @@ resource "azurerm_container_registry" "domino" {
   # Premium only
   public_network_access_enabled = var.registry_tier == "Premium" ? false : true
 
+  zone_redundancy_enabled = var.registry_tier == "Premium"
+
   retention_policy {
     # Premium only
     enabled = var.registry_tier == "Premium"

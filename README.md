@@ -90,6 +90,7 @@ No modules.
 | <a name="input_containers"></a> [containers](#input\_containers) | storage containers to create | <pre>map(object({<br>    container_access_type = string<br>  }))</pre> | <pre>{<br>  "backups": {<br>    "container_access_type": "private"<br>  },<br>  "projects": {<br>    "container_access_type": "private"<br>  }<br>}</pre> | no |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino Deployment ID. | `string` | n/a | yes |
 | <a name="input_kubeconfig_output_path"></a> [kubeconfig\_output\_path](#input\_kubeconfig\_output\_path) | kubeconfig path | `string` | n/a | yes |
+| <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br>    idle_timeout_in_minutes   = optional(number, 4)<br>    managed_outbound_ip_count = number<br>    }<br>  )</pre> | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm\_kubernetes\_service\_versions. | `string` | `null` | no |
 | <a name="input_log_analytics_workspace_sku"></a> [log\_analytics\_workspace\_sku](#input\_log\_analytics\_workspace\_sku) | log analytics sku | `string` | `"PerGB2018"` | no |
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespace that are used for generating the service account bindings | `object({ platform = string, compute = string })` | n/a | yes |
