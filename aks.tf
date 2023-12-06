@@ -73,6 +73,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
     load_balancer_sku = "standard"
     network_plugin    = "azure"
     network_policy    = "calico"
+
+    outbound_type = var.kubernetes_nat_gateway == null ? "loadBalancer" : "managedNATGateway"
+
+    dynamic "nat_gateway_profile" {
+      for_each = var.kubernetes_nat_gateway == null ? [] : [var.kubernetes_nat_gateway]
+      content {
+        idle_timeout_in_minutes   = nat_gateway_profile.value.idle_timeout_in_minutes
+        managed_outbound_ip_count = nat_gateway_profile.value.managed_outbound_ip_count
+      }
+    }
   }
 
   tags = var.tags
