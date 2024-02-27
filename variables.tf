@@ -129,7 +129,7 @@ variable "node_pools" {
     })
     system = object({
       enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "standard_ds4_v2")
+      vm_size               = optional(string, "Standard_DS4_v2")
       zones                 = optional(list(string), ["1", "2", "3"])
       node_labels           = optional(map(string), {})
       node_os               = optional(string, "AzureLinux")
