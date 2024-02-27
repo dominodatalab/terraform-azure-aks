@@ -8,8 +8,3 @@ terraform {
     }
   }
 }
-
-provider "azurerm" {
-  partner_id = "31912fbf-f6dd-5176-bffb-0a01e8ac71f2"
-  features {}
-}
