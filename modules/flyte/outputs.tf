@@ -1,6 +1,6 @@
 output "info" {
   description = "Flyte info"
-  value       = {
+  value = {
     aks = {
       metadata_container     = azurerm_storage_container.flyte_metadata.name
       data_container         = azurerm_storage_container.flyte_data.name
