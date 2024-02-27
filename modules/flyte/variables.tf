@@ -1,35 +1,26 @@
-variable "azurerm_container_registry" {
-  type = object({
-    domino = object({
-      id = string
-    })
-  })
+variable "azurerm_container_registry_id" {
+  type        = string
+  description = "AzureRM Container Registry ID"
 }
 
-variable "azurerm_kubernetes_cluster" {
-  type = object({
-    aks = object({
-      name = string
-      oidc_issuer_url = string
-    })
-  })
+variable "azurerm_kubernetes_cluster_oidc_issuer_url" {
+  type        = string
+  description = "AzureRM Kubernetes Cluster OIDC issuer url"
 }
 
-variable "azurerm_resource_group" {
-  type = object({
-    aks = object({
-      location = string
-      name     = string
-    })
-  })
+variable "azurerm_resource_group_location" {
+  type        = string
+  description = "AzureRM Resource Group location"
 }
 
-variable "azurerm_storage_account" {
-  type = object({
-    domino = object({
-      name = string
-    })
-  })
+variable "azurerm_resource_group_name" {
+  type        = string
+  description = "AzureRM Resource Group name"
+}
+
+variable "azurerm_storage_account_name" {
+  type        = string
+  description = "AzureRM Storage Account name"
 }
 
 variable "deploy_id" {
@@ -43,7 +34,7 @@ variable "namespaces" {
     compute  = string
     platform = string
   })
-  description = "Namespace that are used for generating the service account bindings"
+  description = "Namespaces for generating service account bindings"
 }
 
 variable "tags" {
