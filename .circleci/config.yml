@@ -20,6 +20,11 @@ commands:
             echo export TF_VAR_deploy_id=\"${WORKSPACE}\" >> $BASH_ENV
             echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+  install_git:
+    steps:
+      - run:
+          name: Install git
+          command: apk add git
   install_tf:
     parameters:
       terraform_version:
@@ -118,6 +123,7 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
+      - install_git
       - install_tf
       - set_env_vars
       - run:
