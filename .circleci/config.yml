@@ -2,11 +2,11 @@ version: 2.1
 
 parameters:
   terraform_version:
-    default: "1.4.5"
+    default: "1.7.4"
     type: string
 
 orbs:
-  terraform: circleci/terraform@3.2.0
+  terraform: circleci/terraform@3.2.1
 
 environment: &default_environment
   WORKSPACE: << parameters.workspace >>
@@ -130,7 +130,7 @@ jobs:
           name: "Set module source to latest domino release"
           working_directory: tests
           command: |
-            latest_tag="v2.3.0"
+            latest_tag="v2.5.0"
             export MOD_SOURCE="github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git?ref=${latest_tag}"
             echo "Latest published release tag is: ${latest_tag}"
             echo "Setting module source to: ${MOD_SOURCE}"
