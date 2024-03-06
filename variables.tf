@@ -214,13 +214,3 @@ variable "kubernetes_nat_gateway" {
   nullable    = true
   description = "Managed NAT Gateway configuration"
 }
-
-variable "flyte" {
-  type = object({
-    enabled = optional(bool, false)
-  })
-  default     = {}
-  description = <<EOF
-    enabled = Whether to provision any Flyte related resources
-  EOF
-}
