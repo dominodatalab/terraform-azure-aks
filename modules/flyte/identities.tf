@@ -5,13 +5,22 @@ resource "azurerm_user_assigned_identity" "flyte_controlplane" {
   tags                = var.tags
 }
 
-resource "azurerm_federated_identity_credential" "flyte_controlplane" {
-  name                = "flyte_controlplane"
+resource "azurerm_federated_identity_credential" "flyteadmin" {
+  name                = "flyteadmin"
   resource_group_name = var.azurerm_resource_group_name
   audience            = ["api://AzureADTokenExchange"]
   issuer              = var.azurerm_kubernetes_cluster_oidc_issuer_url
   parent_id           = azurerm_user_assigned_identity.flyte_controlplane.id
-  subject             = "system:serviceaccount:${var.namespaces.platform}:flyte_controlplane"
+  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.serviceaccount_names.flyteadmin}"
+}
+
+resource "azurerm_federated_identity_credential" "flytepropeller" {
+  name                = "flytepropeller"
+  resource_group_name = var.azurerm_resource_group_name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = var.azurerm_kubernetes_cluster_oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.flyte_controlplane.id
+  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.serviceaccount_names.flytepropeller}"
 }
 
 resource "azurerm_user_assigned_identity" "flyte_dataplane" {
@@ -21,11 +30,11 @@ resource "azurerm_user_assigned_identity" "flyte_dataplane" {
   tags                = var.tags
 }
 
-resource "azurerm_federated_identity_credential" "flyte_dataplane" {
-  name                = "flyte_dataplane"
+resource "azurerm_federated_identity_credential" "datacatalog" {
+  name                = "datacatalog"
   resource_group_name = var.azurerm_resource_group_name
   audience            = ["api://AzureADTokenExchange"]
   issuer              = var.azurerm_kubernetes_cluster_oidc_issuer_url
   parent_id           = azurerm_user_assigned_identity.flyte_dataplane.id
-  subject             = "system:serviceaccount:${var.namespaces.compute}:flyte_dataplane"
+  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.serviceaccount_names.datacatalog}"
 }

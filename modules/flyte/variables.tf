@@ -1,8 +1,3 @@
-variable "azurerm_container_registry_id" {
-  type        = string
-  description = "AzureRM Container Registry ID"
-}
-
 variable "azurerm_kubernetes_cluster_oidc_issuer_url" {
   type        = string
   description = "AzureRM Kubernetes Cluster OIDC issuer url"
@@ -37,7 +32,18 @@ variable "namespaces" {
   description = "Namespaces for generating service account bindings"
 }
 
+variable "serviceaccount_names" {
+  type = object({
+    datacatalog    = optional(string, "datacatalog")
+    flyteadmin     = optional(string, "flyteadmin")
+    flytepropeller = optional(string, "flytepropeller")
+  })
+  default     = {}
+  description = "Service account names for Flyte"
+}
+
 variable "tags" {
   type        = map(string)
+  default     = {}
   description = "Tags to apply to resources"
 }

@@ -14,7 +14,6 @@ resource "azurerm_role_assignment" "aks_network" {
 module "flyte" {
   count                                      = (var.flyte.enabled == true) ? 1 : 0
   source                                     = "./modules/flyte"
-  azurerm_container_registry_id              = azurerm_container_registry.domino.id
   azurerm_kubernetes_cluster_oidc_issuer_url = azurerm_kubernetes_cluster.aks.oidc_issuer_url
   azurerm_resource_group_location            = data.azurerm_resource_group.aks.location
   azurerm_resource_group_name                = data.azurerm_resource_group.aks.name
