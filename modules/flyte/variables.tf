@@ -26,9 +26,10 @@ variable "deploy_id" {
 
 variable "namespaces" {
   type = object({
-    compute  = string
-    platform = string
+    compute  = optional(string, "domino-compute")
+    platform = optional(string, "domino-platform")
   })
+  default     = {}
   description = "Namespaces for generating service account bindings"
 }
 
