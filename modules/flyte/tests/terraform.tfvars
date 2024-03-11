@@ -1,0 +1,5 @@
+azurerm_kubernetes_cluster_oidc_issuer_url = "https://eastus.oic.prod-aks.azure.com/00000000-0000-0000-0000-000000000000"
+azurerm_resource_group_location            = "eastus"
+azurerm_resource_group_name                = "domino-test-rg"
+azurerm_storage_account_name               = "dominodatalab001"
+deploy_id                                  = "test12345"
