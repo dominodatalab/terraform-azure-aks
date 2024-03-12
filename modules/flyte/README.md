@@ -49,8 +49,8 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_flyte_controlplane_client_id"></a> [flyte\_controlplane\_client\_id](#output\_flyte\_controlplane\_client\_id) | Flyte controlplane client id |
-| <a name="output_flyte_data_container_name"></a> [flyte\_data\_container\_name](#output\_flyte\_data\_container\_name) | Flyte data storage container name |
-| <a name="output_flyte_dataplane_client_id"></a> [flyte\_dataplane\_client\_id](#output\_flyte\_dataplane\_client\_id) | Flyte dataplane client id |
-| <a name="output_flyte_metadata_container_name"></a> [flyte\_metadata\_container\_name](#output\_flyte\_metadata\_container\_name) | Flyte metadata storage container name |
+| <a name="output_controlplane_client_id"></a> [controlplane\_client\_id](#output\_controlplane\_client\_id) | Flyte controlplane client id |
+| <a name="output_data_container_name"></a> [data\_container\_name](#output\_data\_container\_name) | Flyte data storage container name |
+| <a name="output_dataplane_client_id"></a> [dataplane\_client\_id](#output\_dataplane\_client\_id) | Flyte dataplane client id |
+| <a name="output_metadata_container_name"></a> [metadata\_container\_name](#output\_metadata\_container\_name) | Flyte metadata storage container name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
