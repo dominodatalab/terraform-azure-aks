@@ -1,5 +1,5 @@
 resource "azurerm_role_definition" "flyte_storage_access" {
-  name  = "flyte-storage-access"
+  name  = "${var.deploy_id}-flyte-storage-access"
   scope = azurerm_storage_container.flyte_metadata.resource_manager_id
   permissions {
     actions = [
