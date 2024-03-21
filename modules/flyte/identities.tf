@@ -5,6 +5,7 @@ locals {
     flyteadmin     = "flyte_controlplane"
     flytepropeller = "flyte_controlplane"
     datacatalog    = "flyte_controlplane"
+    nucleus        = "flyte_dataplane"
   }
 }
 

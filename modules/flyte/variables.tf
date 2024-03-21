@@ -13,6 +13,11 @@ variable "azurerm_resource_group_name" {
   description = "AzureRM Resource Group name"
 }
 
+variable "azurerm_storage_account_id" {
+  type        = string
+  description = "AzureRM Storage Account ID"
+}
+
 variable "azurerm_storage_account_name" {
   type        = string
   description = "AzureRM Storage Account name"
@@ -38,9 +43,10 @@ variable "serviceaccount_names" {
     datacatalog    = optional(string, "datacatalog")
     flyteadmin     = optional(string, "flyteadmin")
     flytepropeller = optional(string, "flytepropeller")
+    nucleus        = optional(string, "nucleus")
   })
   default     = {}
-  description = "Service account names for Flyte"
+  description = "Service account names for workload identity federation"
 }
 
 variable "tags" {
