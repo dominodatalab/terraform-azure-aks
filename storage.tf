@@ -8,6 +8,7 @@ resource "azurerm_storage_account" "domino" {
   access_tier              = "Hot"
   min_tls_version          = "TLS1_2"
   tags                     = var.tags
+  is_hns_enabled           = true
 
   lifecycle {
     ignore_changes = [
