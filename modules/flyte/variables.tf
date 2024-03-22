@@ -13,14 +13,16 @@ variable "azurerm_resource_group_name" {
   description = "AzureRM Resource Group name"
 }
 
-variable "azurerm_storage_account_id" {
+variable "storage_account_tier" {
+  description = "Storage account tier"
   type        = string
-  description = "AzureRM Storage Account ID"
+  default     = "Standard"
 }
 
-variable "azurerm_storage_account_name" {
+variable "storage_account_replication_type" {
+  description = "Storage account replication type"
   type        = string
-  description = "AzureRM Storage Account name"
+  default     = "LRS"
 }
 
 variable "deploy_id" {

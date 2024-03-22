@@ -29,7 +29,7 @@ resource "azurerm_role_definition" "flyte_data_role" {
 #
 resource "azurerm_role_definition" "flyte_sas_role" {
   name  = "${var.deploy_id}-flyte-sas"
-  scope = var.azurerm_storage_account_id
+  scope = azurerm_storage_account.flyte.id
   permissions {
     actions = [
       "Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action"
@@ -50,7 +50,7 @@ resource "azurerm_role_assignment" "flyte_data_role_assignment" {
 }
 
 resource "azurerm_role_assignment" "flyte_sas_role_assignment" {
-  scope              = var.azurerm_storage_account_id
+  scope              = azurerm_storage_account.flyte.id
   role_definition_id = azurerm_role_definition.flyte_sas_role.role_definition_resource_id
   principal_id       = azuread_group.flyte_sas_group.object_id
 }

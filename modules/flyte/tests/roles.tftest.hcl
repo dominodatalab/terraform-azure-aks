@@ -1,16 +1,30 @@
-mock_provider "azuread" {}
 mock_provider "azurerm" {}
 
 run "test_roles" {
   command = plan
 
   assert {
-    condition     = azurerm_role_definition.flyte_sas_role.scope == var.azurerm_storage_account_id
-    error_message = "Incorrect Flyte SAS role scope"
+    condition = azurerm_role_definition.flyte_metadata_role.permissions[0].data_actions == toset([
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action",
+    ])
+    error_message = "Incorrect Flyte metadata role permissions"
   }
 
   assert {
-    condition     = azurerm_role_assignment.flyte_sas_role_assignment.scope == var.azurerm_storage_account_id
-    error_message = "Incorrect Flyte SAS role assignment scope"
+    condition = azurerm_role_definition.flyte_data_role.permissions[0].data_actions == toset([
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action",
+    ])
+    error_message = "Incorrect Flyte data role permissions"
+  }
+
+  assert {
+    condition = azurerm_role_definition.flyte_sas_role.permissions[0].actions == tolist([
+      "Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action"
+    ])
+    error_message = "Incorrect Flyte SAS role permissions"
   }
 }

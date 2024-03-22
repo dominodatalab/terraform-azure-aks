@@ -1,4 +1,3 @@
-mock_provider "azuread" {}
 mock_provider "azurerm" {}
 
 run "test_identities" {

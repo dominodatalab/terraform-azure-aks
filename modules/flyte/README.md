@@ -32,6 +32,7 @@ No modules.
 | [azurerm_role_definition.flyte_data_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_role_definition.flyte_metadata_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_role_definition.flyte_sas_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_storage_account.flyte](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_container.flyte_data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
@@ -43,11 +44,11 @@ No modules.
 | <a name="input_azurerm_kubernetes_cluster_oidc_issuer_url"></a> [azurerm\_kubernetes\_cluster\_oidc\_issuer\_url](#input\_azurerm\_kubernetes\_cluster\_oidc\_issuer\_url) | AzureRM Kubernetes Cluster OIDC issuer url | `string` | n/a | yes |
 | <a name="input_azurerm_resource_group_location"></a> [azurerm\_resource\_group\_location](#input\_azurerm\_resource\_group\_location) | AzureRM Resource Group location | `string` | n/a | yes |
 | <a name="input_azurerm_resource_group_name"></a> [azurerm\_resource\_group\_name](#input\_azurerm\_resource\_group\_name) | AzureRM Resource Group name | `string` | n/a | yes |
-| <a name="input_azurerm_storage_account_id"></a> [azurerm\_storage\_account\_id](#input\_azurerm\_storage\_account\_id) | AzureRM Storage Account ID | `string` | n/a | yes |
-| <a name="input_azurerm_storage_account_name"></a> [azurerm\_storage\_account\_name](#input\_azurerm\_storage\_account\_name) | AzureRM Storage Account name | `string` | n/a | yes |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino deployment ID | `string` | n/a | yes |
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespaces for generating service account bindings | <pre>object({<br>    compute  = optional(string, "domino-compute")<br>    platform = optional(string, "domino-platform")<br>  })</pre> | `{}` | no |
 | <a name="input_serviceaccount_names"></a> [serviceaccount\_names](#input\_serviceaccount\_names) | Service account names for workload identity federation | <pre>object({<br>    datacatalog    = optional(string, "datacatalog")<br>    flyteadmin     = optional(string, "flyteadmin")<br>    flytepropeller = optional(string, "flytepropeller")<br>    nucleus        = optional(string, "nucleus")<br>  })</pre> | `{}` | no |
+| <a name="input_storage_account_replication_type"></a> [storage\_account\_replication\_type](#input\_storage\_account\_replication\_type) | Storage account replication type | `string` | `"LRS"` | no |
+| <a name="input_storage_account_tier"></a> [storage\_account\_tier](#input\_storage\_account\_tier) | Storage account tier | `string` | `"Standard"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to resources | `map(string)` | `{}` | no |
 
 ## Outputs
