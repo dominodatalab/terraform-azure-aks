@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "flyte" {
   name                     = join("", [replace(var.deploy_id, "/[_-]/", ""), "flyte"])
-  location                 = var.azurerm_resource_group_location
-  resource_group_name      = var.azurerm_resource_group_name
+  location                 = var.resource_group_location
+  resource_group_name      = var.resource_group_name
   account_kind             = "StorageV2"
   account_tier             = var.storage_account_tier
   account_replication_type = var.storage_account_replication_type

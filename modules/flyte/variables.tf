@@ -1,16 +1,47 @@
-variable "azurerm_kubernetes_cluster_oidc_issuer_url" {
+variable "deploy_id" {
+  description = "Domino deployment id"
   type        = string
-  description = "AzureRM Kubernetes Cluster OIDC issuer url"
+  nullable    = false
 }
 
-variable "azurerm_resource_group_location" {
+variable "oidc_issuer_url" {
+  description = "OIDC issuer url"
   type        = string
-  description = "AzureRM Resource Group location"
+  nullable    = false
 }
 
-variable "azurerm_resource_group_name" {
+variable "resource_group_location" {
+  description = "Resource group location"
   type        = string
-  description = "AzureRM Resource Group name"
+  nullable    = false
+}
+
+variable "resource_group_name" {
+  description = "Resource group name"
+  type        = string
+  nullable    = false
+}
+
+### Variables with default values ###
+
+variable "namespaces" {
+  description = "Namespaces for workload identity federation"
+  type = object({
+    compute  = optional(string, "domino-compute")
+    platform = optional(string, "domino-platform")
+  })
+  default = {}
+}
+
+variable "service_account_names" {
+  description = "Service account names for workload identity federation"
+  type = object({
+    datacatalog    = optional(string, "datacatalog")
+    flyteadmin     = optional(string, "flyteadmin")
+    flytepropeller = optional(string, "flytepropeller")
+    nucleus        = optional(string, "nucleus")
+  })
+  default = {}
 }
 
 variable "storage_account_tier" {
@@ -25,34 +56,8 @@ variable "storage_account_replication_type" {
   default     = "LRS"
 }
 
-variable "deploy_id" {
-  type        = string
-  description = "Domino deployment ID"
-  nullable    = false
-}
-
-variable "namespaces" {
-  type = object({
-    compute  = optional(string, "domino-compute")
-    platform = optional(string, "domino-platform")
-  })
-  default     = {}
-  description = "Namespaces for generating service account bindings"
-}
-
-variable "serviceaccount_names" {
-  type = object({
-    datacatalog    = optional(string, "datacatalog")
-    flyteadmin     = optional(string, "flyteadmin")
-    flytepropeller = optional(string, "flytepropeller")
-    nucleus        = optional(string, "nucleus")
-  })
-  default     = {}
-  description = "Service account names for workload identity federation"
-}
-
 variable "tags" {
+  description = "Tags to apply to resources"
   type        = map(string)
   default     = {}
-  description = "Tags to apply to resources"
 }
