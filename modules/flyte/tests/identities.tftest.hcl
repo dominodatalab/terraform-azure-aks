@@ -1,4 +1,3 @@
-mock_provider "azuread" {}
 mock_provider "azurerm" {}
 
 run "test_identities" {
@@ -10,7 +9,7 @@ run "test_identities" {
   }
 
   assert {
-    condition     = azurerm_user_assigned_identity.this["flyte_controlplane"].resource_group_name == var.azurerm_resource_group_name
+    condition     = azurerm_user_assigned_identity.this["flyte_controlplane"].resource_group_name == var.resource_group_name
     error_message = "Incorrect user-assigned identity resource group name for flyte_controlplane"
   }
 
@@ -20,7 +19,7 @@ run "test_identities" {
   }
 
   assert {
-    condition     = azurerm_user_assigned_identity.this["flyte_dataplane"].resource_group_name == var.azurerm_resource_group_name
+    condition     = azurerm_user_assigned_identity.this["flyte_dataplane"].resource_group_name == var.resource_group_name
     error_message = "Incorrect user-assigned identity resource group name for flyte_dataplane"
   }
 
@@ -30,7 +29,7 @@ run "test_identities" {
   }
 
   assert {
-    condition     = azurerm_federated_identity_credential.this["flyteadmin"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.serviceaccount_names["flyteadmin"]}"
+    condition     = azurerm_federated_identity_credential.this["flyteadmin"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names.flyteadmin}"
     error_message = "Incorrect federated identity credential subject for flyteadmin"
   }
 
@@ -40,7 +39,7 @@ run "test_identities" {
   }
 
   assert {
-    condition     = azurerm_federated_identity_credential.this["flytepropeller"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.serviceaccount_names["flytepropeller"]}"
+    condition     = azurerm_federated_identity_credential.this["flytepropeller"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names.flytepropeller}"
     error_message = "Incorrect federated identity credential subject for flytepropeller"
   }
 
@@ -50,7 +49,17 @@ run "test_identities" {
   }
 
   assert {
-    condition     = azurerm_federated_identity_credential.this["datacatalog"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.serviceaccount_names["datacatalog"]}"
+    condition     = azurerm_federated_identity_credential.this["datacatalog"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names.datacatalog}"
     error_message = "Incorrect federated identity credential subject for datacatalog"
+  }
+
+  assert {
+    condition     = azurerm_federated_identity_credential.this["nucleus"].name == "nucleus"
+    error_message = "Incorrect federated identity credential name for nucleus"
+  }
+
+  assert {
+    condition     = azurerm_federated_identity_credential.this["nucleus"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names.nucleus}"
+    error_message = "Incorrect federated identity credential subject for nucleus"
   }
 }
