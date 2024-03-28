@@ -1,28 +1,33 @@
 locals {
-  identities = ["controlplane", "dataplane"]
   # Kubernetes service account to user-assigned managed identity mapping
-  mapping = {
-    flyteadmin     = "controlplane"
-    flytepropeller = "controlplane"
-    datacatalog    = "controlplane"
-    nucleus        = "dataplane"
+  federated_identity_mapping = {
+    flyteadmin     = azurerm_user_assigned_identity.flyte_controlplane.id
+    flytepropeller = azurerm_user_assigned_identity.flyte_controlplane.id
+    datacatalog    = azurerm_user_assigned_identity.flyte_controlplane.id
+    nucleus        = azurerm_user_assigned_identity.flyte_dataplane.id
   }
 }
 
-resource "azurerm_user_assigned_identity" "flyte" {
-  for_each            = toset(local.identities)
-  name                = "${var.deploy_id}-flyte-${each.key}"
+resource "azurerm_user_assigned_identity" "flyte_controlplane" {
+  name                = "${var.deploy_id}-flyte-controlplane"
+  location            = var.resource_group_location
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
+}
+
+resource "azurerm_user_assigned_identity" "flyte_dataplane" {
+  name                = "${var.deploy_id}-flyte-dataplane"
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
   tags                = var.tags
 }
 
 resource "azurerm_federated_identity_credential" "this" {
-  for_each            = local.mapping
+  for_each            = local.federated_identity_mapping
   name                = "${var.deploy_id}-${each.key}"
   resource_group_name = var.resource_group_name
   audience            = ["api://AzureADTokenExchange"]
   issuer              = var.oidc_issuer_url
-  parent_id           = azurerm_user_assigned_identity.flyte[each.value].id
+  parent_id           = each.value
   subject             = "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names[each.key]}"
 }

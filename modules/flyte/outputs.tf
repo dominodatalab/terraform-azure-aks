@@ -9,11 +9,11 @@ output "data_container_name" {
 }
 
 output "controlplane_client_id" {
-  value       = azurerm_user_assigned_identity.flyte["controlplane"].client_id
+  value       = azurerm_user_assigned_identity.flyte_controlplane.client_id
   description = "Flyte controlplane client id"
 }
 
 output "dataplane_client_id" {
-  value       = azurerm_user_assigned_identity.flyte["dataplane"].client_id
+  value       = azurerm_user_assigned_identity.flyte_dataplane.client_id
   description = "Flyte dataplane client id"
 }

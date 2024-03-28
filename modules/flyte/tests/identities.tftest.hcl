@@ -4,22 +4,22 @@ run "test_identities" {
   command = plan
 
   assert {
-    condition     = azurerm_user_assigned_identity.flyte["controlplane"].name == "${var.deploy_id}-flyte-controlplane"
+    condition     = azurerm_user_assigned_identity.flyte_controlplane.name == "${var.deploy_id}-flyte-controlplane"
     error_message = "Incorrect user-assigned identity name for controlplane"
   }
 
   assert {
-    condition     = azurerm_user_assigned_identity.flyte["controlplane"].resource_group_name == var.resource_group_name
+    condition     = azurerm_user_assigned_identity.flyte_controlplane.resource_group_name == var.resource_group_name
     error_message = "Incorrect user-assigned identity resource group name for controlplane"
   }
 
   assert {
-    condition     = azurerm_user_assigned_identity.flyte["dataplane"].name == "${var.deploy_id}-flyte-dataplane"
+    condition     = azurerm_user_assigned_identity.flyte_dataplane.name == "${var.deploy_id}-flyte-dataplane"
     error_message = "Incorrect user-assigned identity name for dataplane"
   }
 
   assert {
-    condition     = azurerm_user_assigned_identity.flyte["dataplane"].resource_group_name == var.resource_group_name
+    condition     = azurerm_user_assigned_identity.flyte_dataplane.resource_group_name == var.resource_group_name
     error_message = "Incorrect user-assigned identity resource group name for dataplane"
   }
 
