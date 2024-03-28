@@ -1,5 +1,5 @@
-resource "azurerm_role_definition" "flyte_metadata_role" {
-  name  = "${var.deploy_id}-flyte-metadata"
+resource "azurerm_role_definition" "flyte_metadata" {
+  name  = "${var.deploy_id}-flyte-metadata-role"
   scope = azurerm_storage_container.flyte_metadata.resource_manager_id
   permissions {
     data_actions = [
@@ -10,8 +10,8 @@ resource "azurerm_role_definition" "flyte_metadata_role" {
   }
 }
 
-resource "azurerm_role_definition" "flyte_data_role" {
-  name  = "${var.deploy_id}-flyte-data"
+resource "azurerm_role_definition" "flyte_data" {
+  name  = "${var.deploy_id}-flyte-data-role"
   scope = azurerm_storage_container.flyte_data.resource_manager_id
   permissions {
     data_actions = [
@@ -27,30 +27,30 @@ resource "azurerm_role_definition" "flyte_data_role" {
 # of the storage account, the resource group, or the subscription.
 # https://learn.microsoft.com/en-us/rest/api/storageservices/get-user-delegation-key
 #
-resource "azurerm_role_definition" "flyte_sas_role" {
-  name  = "${var.deploy_id}-flyte-sas"
+resource "azurerm_role_definition" "flyte_sas" {
+  name  = "${var.deploy_id}-flyte-sas-role"
   scope = azurerm_storage_account.flyte.id
   permissions {
     actions = [
-      "Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action"
+      "Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action",
     ]
   }
 }
 
-resource "azurerm_role_assignment" "flyte_metadata_role_assignment" {
+resource "azurerm_role_assignment" "flyte_metadata" {
   scope              = azurerm_storage_container.flyte_metadata.resource_manager_id
-  role_definition_id = azurerm_role_definition.flyte_metadata_role.role_definition_resource_id
-  principal_id       = azuread_group.flyte_metadata_group.object_id
+  role_definition_id = azurerm_role_definition.flyte_metadata.role_definition_resource_id
+  principal_id       = azuread_group.flyte_metadata.object_id
 }
 
-resource "azurerm_role_assignment" "flyte_data_role_assignment" {
+resource "azurerm_role_assignment" "flyte_data" {
   scope              = azurerm_storage_container.flyte_data.resource_manager_id
-  role_definition_id = azurerm_role_definition.flyte_data_role.role_definition_resource_id
-  principal_id       = azuread_group.flyte_data_group.object_id
+  role_definition_id = azurerm_role_definition.flyte_data.role_definition_resource_id
+  principal_id       = azuread_group.flyte_data.object_id
 }
 
-resource "azurerm_role_assignment" "flyte_sas_role_assignment" {
+resource "azurerm_role_assignment" "flyte_sas" {
   scope              = azurerm_storage_account.flyte.id
-  role_definition_id = azurerm_role_definition.flyte_sas_role.role_definition_resource_id
-  principal_id       = azuread_group.flyte_sas_group.object_id
+  role_definition_id = azurerm_role_definition.flyte_sas.role_definition_resource_id
+  principal_id       = azuread_group.flyte_sas.object_id
 }
