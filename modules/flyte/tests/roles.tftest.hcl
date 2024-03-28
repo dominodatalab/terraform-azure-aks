@@ -4,7 +4,7 @@ run "test_roles" {
   command = plan
 
   assert {
-    condition = azurerm_role_definition.flyte_metadata_role.permissions[0].data_actions == toset([
+    condition = azurerm_role_definition.flyte_metadata.permissions[0].data_actions == toset([
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action",
@@ -13,7 +13,7 @@ run "test_roles" {
   }
 
   assert {
-    condition = azurerm_role_definition.flyte_data_role.permissions[0].data_actions == toset([
+    condition = azurerm_role_definition.flyte_data.permissions[0].data_actions == toset([
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action",
@@ -22,7 +22,7 @@ run "test_roles" {
   }
 
   assert {
-    condition = azurerm_role_definition.flyte_sas_role.permissions[0].actions == tolist([
+    condition = azurerm_role_definition.flyte_sas.permissions[0].actions == tolist([
       "Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action"
     ])
     error_message = "Incorrect Flyte SAS role permissions"

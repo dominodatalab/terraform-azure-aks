@@ -22,20 +22,20 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azuread_group.flyte_data_group](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
-| [azuread_group.flyte_metadata_group](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
-| [azuread_group.flyte_sas_group](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
+| [azuread_group.flyte_data](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
+| [azuread_group.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
+| [azuread_group.flyte_sas](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
 | [azurerm_federated_identity_credential.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
-| [azurerm_role_assignment.flyte_data_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.flyte_metadata_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.flyte_sas_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_definition.flyte_data_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
-| [azurerm_role_definition.flyte_metadata_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
-| [azurerm_role_definition.flyte_sas_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_assignment.flyte_data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.flyte_sas](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.flyte_data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.flyte_sas](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_storage_account.flyte](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_container.flyte_data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_container.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
-| [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
+| [azurerm_user_assigned_identity.flyte](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 
 ## Inputs
 
