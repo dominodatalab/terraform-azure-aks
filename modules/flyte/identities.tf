@@ -1,7 +1,7 @@
 locals {
   # Kubernetes service account to user-assigned managed identity mapping
   federated_identity_mapping = {
-    flyteadmin     = azurerm_user_assigned_identity.flyte_controlplane.id
+    flyteadmin     = azurerm_user_assigned_identity.flyte_dataplane.id
     flytepropeller = azurerm_user_assigned_identity.flyte_controlplane.id
     datacatalog    = azurerm_user_assigned_identity.flyte_controlplane.id
     nucleus        = azurerm_user_assigned_identity.flyte_dataplane.id
