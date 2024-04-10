@@ -214,3 +214,27 @@ variable "kubernetes_nat_gateway" {
   nullable    = true
   description = "Managed NAT Gateway configuration"
 }
+
+variable "cni_overlay_enabled" {
+  description = "Flag to determine whether to use overlay network settings"
+  type        = bool
+  default     = false
+}
+
+variable "dns_service_ip" {
+  description = "IP address assigned to the Kubernetes DNS service"
+  type        = string
+  default     = "100.97.0.10"
+}
+
+variable "service_cidr" {
+  description = "CIDR block for Kubernetes services"
+  type        = string
+  default     = "100.97.0.0/16"
+}
+
+variable "pod_cidr" {
+  description = "CIDR block for Kubernetes pods"
+  type        = string
+  default     = "192.168.0.0/16"
+}
