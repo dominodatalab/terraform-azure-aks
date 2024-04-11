@@ -222,19 +222,19 @@ variable "cni_overlay_enabled" {
 }
 
 variable "dns_service_ip" {
-  description = "IP address assigned to the Kubernetes DNS service"
+  description = "IP address assigned to the Kubernetes DNS service, used when CNI Overlay is enabled"
   type        = string
   default     = "100.97.0.10"
 }
 
 variable "service_cidr" {
-  description = "CIDR block for Kubernetes services"
+  description = "CIDR block for Kubernetes services, used  when CNI Overlay is enabled"
   type        = string
   default     = "100.97.0.0/16"
 }
 
 variable "pod_cidr" {
-  description = "CIDR block for Kubernetes pods"
+  description = "CIDR block for Kubernetes pods, used when CNI Overlay is enabled"
   type        = string
   default     = "192.168.0.0/16"
 }
