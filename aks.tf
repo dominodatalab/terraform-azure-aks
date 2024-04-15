@@ -74,9 +74,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   network_profile {
-    load_balancer_sku = "standard"
-    network_plugin    = "azure"
-    network_policy    = "calico"
+    load_balancer_sku   = "standard"
+    network_plugin      = "azure"
+    network_policy      = "calico"
+    network_plugin_mode = var.cni_overlay_enabled ? "overlay" : null
+    dns_service_ip      = var.cni_overlay_enabled ? var.dns_service_ip : null
+    service_cidr        = var.cni_overlay_enabled ? var.service_cidr : null
+    pod_cidr            = var.cni_overlay_enabled ? var.pod_cidr : null
 
     outbound_type = var.kubernetes_nat_gateway == null ? "loadBalancer" : "managedNATGateway"
 
