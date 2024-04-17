@@ -17,8 +17,8 @@ resource "azurerm_private_endpoint" "ep_object" {
   }
 
   private_dns_zone_group {
-    name                 = var.private_DNS_zone
-    private_dns_zone_ids = [var.private_DNS_zone_id]
+    name                 = var.private_dns_zone
+    private_dns_zone_ids = [var.private_dns_zone_id]
   }
 
   lifecycle {

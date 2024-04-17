@@ -8,16 +8,6 @@ variable "subnet_id" {
   type        = string
 }
 
-variable "service" {
-  description = "Name of related service, used in diagnostic settings, private endpoints, internal load balancer and external load balancer."
-  type        = string
-}
-
-variable "vnet_name" {
-  description = "Name of vnet, used for private endpoints"
-  type        = string
-}
-
 variable "resource_id" {
   description = "resource id of the resource of which to create a private endpoint for, ommit if looking for any 'resource_type'"
   type        = string
@@ -43,13 +33,12 @@ variable "private_endpoint_name" {
   type        = string
 }
 
-variable "private_DNS_zone" {
+variable "private_dns_zone" {
   description = "Private DNS zone name"
   type        = string
 }
 
-variable "private_DNS_zone_id" {
+variable "private_dns_zone_id" {
   description = "Private DNS zone ID"
   type        = string
 }
-

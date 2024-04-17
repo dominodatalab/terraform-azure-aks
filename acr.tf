@@ -34,18 +34,18 @@ resource "azurerm_container_registry" "domino" {
 ########################## Private DNS Zone #############################
 #########################################################################
 # create private dns zone for acr
-resource "azurerm_private_dns_zone" "acr-private-dns-zone" {
+resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
   count               = var.private_acr_enabled ? 1 : 0
   name                = "acr-${var.deploy_id}.privatelink.${lower(replace("${data.azurerm_resource_group.aks.location}", " ", ""))}.azmk8s.io"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
 # link the dns provate zone to the AKS VNET
-resource "azurerm_private_dns_zone_virtual_network_link" "private-dns-zone-acr-vnet-link" {
+resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_vnet_link" {
   count                 = var.private_acr_enabled ? 1 : 0
   name                  = "acr-vnet-dns-link"
   resource_group_name   = data.azurerm_resource_group.aks.name
-  private_dns_zone_name = azurerm_private_dns_zone.acr-private-dns-zone[0].name
-  virtual_network_id    = data.azurerm_virtual_network.aks-vnet[0].id
+  private_dns_zone_name = azurerm_private_dns_zone.acr_private_dns_zone[0].name
+  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
 }
 #########################################################################
 ########################## Private EndPoint #############################
@@ -57,14 +57,12 @@ module "domino_acr_ep" {
   resource_id           = azurerm_container_registry.domino.id
   nic_name              = "acr-${var.deploy_id}"
   private_endpoint_name = "acr-${var.deploy_id}"
-  private_DNS_zone      = azurerm_private_dns_zone.acr-private-dns-zone[0].name
-  private_DNS_zone_id   = azurerm_private_dns_zone.acr-private-dns-zone[0].id
+  private_dns_zone      = azurerm_private_dns_zone.acr_private_dns_zone[0].name
+  private_dns_zone_id   = azurerm_private_dns_zone.acr_private_dns_zone[0].id
   sub_resource          = "registry"
   location              = data.azurerm_resource_group.aks.location
-  service               = "registry"
   resource_group_name   = data.azurerm_resource_group.aks.name
-  vnet_name             = var.aks_vnet_name
-  subnet_id             = data.azurerm_subnet.aks-subnet[0].id
+  subnet_id             = data.azurerm_subnet.aks_subnet[0].id
 }
 #########################################################################
 ########################### Role Assignment #############################

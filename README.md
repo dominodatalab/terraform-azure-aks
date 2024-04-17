@@ -56,7 +56,9 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_domino_acr_ep"></a> [domino\_acr\_ep](#module\_domino\_acr\_ep) | ./modules/private_endpoint | n/a |
 
 ## Resources
 
@@ -69,28 +71,43 @@ No modules.
 | [azurerm_log_analytics_solution.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_solution) | resource |
 | [azurerm_log_analytics_workspace.logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
 | [azurerm_monitor_diagnostic_setting.control_plane](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
+| [azurerm_private_dns_zone.acr_private_dns_zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone.aks_private_dns_zone](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_acr_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_aks_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_role_assignment.aks_domino_acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_network](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.hephaestus_acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.identity_assign_pdnsz](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.identity_assign_rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.identity_assign_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_storage_account.domino](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_container.domino_containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
+| [azurerm_user_assigned_identity.aks_assigned_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.hephaestus](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [random_id.log_analytics_workspace_name_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [azurerm_kubernetes_service_versions.selected](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/kubernetes_service_versions) | data source |
 | [azurerm_resource_group.aks](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+| [azurerm_subnet.aks_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
 | [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
+| [azurerm_virtual_network.aks_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/virtual_network) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | additional node pools | <pre>map(object({<br>    enable_node_public_ip = optional(bool, false)<br>    vm_size               = string<br>    zones                 = list(string)<br>    node_labels           = map(string)<br>    node_os               = optional(string, "AzureLinux")<br>    node_taints           = optional(list(string), [])<br>    enable_auto_scaling   = optional(bool, true)<br>    min_count             = optional(number, 0)<br>    max_count             = number<br>    initial_count         = optional(number, 0)<br>    max_pods              = optional(number, 30)<br>    os_disk_size_gb       = optional(number, 128)<br>  }))</pre> | `{}` | no |
+| <a name="input_address_prefixes"></a> [address\_prefixes](#input\_address\_prefixes) | CIDR block for AKS and ACR Subnet | `list(string)` | <pre>[<br>  "172.16.0.0/24"<br>]</pre> | no |
+| <a name="input_aks_subnet_name"></a> [aks\_subnet\_name](#input\_aks\_subnet\_name) | ACR/AKS subnet name, used when private\_acr\_enabled is true or private\_cluster\_enabled is true | `string` | n/a | yes |
+| <a name="input_aks_vnet_name"></a> [aks\_vnet\_name](#input\_aks\_vnet\_name) | ACR/AKS vnet name, used when private\_acr\_enabled is true or private\_cluster\_enabled is true | `string` | n/a | yes |
+| <a name="input_aks_vnet_rg_name"></a> [aks\_vnet\_rg\_name](#input\_aks\_vnet\_rg\_name) | Name of the acr/aks vnet, used when private\_acr\_enabled is true or private\_cluster\_enabled is true | `string` | n/a | yes |
 | <a name="input_api_server_authorized_ip_ranges"></a> [api\_server\_authorized\_ip\_ranges](#input\_api\_server\_authorized\_ip\_ranges) | The IP ranges to whitelist for incoming traffic to the masters | `list(string)` | n/a | yes |
 | <a name="input_cluster_sku_tier"></a> [cluster\_sku\_tier](#input\_cluster\_sku\_tier) | The Domino cluster SKU (defaults to Free) | `string` | `null` | no |
 | <a name="input_cni_overlay_enabled"></a> [cni\_overlay\_enabled](#input\_cni\_overlay\_enabled) | Flag to determine whether to use overlay network settings | `bool` | `false` | no |
 | <a name="input_containers"></a> [containers](#input\_containers) | storage containers to create | <pre>map(object({<br>    container_access_type = string<br>  }))</pre> | <pre>{<br>  "backups": {<br>    "container_access_type": "private"<br>  },<br>  "projects": {<br>    "container_access_type": "private"<br>  }<br>}</pre> | no |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino Deployment ID. | `string` | n/a | yes |
 | <a name="input_dns_service_ip"></a> [dns\_service\_ip](#input\_dns\_service\_ip) | IP address assigned to the Kubernetes DNS service, used when CNI Overlay is enabled | `string` | `"100.97.0.10"` | no |
+| <a name="input_ipspace"></a> [ipspace](#input\_ipspace) | CIDR block for AKS and ACR Vnet | `string` | `"172.16.0.0/16"` | no |
 | <a name="input_kubeconfig_output_path"></a> [kubeconfig\_output\_path](#input\_kubeconfig\_output\_path) | kubeconfig path | `string` | n/a | yes |
 | <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br>    idle_timeout_in_minutes   = optional(number, 4)<br>    managed_outbound_ip_count = number<br>    }<br>  )</pre> | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm\_kubernetes\_service\_versions. | `string` | `null` | no |
@@ -98,6 +115,9 @@ No modules.
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespace that are used for generating the service account bindings | `object({ platform = string, compute = string })` | n/a | yes |
 | <a name="input_node_pools"></a> [node\_pools](#input\_node\_pools) | default node pools | <pre>object({<br>    compute = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_D8s_v4")<br>      zones                 = optional(list(string), ["1", "2", "3"])<br>      node_labels = optional(map(string), {<br>        "dominodatalab.com/node-pool" = "default"<br>      })<br>      node_os             = optional(string, "AzureLinux")<br>      node_taints         = optional(list(string), [])<br>      enable_auto_scaling = optional(bool, true)<br>      min_count           = optional(number, 0)<br>      max_count           = optional(number, 10)<br>      initial_count       = optional(number, 1)<br>      max_pods            = optional(number, 30)<br>      os_disk_size_gb     = optional(number, 128)<br>    }),<br>    platform = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_D8s_v4")<br>      zones                 = optional(list(string), ["1", "2", "3"])<br>      node_labels = optional(map(string), {<br>        "dominodatalab.com/node-pool" = "platform"<br>      })<br>      node_os             = optional(string, "AzureLinux")<br>      node_taints         = optional(list(string), [])<br>      enable_auto_scaling = optional(bool, true)<br>      min_count           = optional(number, 1)<br>      max_count           = optional(number, 3)<br>      initial_count       = optional(number, 1)<br>      max_pods            = optional(number, 60)<br>      os_disk_size_gb     = optional(number, 128)<br>    }),<br>    gpu = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_NC6s_v3")<br>      zones                 = optional(list(string), [])<br>      node_labels = optional(map(string), {<br>        "dominodatalab.com/node-pool" = "default-gpu"<br>        "nvidia.com/gpu"              = "true"<br>      })<br>      node_os = optional(string, "AzureLinux")<br>      node_taints = optional(list(string), [<br>        "nvidia.com/gpu=true:NoExecute"<br>      ])<br>      enable_auto_scaling = optional(bool, true)<br>      min_count           = optional(number, 0)<br>      max_count           = optional(number, 1)<br>      initial_count       = optional(number, 0)<br>      max_pods            = optional(number, 30)<br>      os_disk_size_gb     = optional(number, 128)<br>    })<br>    system = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_DS4_v2")<br>      zones                 = optional(list(string), ["1", "2", "3"])<br>      node_labels           = optional(map(string), {})<br>      node_os               = optional(string, "AzureLinux")<br>      node_taints           = optional(list(string), [])<br>      enable_auto_scaling   = optional(bool, true)<br>      min_count             = optional(number, 1)<br>      max_count             = optional(number, 6)<br>      initial_count         = optional(number, 1)<br>      max_pods              = optional(number, 60)<br>      os_disk_size_gb       = optional(number, 128)<br>    })<br>  })</pre> | <pre>{<br>  "compute": {},<br>  "gpu": {},<br>  "platform": {},<br>  "system": {}<br>}</pre> | no |
 | <a name="input_pod_cidr"></a> [pod\_cidr](#input\_pod\_cidr) | CIDR block for Kubernetes pods, used when CNI Overlay is enabled | `string` | `"192.168.0.0/16"` | no |
+| <a name="input_private_acr_enabled"></a> [private\_acr\_enabled](#input\_private\_acr\_enabled) | Flag to determine whether to deploy a private ACR | `bool` | `false` | no |
+| <a name="input_private_cluster_enabled"></a> [private\_cluster\_enabled](#input\_private\_cluster\_enabled) | Flag to determine whether to deploy a private AKS | `bool` | `false` | no |
+| <a name="input_private_cluster_public_fqdn_enabled"></a> [private\_cluster\_public\_fqdn\_enabled](#input\_private\_cluster\_public\_fqdn\_enabled) | Flag to determine whether to use a public FQDN when deploying a private AKS cluster | `bool` | `true` | no |
 | <a name="input_registry_tier"></a> [registry\_tier](#input\_registry\_tier) | registry tier | `string` | `"Standard"` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name or id of optional pre-existing resource group to install AKS in | `string` | n/a | yes |
 | <a name="input_service_cidr"></a> [service\_cidr](#input\_service\_cidr) | CIDR block for Kubernetes services, used  when CNI Overlay is enabled | `string` | `"100.97.0.0/16"` | no |
