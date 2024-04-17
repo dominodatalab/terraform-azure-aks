@@ -56,4 +56,6 @@ No modules.
 | <a name="output_data_container_name"></a> [data\_container\_name](#output\_data\_container\_name) | Flyte data storage container name |
 | <a name="output_dataplane_client_id"></a> [dataplane\_client\_id](#output\_dataplane\_client\_id) | Flyte dataplane client id |
 | <a name="output_metadata_container_name"></a> [metadata\_container\_name](#output\_metadata\_container\_name) | Flyte metadata storage container name |
+| <a name="output_storage_account_key"></a> [storage\_account\_key](#output\_storage\_account\_key) | Flyte storage account key |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | Flyte storage account name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
