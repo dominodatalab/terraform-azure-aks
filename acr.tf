@@ -1,30 +1,81 @@
+#########################################################################
+################################# ACR ###################################
+#########################################################################
+# Create ACR registry for Domino images
 resource "azurerm_container_registry" "domino" {
   name                = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
   resource_group_name = data.azurerm_resource_group.aks.name
   location            = data.azurerm_resource_group.aks.location
 
-  sku           = var.registry_tier
+  sku           = var.private_acr_enabled == true ? "Premium" : var.registry_tier
   admin_enabled = false
 
   # Premium only
-  public_network_access_enabled = var.registry_tier == "Premium" ? false : true
+  public_network_access_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? false : true
 
-  zone_redundancy_enabled = var.registry_tier == "Premium"
+  zone_redundancy_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
 
   retention_policy {
     # Premium only
-    enabled = var.registry_tier == "Premium"
+    enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
   }
 
   tags = var.tags
-}
 
+  # Premium only
+  dynamic "network_rule_set" {
+    for_each = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? [1] : []
+    content {
+      default_action = "Deny"
+    }
+  }
+}
+#########################################################################
+########################## Private DNS Zone #############################
+#########################################################################
+# create private dns zone for acr
+resource "azurerm_private_dns_zone" "acr-private-dns-zone" {
+  count               = var.private_acr_enabled ? 1 : 0
+  name                = "acr-${var.deploy_id}.privatelink.${lower(replace("${data.azurerm_resource_group.aks.location}", " ", ""))}.azmk8s.io"
+  resource_group_name = data.azurerm_resource_group.aks.name
+}
+# link the dns provate zone to the AKS VNET
+resource "azurerm_private_dns_zone_virtual_network_link" "private-dns-zone-acr-vnet-link" {
+  count                 = var.private_acr_enabled ? 1 : 0
+  name                  = "acr-vnet-dns-link"
+  resource_group_name   = data.azurerm_resource_group.aks.name
+  private_dns_zone_name = azurerm_private_dns_zone.acr-private-dns-zone[0].name
+  virtual_network_id    = data.azurerm_virtual_network.aks-vnet[0].id
+}
+#########################################################################
+########################## Private EndPoint #############################
+#########################################################################
+# Create a private endpoint for the ACR
+module "domino_acr_ep" {
+  count                 = var.private_acr_enabled ? 1 : 0
+  source                = "./modules/private_endpoint"
+  resource_id           = azurerm_container_registry.domino.id
+  nic_name              = "acr-${var.deploy_id}"
+  private_endpoint_name = "acr-${var.deploy_id}"
+  private_DNS_zone      = azurerm_private_dns_zone.acr-private-dns-zone[0].name
+  private_DNS_zone_id   = azurerm_private_dns_zone.acr-private-dns-zone[0].id
+  sub_resource          = "registry"
+  location              = data.azurerm_resource_group.aks.location
+  service               = "registry"
+  resource_group_name   = data.azurerm_resource_group.aks.name
+  vnet_name             = var.aks_vnet_name
+  subnet_id             = data.azurerm_subnet.aks-subnet[0].id
+}
+#########################################################################
+########################### Role Assignment #############################
+#########################################################################
+# ACR Pull from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_acr" {
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
-
+# ACR Push from hepheastus
 resource "azurerm_role_assignment" "hephaestus_acr" {
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPush"

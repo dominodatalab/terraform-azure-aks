@@ -238,3 +238,48 @@ variable "pod_cidr" {
   type        = string
   default     = "192.168.0.0/16"
 }
+
+variable "private_acr_enabled" {
+  description = "Flag to determine whether to deploy a private ACR"
+  type        = bool
+  default     = false
+}
+
+variable "private_cluster_enabled" {
+  description = "Flag to determine whether to deploy a private AKS"
+  type        = bool
+  default     = false
+}
+
+variable "aks_vnet_name" {
+  description = "ACR/AKS vnet name, used when private_acr_enabled is true or private_cluster_enabled is true"
+  type        = string
+}
+
+variable "aks_subnet_name" {
+  description = "ACR/AKS subnet name, used when private_acr_enabled is true or private_cluster_enabled is true"
+  type        = string
+}
+
+variable "aks_vnet_rg_name" {
+  description = "Name of the acr/aks vnet, used when private_acr_enabled is true or private_cluster_enabled is true"
+  type        = string
+}
+
+variable "private_cluster_public_fqdn_enabled" {
+  description = "Flag to determine whether to use a public FQDN when deploying a private AKS cluster"
+  type        = bool
+  default     = true
+}
+
+variable "ipspace" {
+  description = "CIDR block for AKS and ACR Vnet"
+  type        = string
+  default     = "172.16.0.0/16"
+}
+
+variable "address_prefixes" {
+  description = "CIDR block for AKS and ACR Subnet"
+  type        = list(string)
+  default     = ["172.16.0.0/24"]
+}
