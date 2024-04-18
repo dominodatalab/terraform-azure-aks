@@ -24,14 +24,14 @@ data "azurerm_kubernetes_service_versions" "selected" {
 }
 # Retrieve AKS subnet
 data "azurerm_subnet" "aks_subnet" {
-  count                = var.private_acr_enabled ? 1 : 0
+  count                = ( var.private_acr_enabled || var.private_cluster_enabled ) ? 1 : 0
   name                 = var.aks_subnet_name
   virtual_network_name = var.aks_vnet_name
   resource_group_name  = var.aks_vnet_rg_name
 }
 # Retrieve AKS vnet
 data "azurerm_virtual_network" "aks_vnet" {
-  count               = var.private_acr_enabled ? 1 : 0
+  count               = ( var.private_acr_enabled || var.private_cluster_enabled ) ? 1 : 0
   name                = var.aks_vnet_name
   resource_group_name = var.aks_vnet_rg_name
 }
@@ -117,8 +117,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   sku_tier                            = var.cluster_sku_tier
   kubernetes_version                  = data.azurerm_kubernetes_service_versions.selected.latest_version
   role_based_access_control_enabled   = true
-  dns_prefix_private_cluster          = var.deploy_id
-  private_dns_zone_id                 = azurerm_private_dns_zone.aks_private_dns_zone[0].id
+  dns_prefix_private_cluster          = var.private_cluster_enabled ? var.deploy_id : null
+  private_dns_zone_id                 = var.private_cluster_enabled ? azurerm_private_dns_zone.aks_private_dns_zone[0].id : null
   private_cluster_public_fqdn_enabled = var.private_cluster_enabled ? var.private_cluster_public_fqdn_enabled : null
 
   api_server_access_profile {
