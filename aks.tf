@@ -24,14 +24,14 @@ data "azurerm_kubernetes_service_versions" "selected" {
 }
 # Retrieve AKS subnet
 data "azurerm_subnet" "aks_subnet" {
-  count                = ( var.private_acr_enabled || var.private_cluster_enabled ) ? 1 : 0
+  count                = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
   name                 = var.aks_subnet_name
   virtual_network_name = var.aks_vnet_name
   resource_group_name  = var.aks_vnet_rg_name
 }
 # Retrieve AKS vnet
 data "azurerm_virtual_network" "aks_vnet" {
-  count               = ( var.private_acr_enabled || var.private_cluster_enabled ) ? 1 : 0
+  count               = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
   name                = var.aks_vnet_name
   resource_group_name = var.aks_vnet_rg_name
 }
