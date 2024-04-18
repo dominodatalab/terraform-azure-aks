@@ -28,43 +28,12 @@ data "azurerm_subnet" "aks_subnet" {
   name                 = var.aks_subnet_name
   virtual_network_name = var.aks_vnet_name
   resource_group_name  = var.aks_vnet_rg_name
-  #### TEST ### TEST ###### Vnet and Subnet ######## TEST ### TEST ########
-  depends_on = [
-    azurerm_subnet.aks_subnet
-  ]
-  #########################################################################
 }
 # Retrieve AKS vnet
 data "azurerm_virtual_network" "aks_vnet" {
   count               = var.private_acr_enabled ? 1 : 0
   name                = var.aks_vnet_name
   resource_group_name = var.aks_vnet_rg_name
-  #### TEST ### TEST ###### Vnet and Subnet ######## TEST ### TEST ########
-  depends_on = [
-    azurerm_virtual_network.aks_vnet
-  ]
-  #########################################################################
-}
-
-#########################################################################
-#### TEST ### TEST ###### Vnet and Subnet ######## TEST ### TEST ########
-#########################################################################
-# Create Vnet for AKS and ACR
-resource "azurerm_virtual_network" "aks_vnet" {
-  count               = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
-  name                = "aks-${var.deploy_id}-vnet"
-  location            = data.azurerm_resource_group.aks.location
-  resource_group_name = data.azurerm_resource_group.aks.name
-  address_space       = [var.ipspace]
-  tags                = var.tags
-}
-# Create Subnet for AKS and ACR
-resource "azurerm_subnet" "aks_subnet" {
-  count                = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
-  name                 = "aks-${var.deploy_id}-subnet"
-  resource_group_name  = data.azurerm_resource_group.aks.name
-  virtual_network_name = azurerm_virtual_network.aks_vnet[0].name
-  address_prefixes     = var.address_prefixes
 }
 #########################################################################
 ########################### Private DNS Zone ############################
@@ -92,7 +61,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_aks_v
 # create user assigned identity for AKS
 resource "azurerm_user_assigned_identity" "aks_assigned_identity" {
   count               = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
-  name                = "id-${var.deploy_id}"
+  name                = "aks-${var.deploy_id}"
   location            = data.azurerm_resource_group.aks.location
   resource_group_name = data.azurerm_resource_group.aks.name
   lifecycle {

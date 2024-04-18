@@ -271,15 +271,3 @@ variable "private_cluster_public_fqdn_enabled" {
   type        = bool
   default     = false
 }
-
-variable "ipspace" {
-  description = "CIDR block for AKS and ACR Vnet"
-  type        = string
-  default     = "172.16.0.0/16"
-}
-
-variable "address_prefixes" {
-  description = "CIDR block for AKS and ACR Subnet"
-  type        = list(string)
-  default     = ["172.16.0.0/24"]
-}
