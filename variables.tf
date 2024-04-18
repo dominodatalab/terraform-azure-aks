@@ -252,22 +252,25 @@ variable "private_cluster_enabled" {
 }
 
 variable "aks_vnet_name" {
-  description = "ACR/AKS vnet name, needed when private_acr_enabled is true or private_cluster_enabled is true"
+  description = "VNet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
   type        = string
+  default     = null
 }
 
 variable "aks_subnet_name" {
-  description = "ACR/AKS subnet name, needed when private_acr_enabled is true or private_cluster_enabled is true"
+  description = "Subnet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
   type        = string
+  default     = null
 }
 
 variable "aks_vnet_rg_name" {
-  description = "Name of the acr/aks vnet, needed when private_acr_enabled is true or private_cluster_enabled is true"
+  description = "VNet Resource Groupe name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
   type        = string
+  default     = null
 }
 
 variable "private_cluster_public_fqdn_enabled" {
   description = "Flag to determine whether to use a public FQDN when deploying a private AKS cluster"
   type        = bool
-  default     = false
+  default     = null
 }
