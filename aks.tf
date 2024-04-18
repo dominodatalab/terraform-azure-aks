@@ -72,7 +72,7 @@ resource "azurerm_subnet" "aks_subnet" {
 # create private dns zone
 resource "azurerm_private_dns_zone" "aks_private_dns_zone" {
   count               = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
-  name                = "aks-${var.deploy_id}.privatelink.${lower(replace("${data.azurerm_resource_group.aks.location}", " ", ""))}.azmk8s.io"
+  name                = "privatelink.${lower(replace(data.azurerm_resource_group.aks.location, " ", ""))}.azmk8s.io"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
 # link the dns provate zone to the AKS VNET
@@ -148,7 +148,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   sku_tier                            = var.cluster_sku_tier
   kubernetes_version                  = data.azurerm_kubernetes_service_versions.selected.latest_version
   role_based_access_control_enabled   = true
-  dns_prefix_private_cluster          = "domino"
+  dns_prefix_private_cluster          = var.deploy_id
   private_dns_zone_id                 = azurerm_private_dns_zone.aks_private_dns_zone[0].id
   private_cluster_public_fqdn_enabled = (var.private_acr_enabled || var.private_cluster_enabled) ? var.private_cluster_public_fqdn_enabled : null
 
