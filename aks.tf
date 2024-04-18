@@ -140,7 +140,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     node_count                   = var.node_pools.system.initial_count
     max_pods                     = var.node_pools.system.max_pods
     tags                         = var.tags
-    vnet_subnet_id               = var.private_cluster_enabled ? data.azurerm_subnet.aks_subnet[0].id : null
+    vnet_subnet_id               = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
   }
   identity {
     type         = var.private_cluster_enabled ? "UserAssigned" : "SystemAssigned"
@@ -215,7 +215,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   max_count             = each.value.node_pool_spec.max_count
   max_pods              = each.value.node_pool_spec.max_pods
   tags                  = var.tags
-  vnet_subnet_id        = var.private_cluster_enabled ? data.azurerm_subnet.aks_subnet[0].id : null
+  vnet_subnet_id        = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
 
   lifecycle {
     ignore_changes = [node_count, max_count, tags]
