@@ -69,7 +69,6 @@ module "domino_acr_ep" {
 #########################################################################
 # ACR Pull from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_acr" {
-  # count                = var.private_cluster_enabled ? 0 : 1
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
