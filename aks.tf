@@ -30,7 +30,7 @@ data "azurerm_subnet" "aks_subnet" {
   resource_group_name  = var.aks_vnet_rg_name
   #### TEST ### TEST ###### Vnet and Subnet ######## TEST ### TEST ########
   depends_on = [
-    # azurerm_subnet.aks-subnet
+    azurerm_subnet.aks_subnet
   ]
   #########################################################################
 }
@@ -41,11 +41,11 @@ data "azurerm_virtual_network" "aks_vnet" {
   resource_group_name = var.aks_vnet_rg_name
   #### TEST ### TEST ###### Vnet and Subnet ######## TEST ### TEST ########
   depends_on = [
-    # azurerm_virtual_network.aks-vnet
+    azurerm_virtual_network.aks_vnet
   ]
   #########################################################################
 }
-/*
+
 #########################################################################
 #### TEST ### TEST ###### Vnet and Subnet ######## TEST ### TEST ########
 #########################################################################
@@ -65,7 +65,7 @@ resource "azurerm_subnet" "aks_subnet" {
   resource_group_name  = data.azurerm_resource_group.aks.name
   virtual_network_name = azurerm_virtual_network.aks_vnet[0].name
   address_prefixes     = var.address_prefixes
-}*/
+}
 #########################################################################
 ########################### Private DNS Zone ############################
 #########################################################################
@@ -148,8 +148,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   sku_tier                            = var.cluster_sku_tier
   kubernetes_version                  = data.azurerm_kubernetes_service_versions.selected.latest_version
   role_based_access_control_enabled   = true
-  dns_prefix_private_cluster          = "aks-${var.deploy_id}"
-  private_dns_zone_id                 = azurerm_private_dns_zone.aks-private-dns-zone[0].id
+  dns_prefix_private_cluster          = "domino"
+  private_dns_zone_id                 = azurerm_private_dns_zone.aks_private_dns_zone[0].id
   private_cluster_public_fqdn_enabled = (var.private_acr_enabled || var.private_cluster_enabled) ? var.private_cluster_public_fqdn_enabled : null
 
   api_server_access_profile {

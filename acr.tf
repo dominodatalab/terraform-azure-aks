@@ -27,6 +27,10 @@ resource "azurerm_container_registry" "domino" {
     for_each = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? [1] : []
     content {
       default_action = "Deny"
+/*      ip_rule {
+        action = "Allow"
+        ip_range = var.address_prefixes[0]
+      }*/
     }
   }
 }
@@ -69,6 +73,7 @@ module "domino_acr_ep" {
 #########################################################################
 # ACR Pull from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_acr" {
+ # count                = var.private_cluster_enabled ? 0 : 1
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
@@ -78,4 +83,11 @@ resource "azurerm_role_assignment" "hephaestus_acr" {
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPush"
   principal_id         = azurerm_user_assigned_identity.hephaestus.principal_id
+}
+# ACR Pull from private AKS nodes
+resource "azurerm_role_assignment" "aks_domino_private_acr" {
+  count                 = var.private_cluster_enabled ? 1 : 0
+  scope                = azurerm_container_registry.domino.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id
 }

@@ -269,7 +269,7 @@ variable "aks_vnet_rg_name" {
 variable "private_cluster_public_fqdn_enabled" {
   description = "Flag to determine whether to use a public FQDN when deploying a private AKS cluster"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "ipspace" {
