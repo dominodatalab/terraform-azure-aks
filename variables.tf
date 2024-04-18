@@ -252,17 +252,17 @@ variable "private_cluster_enabled" {
 }
 
 variable "aks_vnet_name" {
-  description = "ACR/AKS vnet name, used when private_acr_enabled is true or private_cluster_enabled is true"
+  description = "ACR/AKS vnet name, needed when private_acr_enabled is true or private_cluster_enabled is true"
   type        = string
 }
 
 variable "aks_subnet_name" {
-  description = "ACR/AKS subnet name, used when private_acr_enabled is true or private_cluster_enabled is true"
+  description = "ACR/AKS subnet name, needed when private_acr_enabled is true or private_cluster_enabled is true"
   type        = string
 }
 
 variable "aks_vnet_rg_name" {
-  description = "Name of the acr/aks vnet, used when private_acr_enabled is true or private_cluster_enabled is true"
+  description = "Name of the acr/aks vnet, needed when private_acr_enabled is true or private_cluster_enabled is true"
   type        = string
 }
 
