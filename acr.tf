@@ -27,10 +27,6 @@ resource "azurerm_container_registry" "domino" {
     for_each = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? [1] : []
     content {
       default_action = "Deny"
-/*      ip_rule {
-        action = "Allow"
-        ip_range = var.address_prefixes[0]
-      }*/
     }
   }
 }
@@ -40,7 +36,7 @@ resource "azurerm_container_registry" "domino" {
 # create private dns zone for acr
 resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
   count               = var.private_acr_enabled ? 1 : 0
-  name                = "acr-${var.deploy_id}.privatelink.${lower(replace("${data.azurerm_resource_group.aks.location}", " ", ""))}.azmk8s.io"
+  name                = "privatelink.azurecr.io"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
 # link the dns provate zone to the AKS VNET
@@ -73,7 +69,7 @@ module "domino_acr_ep" {
 #########################################################################
 # ACR Pull from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_acr" {
- # count                = var.private_cluster_enabled ? 0 : 1
+  # count                = var.private_cluster_enabled ? 0 : 1
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
@@ -86,7 +82,7 @@ resource "azurerm_role_assignment" "hephaestus_acr" {
 }
 # ACR Pull from private AKS nodes
 resource "azurerm_role_assignment" "aks_domino_private_acr" {
-  count                 = var.private_cluster_enabled ? 1 : 0
+  count                = var.private_cluster_enabled ? 1 : 0
   scope                = azurerm_container_registry.domino.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id
