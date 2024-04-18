@@ -37,20 +37,26 @@ resource "azurerm_role_definition" "flyte_sas" {
   }
 }
 
-resource "azurerm_role_assignment" "flyte_metadata" {
+resource "azurerm_role_assignment" "flyte_metadata_controlplane" {
   scope              = azurerm_storage_container.flyte_metadata.resource_manager_id
   role_definition_id = azurerm_role_definition.flyte_metadata.role_definition_resource_id
-  principal_id       = azuread_group.flyte_metadata.object_id
+  principal_id       = azurerm_user_assigned_identity.flyte_controlplane.principal_id
+}
+
+resource "azurerm_role_assignment" "flyte_metadata_dataplane" {
+  scope              = azurerm_storage_container.flyte_metadata.resource_manager_id
+  role_definition_id = azurerm_role_definition.flyte_metadata.role_definition_resource_id
+  principal_id       = azurerm_user_assigned_identity.flyte_dataplane.principal_id
 }
 
 resource "azurerm_role_assignment" "flyte_data" {
   scope              = azurerm_storage_container.flyte_data.resource_manager_id
   role_definition_id = azurerm_role_definition.flyte_data.role_definition_resource_id
-  principal_id       = azuread_group.flyte_data.object_id
+  principal_id       = azurerm_user_assigned_identity.flyte_dataplane.principal_id
 }
 
 resource "azurerm_role_assignment" "flyte_sas" {
   scope              = azurerm_storage_account.flyte.id
   role_definition_id = azurerm_role_definition.flyte_sas.role_definition_resource_id
-  principal_id       = azuread_group.flyte_sas.object_id
+  principal_id       = azurerm_user_assigned_identity.flyte_dataplane.principal_id
 }

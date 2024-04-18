@@ -4,14 +4,12 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~> 2.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.45 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | ~> 2.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 3.45 |
 
 ## Modules
@@ -22,12 +20,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azuread_group.flyte_data](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
-| [azuread_group.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
-| [azuread_group.flyte_sas](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
 | [azurerm_federated_identity_credential.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_role_assignment.flyte_data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.flyte_metadata_controlplane](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.flyte_metadata_dataplane](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.flyte_sas](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_definition.flyte_data](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_role_definition.flyte_metadata](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
@@ -60,4 +56,6 @@ No modules.
 | <a name="output_data_container_name"></a> [data\_container\_name](#output\_data\_container\_name) | Flyte data storage container name |
 | <a name="output_dataplane_client_id"></a> [dataplane\_client\_id](#output\_dataplane\_client\_id) | Flyte dataplane client id |
 | <a name="output_metadata_container_name"></a> [metadata\_container\_name](#output\_metadata\_container\_name) | Flyte metadata storage container name |
+| <a name="output_storage_account_key"></a> [storage\_account\_key](#output\_storage\_account\_key) | Flyte storage account key |
+| <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | Flyte storage account name |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
