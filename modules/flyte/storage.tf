@@ -10,6 +10,15 @@ resource "azurerm_storage_account" "flyte" {
   tags                     = var.tags
   is_hns_enabled           = true
 
+  blob_properties {
+    cors_rule {
+      allowed_headers    = ["x-ms-*"]
+      allowed_methods    = ["GET", "HEAD"]
+      allowed_origins    = ["*"]
+      exposed_headers    = [""]
+      max_age_in_seconds = 300
+    }
+  }
   lifecycle {
     ignore_changes = [
       tags
