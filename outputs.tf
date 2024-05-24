@@ -27,6 +27,5 @@ output "workload_identities" {
   description = "service identities"
   value = {
     "hephaestus" = azurerm_user_assigned_identity.hephaestus
-    "importer" = azurerm_user_assigned_identity.importer
   }
 }
