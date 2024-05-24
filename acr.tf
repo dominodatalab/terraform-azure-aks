@@ -30,3 +30,9 @@ resource "azurerm_role_assignment" "hephaestus_acr" {
   role_definition_name = "AcrPush"
   principal_id         = azurerm_user_assigned_identity.hephaestus.principal_id
 }
+
+resource "azurerm_role_assignment" "importer_acr" {
+  scope                = azurerm_container_registry.domino.id
+  role_definition_name = "AcrPush"
+  principal_id         = azurerm_user_assigned_identity.importer.principal_id
+}
