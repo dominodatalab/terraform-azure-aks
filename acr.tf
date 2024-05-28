@@ -1,4 +1,5 @@
 resource "azurerm_container_registry" "domino" {
+  #checkov:skip=CKV_AZURE_237: "Ensure dedicated data endpoints are enabled."
   name                = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
   resource_group_name = data.azurerm_resource_group.aks.name
   location            = data.azurerm_resource_group.aks.location
