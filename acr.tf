@@ -34,7 +34,7 @@ resource "azurerm_container_registry" "domino" {
 ########################## Private DNS Zone #############################
 #########################################################################
 # create private dns zone for acr
-resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
+/* resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
   count               = var.private_acr_enabled ? 1 : 0
   name                = "privatelink.azurecr.io"
   resource_group_name = data.azurerm_resource_group.aks.name
@@ -46,7 +46,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_v
   resource_group_name   = data.azurerm_resource_group.aks.name
   private_dns_zone_name = azurerm_private_dns_zone.acr_private_dns_zone[0].name
   virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
-}
+} */
 #########################################################################
 ########################## Private EndPoint #############################
 #########################################################################
@@ -57,8 +57,8 @@ module "domino_acr_ep" {
   resource_id           = azurerm_container_registry.domino.id
   nic_name              = "acr-${var.deploy_id}"
   private_endpoint_name = "acr-${var.deploy_id}"
-  private_dns_zone      = azurerm_private_dns_zone.acr_private_dns_zone[0].name
-  private_dns_zone_id   = azurerm_private_dns_zone.acr_private_dns_zone[0].id
+  private_dns_zone      = "private.eastus.azmk8s.io"
+  private_dns_zone_id   = "/subscriptions/de806df8-4359-4802-b814-b8a7699cfaa5/resourceGroups/hub-network/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
   sub_resource          = "registry"
   location              = data.azurerm_resource_group.aks.location
   resource_group_name   = data.azurerm_resource_group.aks.name

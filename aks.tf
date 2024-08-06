@@ -38,7 +38,7 @@ data "azurerm_virtual_network" "aks_vnet" {
 #########################################################################
 ########################### Private DNS Zone ############################
 #########################################################################
-# create private dns zone
+/*# create private dns zone
 resource "azurerm_private_dns_zone" "aks_private_dns_zone" {
   count               = var.private_cluster_enabled ? 1 : 0
   name                = "privatelink.${lower(replace(data.azurerm_resource_group.aks.location, " ", ""))}.azmk8s.io"
@@ -54,7 +54,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_aks_v
   depends_on = [
     azurerm_private_dns_zone.aks_private_dns_zone
   ]
-}
+}*/
 #########################################################################
 ########################### Managed Identity ############################
 #########################################################################
@@ -71,13 +71,11 @@ resource "azurerm_user_assigned_identity" "aks_assigned_identity" {
 # Assign identity permissions on private dns zone
 resource "azurerm_role_assignment" "identity_assign_pdnsz" {
   count                = var.private_cluster_enabled ? 1 : 0
-  scope                = azurerm_private_dns_zone.aks_private_dns_zone[0].id
+  scope                = "/subscriptions/de806df8-4359-4802-b814-b8a7699cfaa5/resourceGroups/hub-network/providers/Microsoft.Network/privateDnsZones/privatelink.eastus.azmk8s.io"
   role_definition_name = "Private DNS Zone Contributor"
   principal_id         = azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id
-  depends_on = [
-    azurerm_private_dns_zone_virtual_network_link.private_dns_zone_aks_vnet_link
-  ]
 }
+
 # Assign identity permissins on resource group
 resource "azurerm_role_assignment" "identity_assign_rg" {
   count                = var.private_cluster_enabled ? 1 : 0
@@ -118,7 +116,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   kubernetes_version                  = data.azurerm_kubernetes_service_versions.selected.latest_version
   role_based_access_control_enabled   = true
   dns_prefix_private_cluster          = var.private_cluster_enabled ? var.deploy_id : null
-  private_dns_zone_id                 = var.private_cluster_enabled ? azurerm_private_dns_zone.aks_private_dns_zone[0].id : null
+  private_dns_zone_id                 = var.private_cluster_enabled ? "/subscriptions/de806df8-4359-4802-b814-b8a7699cfaa5/resourceGroups/hub-network/providers/Microsoft.Network/privateDnsZones/privatelink.eastus.azmk8s.io" : null
   private_cluster_public_fqdn_enabled = var.private_cluster_enabled ? var.private_cluster_public_fqdn_enabled : null
 
   api_server_access_profile {
@@ -166,16 +164,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip      = var.cni_overlay_enabled ? var.dns_service_ip : null
     service_cidr        = var.cni_overlay_enabled ? var.service_cidr : null
     pod_cidr            = var.cni_overlay_enabled ? var.pod_cidr : null
-
-    outbound_type = var.kubernetes_nat_gateway == null ? "loadBalancer" : "managedNATGateway"
-
-    dynamic "nat_gateway_profile" {
-      for_each = var.kubernetes_nat_gateway == null ? [] : [var.kubernetes_nat_gateway]
-      content {
-        idle_timeout_in_minutes   = nat_gateway_profile.value.idle_timeout_in_minutes
-        managed_outbound_ip_count = nat_gateway_profile.value.managed_outbound_ip_count
-      }
-    }
+    outbound_type       = "userAssignedNATGateway"
   }
 
   tags = var.tags
