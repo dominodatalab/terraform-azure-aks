@@ -7,6 +7,8 @@ resource "azurerm_storage_account" "domino" {
   account_replication_type = var.storage_account_replication_type
   access_tier              = "Hot"
   min_tls_version          = "TLS1_2"
+  public_network_access_enabled   = false
+  allow_nested_items_to_be_public = false
   tags                     = var.tags
 
   lifecycle {
@@ -37,6 +39,8 @@ resource "azurerm_storage_account" "domino_shared" {
   account_replication_type = var.storage_account_replication_type
   access_tier              = "Hot"
   min_tls_version          = "TLS1_2"
+  public_network_access_enabled   = false
+  allow_nested_items_to_be_public = false
   tags                     = var.tags
 
   lifecycle {
@@ -54,7 +58,7 @@ resource "azurerm_storage_share" "shared_store" {
 }
 
 # Assign identity permissins on fileshare
-resource "azurerm_role_assignment" "identity_assign_rg" {
+resource "azurerm_role_assignment" "identity_assign_aks" {
   count                = var.private_cluster_enabled ? 1 : 0
   scope                = azurerm_storage_account.domino_shared.id
   role_definition_name = "Contributor"

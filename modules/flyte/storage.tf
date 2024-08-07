@@ -9,6 +9,8 @@ resource "azurerm_storage_account" "flyte" {
   min_tls_version          = "TLS1_2"
   tags                     = var.tags
   is_hns_enabled           = true
+  public_network_access_enabled   = false
+  allow_nested_items_to_be_public = false
 
   lifecycle {
     ignore_changes = [
