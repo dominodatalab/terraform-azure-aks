@@ -3,26 +3,21 @@
 #########################################################################
 # Create ACR registry for Domino images
 resource "azurerm_container_registry" "domino" {
-  name                = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
-  resource_group_name = data.azurerm_resource_group.aks.name
-  location            = data.azurerm_resource_group.aks.location
-
-  sku           = var.private_acr_enabled == true ? "Premium" : var.registry_tier
-  admin_enabled = false
-
-  # Premium only
+  name                          = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
+  resource_group_name           = data.azurerm_resource_group.aks.name
+  location                      = data.azurerm_resource_group.aks.location
+  sku                           = var.private_acr_enabled == true ? "Premium" : var.registry_tier
+  admin_enabled                 = false
+  data_endpoint_enabled         = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? true : null
   public_network_access_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? false : true
-
-  zone_redundancy_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
+  zone_redundancy_enabled       = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
 
   retention_policy {
-    # Premium only
     enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
   }
 
   tags = var.tags
 
-  # Premium only
   dynamic "network_rule_set" {
     for_each = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? [1] : []
     content {
