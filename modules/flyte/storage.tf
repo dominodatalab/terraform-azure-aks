@@ -6,6 +6,26 @@ locals {
   private_flyte_enabled = var.private_cluster_enabled ? true : false
 }
 #########################################################################
+################################# Data ##################################
+#########################################################################
+# Retrieve AKS vnet resource group
+data "azurerm_resource_group" "aks" {
+  name = reverse(split("/", var.aks_vnet_rg_name))[0]
+}
+# Retrieve AKS subnet
+data "azurerm_subnet" "aks_subnet" {
+  count                = var.private_cluster_enabled ? 1 : 0
+  name                 = var.aks_subnet_name
+  virtual_network_name = var.aks_vnet_name
+  resource_group_name  = var.aks_vnet_rg_name
+}
+# Retrieve AKS vnet
+data "azurerm_virtual_network" "aks_vnet" {
+  count               = var.private_cluster_enabled ? 1 : 0
+  name                = var.aks_vnet_name
+  resource_group_name = var.aks_vnet_rg_name
+}
+#########################################################################
 ############################ Storage Account ############################
 #########################################################################
 # Create Domino Flyte Storage Account
@@ -61,13 +81,13 @@ resource "azurerm_storage_container" "flyte_data" {
 resource "azurerm_private_dns_zone" "flyte_private_dns_zone" {
   count               = local.private_flyte_enabled ? 1 : 0
   name                = "privatelink.blob.core.windows.net"
-  resource_group_name = data.azurerm_resource_group.aks.name
+  resource_group_name = var.aks_vnet_rg_name
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_flyte_vnet_link" {
   count                 = local.private_flyte_enabled ? 1 : 0
   name                  = "flyte-vnet-dns-link"
-  resource_group_name   = data.azurerm_resource_group.aks.name
+  resource_group_name   = var.aks_vnet_rg_name
   private_dns_zone_name = azurerm_private_dns_zone.flyte_private_dns_zone[0].name
   virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
 }
@@ -77,7 +97,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_flyte
 # Create a private endpoint for the Flyte Blob Storage Account
 module "domino_flyte_ep" {
   count                 = local.private_flyte_enabled ? 1 : 0
-  source                = "./private_endpoint"
+  source                = "../private_endpoint"
   resource_id           = azurerm_storage_account.flyte.id
   nic_name              = "sa-flyte-${var.deploy_id}"
   private_endpoint_name = "sa-flyte-${var.deploy_id}"
@@ -85,7 +105,7 @@ module "domino_flyte_ep" {
   private_dns_zone_id   = azurerm_private_dns_zone.flyte_private_dns_zone[0].id
   sub_resource          = "blob"
   location              = data.azurerm_resource_group.aks.location
-  resource_group_name   = data.azurerm_resource_group.aks.name
+  resource_group_name   = var.aks_vnet_rg_name
   subnet_id             = data.azurerm_subnet.aks_subnet[0].id
 }
 #########################################################################
