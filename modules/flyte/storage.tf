@@ -44,6 +44,15 @@ resource "azurerm_storage_account" "flyte" {
   allow_nested_items_to_be_public = local.private_flyte_enabled ? false : null
   local_user_enabled              = local.private_flyte_enabled ? false : null
 
+  blob_properties {
+    cors_rule {
+      allowed_headers    = ["x-ms-*"]
+      allowed_methods    = ["GET", "HEAD"]
+      allowed_origins    = ["*"]
+      exposed_headers    = [""]
+      max_age_in_seconds = 300
+    }
+  }
   lifecycle {
     ignore_changes = [
       tags

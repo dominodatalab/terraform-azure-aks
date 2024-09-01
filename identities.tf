@@ -69,4 +69,12 @@ resource "azurerm_role_assignment" "aks_domino_shared" {
   scope                = azurerm_storage_account.domino_shared.id
   role_definition_name = "Storage Account Key Operator Service Role"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+# Data importer identity credentials
+resource "azurerm_federated_identity_credential" "importer" {
+  name                = "importer"
+  resource_group_name = data.azurerm_resource_group.aks.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.hephaestus.id
+  subject             = "system:serviceaccount:${var.namespaces.platform}:domino-data-importer"
 }
