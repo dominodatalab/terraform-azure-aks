@@ -61,3 +61,26 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "private_cluster_enabled" {
+  description = "Flag to determine whether to deploy a private cluster"
+  type        = bool
+  default     = false
+}
+variable "aks_vnet_name" {
+  description = "VNet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  type        = string
+  default     = null
+}
+
+variable "aks_subnet_name" {
+  description = "Subnet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  type        = string
+  default     = null
+}
+
+variable "aks_vnet_rg_name" {
+  description = "VNet Resource Groupe name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  type        = string
+  default     = null
+}

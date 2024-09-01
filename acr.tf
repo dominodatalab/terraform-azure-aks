@@ -3,26 +3,21 @@
 #########################################################################
 # Create ACR registry for Domino images
 resource "azurerm_container_registry" "domino" {
-  name                = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
-  resource_group_name = data.azurerm_resource_group.aks.name
-  location            = data.azurerm_resource_group.aks.location
-
-  sku           = var.private_acr_enabled == true ? "Premium" : var.registry_tier
-  admin_enabled = false
-
-  # Premium only
+  name                          = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
+  resource_group_name           = data.azurerm_resource_group.aks.name
+  location                      = data.azurerm_resource_group.aks.location
+  sku                           = var.private_acr_enabled == true ? "Premium" : var.registry_tier
+  admin_enabled                 = false
+  data_endpoint_enabled         = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? true : null
   public_network_access_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? false : true
-
-  zone_redundancy_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
+  zone_redundancy_enabled       = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
 
   retention_policy {
-    # Premium only
     enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
   }
 
   tags = var.tags
 
-  # Premium only
   dynamic "network_rule_set" {
     for_each = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? [1] : []
     content {
@@ -39,7 +34,7 @@ resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
   name                = "privatelink.azurecr.io"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
-# link the dns provate zone to the AKS VNET
+# link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_vnet_link" {
   count                 = var.private_acr_enabled ? 1 : 0
   name                  = "acr-vnet-dns-link"

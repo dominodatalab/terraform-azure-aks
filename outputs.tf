@@ -8,6 +8,11 @@ output "storage_account" {
   value       = azurerm_storage_account.domino
 }
 
+output "shared_storage_account" {
+  description = "shared storage account"
+  value       = azurerm_storage_account.domino_shared
+}
+
 output "aks_identity" {
   description = "AKS managed identity"
   value       = azurerm_kubernetes_cluster.aks.kubelet_identity[0]
