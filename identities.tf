@@ -69,6 +69,7 @@ resource "azurerm_role_assignment" "aks_domino_shared" {
   scope                = azurerm_storage_account.domino_shared.id
   role_definition_name = "Storage Account Key Operator Service Role"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+}
 # Data importer identity credentials
 resource "azurerm_federated_identity_credential" "importer" {
   name                = "importer"
