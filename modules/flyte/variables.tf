@@ -61,3 +61,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "private_cluster_enabled" {
+  description = "Flag to determine whether to deploy a private cluster"
+  type        = bool
+  default     = false
+}

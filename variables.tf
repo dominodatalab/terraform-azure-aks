@@ -251,6 +251,18 @@ variable "private_cluster_enabled" {
   default     = false
 }
 
+variable "private_blob_enabled" {
+  description = "Flag to determine whether to deploy a private blob storage account"
+  type        = bool
+  default     = false
+}
+
+variable "private_shared_enabled" {
+  description = "Flag to determine whether to deploy a private shared storage account"
+  type        = bool
+  default     = false
+}
+
 variable "aks_vnet_name" {
   description = "VNet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
   type        = string

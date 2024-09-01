@@ -39,7 +39,7 @@ resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
   name                = "privatelink.azurecr.io"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
-# link the dns provate zone to the AKS VNET
+# link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_vnet_link" {
   count                 = var.private_acr_enabled ? 1 : 0
   name                  = "acr-vnet-dns-link"
