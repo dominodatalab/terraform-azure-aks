@@ -68,19 +68,25 @@ variable "private_cluster_enabled" {
   default     = false
 }
 variable "aks_vnet_name" {
-  description = "VNet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  description = "VNet name for AAKS, required when private_cluster_enabled is set to true."
   type        = string
   default     = null
 }
 
 variable "aks_subnet_name" {
-  description = "Subnet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  description = "Subnet name for AKS, required when private_cluster_enabled is set to true."
   type        = string
   default     = null
 }
 
 variable "aks_vnet_rg_name" {
-  description = "VNet Resource Groupe name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  description = "VNet Resource Groupe name for AKS, required when private_cluster_enabled is set to true."
   type        = string
   default     = null
+}
+
+variable "blob_dns_zone_name" {
+  description = "Blob DNS zone name for flyte record"
+  type        = string
+  default     = "privatelink.blob.core.windows.net"
 }

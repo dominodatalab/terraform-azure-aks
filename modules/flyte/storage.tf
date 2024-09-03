@@ -8,22 +8,12 @@ locals {
 #########################################################################
 ################################# Data ##################################
 #########################################################################
-# Retrieve AKS vnet resource group
-data "azurerm_resource_group" "aks" {
-  name = reverse(split("/", var.aks_vnet_rg_name))[0]
-}
 # Retrieve AKS subnet
 data "azurerm_subnet" "aks_subnet" {
   count                = var.private_cluster_enabled ? 1 : 0
   name                 = var.aks_subnet_name
   virtual_network_name = var.aks_vnet_name
   resource_group_name  = var.aks_vnet_rg_name
-}
-# Retrieve AKS vnet
-data "azurerm_virtual_network" "aks_vnet" {
-  count               = var.private_cluster_enabled ? 1 : 0
-  name                = var.aks_vnet_name
-  resource_group_name = var.aks_vnet_rg_name
 }
 #########################################################################
 ############################ Storage Account ############################
@@ -86,19 +76,21 @@ resource "azurerm_storage_container" "flyte_data" {
 #########################################################################
 ########################## Private DNS Zone #############################
 #########################################################################
-# Create a Private DNS Zone for the Storage Account Blob service
-resource "azurerm_private_dns_zone" "flyte_private_dns_zone" {
+# Get DNS zone data
+data "azurerm_private_dns_zone" "blob_dns_zone" {
   count               = local.private_flyte_enabled ? 1 : 0
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = var.aks_vnet_rg_name
+  name                = var.blob_dns_zone_name
+  resource_group_name = var.resource_group_name
 }
-# link the dns private zone to the AKS VNET
-resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_flyte_vnet_link" {
-  count                 = local.private_flyte_enabled ? 1 : 0
-  name                  = "flyte-vnet-dns-link"
-  resource_group_name   = var.aks_vnet_rg_name
-  private_dns_zone_name = azurerm_private_dns_zone.flyte_private_dns_zone[0].name
-  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
+# Create an A Record in the Blob Private DNS Zone
+resource "azurerm_private_dns_a_record" "flyte_a_record" {
+  count               = local.private_flyte_enabled ? 1 : 0
+  name                = "flyte"
+  zone_name           = data.azurerm_private_dns_zone.blob_dns_zone[0].name
+  resource_group_name = var.resource_group_name
+  ttl                 = 300
+  records             = [module.domino_flyte_ep[0].ep_object.private_service_connection[0].private_ip_address]
+  depends_on          = [module.domino_flyte_ep]
 }
 #########################################################################
 ########################## Private EndPoint #############################
@@ -110,18 +102,18 @@ module "domino_flyte_ep" {
   resource_id           = azurerm_storage_account.flyte.id
   nic_name              = "sa-flyte-${var.deploy_id}"
   private_endpoint_name = "sa-flyte-${var.deploy_id}"
-  private_dns_zone      = azurerm_private_dns_zone.flyte_private_dns_zone[0].name
-  private_dns_zone_id   = azurerm_private_dns_zone.flyte_private_dns_zone[0].id
+  private_dns_zone      = data.azurerm_private_dns_zone.blob_dns_zone[0].name
+  private_dns_zone_id   = data.azurerm_private_dns_zone.blob_dns_zone[0].id
   sub_resource          = "blob"
-  location              = data.azurerm_resource_group.aks.location
+  location              = var.resource_group_location
   resource_group_name   = var.aks_vnet_rg_name
   subnet_id             = data.azurerm_subnet.aks_subnet[0].id
 }
 #########################################################################
 ############################ Network rules ##############################
 #########################################################################
-# Create a storage account network rule to authorize access to shared from private endpoint
-resource "azurerm_storage_account_network_rules" "domino_shared_rules" {
+# Create a storage account network rule to authorize access to flyte from private endpoint
+resource "azurerm_storage_account_network_rules" "domino_flyte_rules" {
   count                      = local.private_flyte_enabled ? 1 : 0
   storage_account_id         = azurerm_storage_account.flyte.id
   default_action             = "Deny"

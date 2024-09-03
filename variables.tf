@@ -1,6 +1,7 @@
 variable "api_server_authorized_ip_ranges" {
   type        = list(string)
   description = "The IP ranges to whitelist for incoming traffic to the masters"
+  default     = null
 }
 
 variable "resource_group" {

@@ -84,8 +84,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_dns_zone_id                 = var.private_cluster_enabled ? azurerm_private_dns_zone.aks_private_dns_zone[0].id : null
   private_cluster_public_fqdn_enabled = var.private_cluster_enabled ? var.private_cluster_public_fqdn_enabled : null
 
-  api_server_access_profile {
-    authorized_ip_ranges = var.private_cluster_enabled ? null : var.api_server_authorized_ip_ranges
+  dynamic "api_server_access_profile" {
+    for_each = var.private_cluster_enabled ? [] : [1]
+    content {
+      authorized_ip_ranges = var.api_server_authorized_ip_ranges
+    }
   }
 
   default_node_pool {

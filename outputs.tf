@@ -34,3 +34,12 @@ output "workload_identities" {
     "hephaestus" = azurerm_user_assigned_identity.hephaestus
   }
 }
+output "blob_dns_zone_name" {
+  description = "blob dns zone name"
+  value       = azurerm_private_dns_zone.blob_private_dns_zone[0].name
+}
+
+output "private_cluster_enabled" {
+  description = "Flag to determine if AKS is private or public"
+  value       = var.private_cluster_enabled
+}
