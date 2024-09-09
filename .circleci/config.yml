@@ -20,6 +20,31 @@ commands:
             echo export TF_VAR_deploy_id=\"${WORKSPACE}\" >> $BASH_ENV
             echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
+  update_package_manager:
+    steps:
+      - run:
+          name: Update package manager
+          command: |
+            yum update
+            yum upgrade --assumeyes
+  install_git_azure_cli:
+    parameters:
+      terraform_version:
+        type: string
+        default: << pipeline.parameters.terraform_version >>
+    steps:
+      - run:
+          name: Install git
+          command: yum install git -y
+  install_tf_azure_cli:
+    parameters:
+      terraform_version:
+        type: string
+        default: << pipeline.parameters.terraform_version >>
+    steps:
+      - run:
+          name: Install terraform
+          command: yum install terraform -y
   install_git:
     steps:
       - run:
@@ -100,7 +125,7 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_tf
+      - install_tf_azure_cli
       - set_env_vars
       - tf_init_apply
       - run:
@@ -123,8 +148,8 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_git
-      - install_tf
+      - install_git_azure_cli
+      - install_tf_azure_cli
       - set_env_vars
       - run:
           name: "Set module source to latest domino release"
