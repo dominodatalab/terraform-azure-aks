@@ -43,8 +43,8 @@ commands:
         default: << pipeline.parameters.terraform_version >>
     steps:
       - run:
-          name: Install terraform
-          command: yum install terraform -y
+          name: Install terraform & jq
+          command: yum install terraform jq -y
   install_git:
     steps:
       - run:
