@@ -19,12 +19,12 @@ output "dataplane_client_id" {
 }
 
 output "storage_account_name" {
-  description = "Flyte storage account name"
   value       = azurerm_storage_account.flyte.name
+  description = "Flyte storage account name"
 }
 
 output "storage_account_key" {
-  description = "Flyte storage account key"
   value       = azurerm_storage_account.flyte.primary_access_key
+  description = "Flyte storage account key"
   sensitive   = true
 }

@@ -1,3 +1,7 @@
+#########################################################################
+############################### Locals ##################################
+#########################################################################
+# locals for nodepools configuration
 locals {
   node_pools = { for k, v in merge(var.node_pools, var.additional_node_pools) : k => v if k != "system" }
   zonal_node_pools = flatten([for name, spec in local.node_pools : [
@@ -10,12 +14,51 @@ locals {
     ]
   ])
 }
-
+#########################################################################
+################################# Data ##################################
+#########################################################################
+# Retrieve kubernetes version
 data "azurerm_kubernetes_service_versions" "selected" {
   location       = data.azurerm_resource_group.aks.location
   version_prefix = var.kubernetes_version
 }
-
+# Retrieve AKS subnet
+data "azurerm_subnet" "aks_subnet" {
+  count                = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
+  name                 = var.aks_subnet_name
+  virtual_network_name = var.aks_vnet_name
+  resource_group_name  = var.aks_vnet_rg_name
+}
+# Retrieve AKS vnet
+data "azurerm_virtual_network" "aks_vnet" {
+  count               = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
+  name                = var.aks_vnet_name
+  resource_group_name = var.aks_vnet_rg_name
+}
+#########################################################################
+########################### Private DNS Zone ############################
+#########################################################################
+# create private dns zone
+resource "azurerm_private_dns_zone" "aks_private_dns_zone" {
+  count               = var.private_cluster_enabled ? 1 : 0
+  name                = "privatelink.${lower(replace(data.azurerm_resource_group.aks.location, " ", ""))}.azmk8s.io"
+  resource_group_name = data.azurerm_resource_group.aks.name
+}
+# link the dns provate zone to the AKS VNET
+resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_aks_vnet_link" {
+  count                 = var.private_cluster_enabled ? 1 : 0
+  name                  = "aks-vnet-dns-link"
+  resource_group_name   = data.azurerm_resource_group.aks.name
+  private_dns_zone_name = azurerm_private_dns_zone.aks_private_dns_zone[0].name
+  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
+  depends_on = [
+    azurerm_private_dns_zone.aks_private_dns_zone
+  ]
+}
+#########################################################################
+############################## AKS Cluster ##############################
+#########################################################################
+# Create the AKS cluster
 resource "azurerm_kubernetes_cluster" "aks" {
   lifecycle {
     ignore_changes = [
@@ -29,17 +72,23 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ]
   }
 
-  name                              = var.deploy_id
-  location                          = data.azurerm_resource_group.aks.location
-  resource_group_name               = data.azurerm_resource_group.aks.name
-  dns_prefix                        = var.deploy_id
-  private_cluster_enabled           = false
-  sku_tier                          = var.cluster_sku_tier
-  kubernetes_version                = data.azurerm_kubernetes_service_versions.selected.latest_version
-  role_based_access_control_enabled = true
+  name                                = var.deploy_id
+  location                            = data.azurerm_resource_group.aks.location
+  resource_group_name                 = data.azurerm_resource_group.aks.name
+  dns_prefix                          = var.private_cluster_enabled ? null : var.deploy_id
+  private_cluster_enabled             = var.private_cluster_enabled
+  sku_tier                            = var.cluster_sku_tier
+  kubernetes_version                  = data.azurerm_kubernetes_service_versions.selected.latest_version
+  role_based_access_control_enabled   = true
+  dns_prefix_private_cluster          = var.private_cluster_enabled ? var.deploy_id : null
+  private_dns_zone_id                 = var.private_cluster_enabled ? azurerm_private_dns_zone.aks_private_dns_zone[0].id : null
+  private_cluster_public_fqdn_enabled = var.private_cluster_enabled ? var.private_cluster_public_fqdn_enabled : null
 
-  api_server_access_profile {
-    authorized_ip_ranges = var.api_server_authorized_ip_ranges
+  dynamic "api_server_access_profile" {
+    for_each = var.private_cluster_enabled ? [] : [1]
+    content {
+      authorized_ip_ranges = var.api_server_authorized_ip_ranges
+    }
   }
 
   default_node_pool {
@@ -57,9 +106,11 @@ resource "azurerm_kubernetes_cluster" "aks" {
     node_count                   = var.node_pools.system.initial_count
     max_pods                     = var.node_pools.system.max_pods
     tags                         = var.tags
+    vnet_subnet_id               = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
   }
   identity {
-    type = "SystemAssigned"
+    type         = var.private_cluster_enabled ? "UserAssigned" : "SystemAssigned"
+    identity_ids = var.private_cluster_enabled ? [azurerm_user_assigned_identity.aks_assigned_identity[0].id] : null
   }
 
   oidc_issuer_enabled       = true
@@ -104,6 +155,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
       az aks get-credentials --overwrite-existing -f ${var.kubeconfig_output_path} -n ${var.deploy_id} -g ${data.azurerm_resource_group.aks.name}
     EOF
   }
+  depends_on = [
+    azurerm_role_assignment.identity_assign_rg,
+    azurerm_role_assignment.identity_assign_vnet
+  ]
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
@@ -126,6 +181,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   max_count             = each.value.node_pool_spec.max_count
   max_pods              = each.value.node_pool_spec.max_pods
   tags                  = var.tags
+  vnet_subnet_id        = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
 
   lifecycle {
     ignore_changes = [node_count, max_count, tags]

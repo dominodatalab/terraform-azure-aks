@@ -1,6 +1,7 @@
 variable "api_server_authorized_ip_ranges" {
   type        = list(string)
   description = "The IP ranges to whitelist for incoming traffic to the masters"
+  default     = null
 }
 
 variable "resource_group" {
@@ -237,4 +238,40 @@ variable "pod_cidr" {
   description = "CIDR block for Kubernetes pods, used when CNI Overlay is enabled"
   type        = string
   default     = "192.168.0.0/16"
+}
+
+variable "private_acr_enabled" {
+  description = "Flag to determine whether to deploy a private ACR"
+  type        = bool
+  default     = false
+}
+
+variable "private_cluster_enabled" {
+  description = "Flag to determine whether to deploy a private AKS"
+  type        = bool
+  default     = false
+}
+
+variable "aks_vnet_name" {
+  description = "VNet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  type        = string
+  default     = null
+}
+
+variable "aks_subnet_name" {
+  description = "Subnet name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  type        = string
+  default     = null
+}
+
+variable "aks_vnet_rg_name" {
+  description = "VNet Resource Groupe name for ACR/AKS, required when either private_acr_enabled or private_cluster_enabled is set to true."
+  type        = string
+  default     = null
+}
+
+variable "private_cluster_public_fqdn_enabled" {
+  description = "Flag to determine whether to use a public FQDN when deploying a private AKS cluster"
+  type        = bool
+  default     = null
 }
