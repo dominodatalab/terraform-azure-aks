@@ -1,9 +1,11 @@
 # terraform-azure-aks
+
 Terraform module for deploying a Domino on AKS
 
 ## Use
 
 ### Create a Domino development AKS cluster
+
 ```hcl
 module "aks_cluster" {
   source  = "github.com/dominodatalab/terraform-azure-aks"
@@ -13,17 +15,21 @@ module "aks_cluster" {
 ```
 
 ## Manual Deploy
+
 For new projects, the following needs to be done only once for the workspace.
+
 1. `az login`
 1. `terraform init`
 1. `terraform workspace new [cluster-name]`
 
 Run the Terraform deployment
+
 1. `export TF_VAR_service_principal_name=<service-principal-appid>`
 1. `export TF_VAR_service_principal_secret=<service-principal-password>`
 1. `terraform apply -auto-approve`
 
 Access AKS cluster
+
 1. `az aks get-credentials --resource-group [cluster-name] --name [cluster-name]`
 
 ### Troubleshooting
@@ -31,7 +37,8 @@ Access AKS cluster
 1. No access to Azure backend store
   In this case you would need to override the backend configuration. This can be done
   via the command line:
-  ```
+
+  ```hcl
   terraform init -backend-config="storage_account_name=<YourAzureStorageAccountName>" -backend-config="container_name=tfstate" -backend-config="access_key=<YourStorageAccountAccessKey>" -backend-config="key=codelab.microsoft.tfstate"
   ```
 
@@ -44,14 +51,14 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.45 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.9 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 3.45 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.9 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1 |
 
 ## Modules
@@ -110,22 +117,22 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | additional node pools | <pre>map(object({<br>    enable_node_public_ip = optional(bool, false)<br>    vm_size               = string<br>    zones                 = list(string)<br>    node_labels           = map(string)<br>    node_os               = optional(string, "AzureLinux")<br>    node_taints           = optional(list(string), [])<br>    enable_auto_scaling   = optional(bool, true)<br>    min_count             = optional(number, 0)<br>    max_count             = number<br>    initial_count         = optional(number, 0)<br>    max_pods              = optional(number, 30)<br>    os_disk_size_gb       = optional(number, 128)<br>  }))</pre> | `{}` | no |
+| <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | additional node pools | <pre>map(object({<br/>    enable_node_public_ip = optional(bool, false)<br/>    vm_size               = string<br/>    zones                 = list(string)<br/>    node_labels           = map(string)<br/>    node_os               = optional(string, "AzureLinux")<br/>    node_taints           = optional(list(string), [])<br/>    enable_auto_scaling   = optional(bool, true)<br/>    min_count             = optional(number, 0)<br/>    max_count             = number<br/>    initial_count         = optional(number, 0)<br/>    max_pods              = optional(number, 30)<br/>    os_disk_size_gb       = optional(number, 128)<br/>  }))</pre> | `{}` | no |
 | <a name="input_aks_subnet_name"></a> [aks\_subnet\_name](#input\_aks\_subnet\_name) | Subnet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_aks_vnet_name"></a> [aks\_vnet\_name](#input\_aks\_vnet\_name) | VNet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_aks_vnet_rg_name"></a> [aks\_vnet\_rg\_name](#input\_aks\_vnet\_rg\_name) | VNet Resource Groupe name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_api_server_authorized_ip_ranges"></a> [api\_server\_authorized\_ip\_ranges](#input\_api\_server\_authorized\_ip\_ranges) | The IP ranges to whitelist for incoming traffic to the masters | `list(string)` | `null` | no |
 | <a name="input_cluster_sku_tier"></a> [cluster\_sku\_tier](#input\_cluster\_sku\_tier) | The Domino cluster SKU (defaults to Free) | `string` | `null` | no |
 | <a name="input_cni_overlay_enabled"></a> [cni\_overlay\_enabled](#input\_cni\_overlay\_enabled) | Flag to determine whether to use overlay network settings | `bool` | `false` | no |
-| <a name="input_containers"></a> [containers](#input\_containers) | storage containers to create | <pre>map(object({<br>    container_access_type = string<br>  }))</pre> | <pre>{<br>  "backups": {<br>    "container_access_type": "private"<br>  },<br>  "projects": {<br>    "container_access_type": "private"<br>  }<br>}</pre> | no |
+| <a name="input_containers"></a> [containers](#input\_containers) | storage containers to create | <pre>map(object({<br/>    container_access_type = string<br/>  }))</pre> | <pre>{<br/>  "backups": {<br/>    "container_access_type": "private"<br/>  },<br/>  "projects": {<br/>    "container_access_type": "private"<br/>  }<br/>}</pre> | no |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino Deployment ID. | `string` | n/a | yes |
 | <a name="input_dns_service_ip"></a> [dns\_service\_ip](#input\_dns\_service\_ip) | IP address assigned to the Kubernetes DNS service, used when CNI Overlay is enabled | `string` | `"100.97.0.10"` | no |
 | <a name="input_kubeconfig_output_path"></a> [kubeconfig\_output\_path](#input\_kubeconfig\_output\_path) | kubeconfig path | `string` | n/a | yes |
-| <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br>    idle_timeout_in_minutes   = optional(number, 4)<br>    managed_outbound_ip_count = number<br>    }<br>  )</pre> | `null` | no |
+| <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br/>    idle_timeout_in_minutes   = optional(number, 4)<br/>    managed_outbound_ip_count = number<br/>    }<br/>  )</pre> | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm\_kubernetes\_service\_versions. | `string` | `null` | no |
 | <a name="input_log_analytics_workspace_sku"></a> [log\_analytics\_workspace\_sku](#input\_log\_analytics\_workspace\_sku) | log analytics sku | `string` | `"PerGB2018"` | no |
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespace that are used for generating the service account bindings | `object({ platform = string, compute = string })` | n/a | yes |
-| <a name="input_node_pools"></a> [node\_pools](#input\_node\_pools) | default node pools | <pre>object({<br>    compute = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_D8s_v4")<br>      zones                 = optional(list(string), ["1", "2", "3"])<br>      node_labels = optional(map(string), {<br>        "dominodatalab.com/node-pool" = "default"<br>      })<br>      node_os             = optional(string, "AzureLinux")<br>      node_taints         = optional(list(string), [])<br>      enable_auto_scaling = optional(bool, true)<br>      min_count           = optional(number, 0)<br>      max_count           = optional(number, 10)<br>      initial_count       = optional(number, 1)<br>      max_pods            = optional(number, 30)<br>      os_disk_size_gb     = optional(number, 128)<br>    }),<br>    platform = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_D8s_v4")<br>      zones                 = optional(list(string), ["1", "2", "3"])<br>      node_labels = optional(map(string), {<br>        "dominodatalab.com/node-pool" = "platform"<br>      })<br>      node_os             = optional(string, "AzureLinux")<br>      node_taints         = optional(list(string), [])<br>      enable_auto_scaling = optional(bool, true)<br>      min_count           = optional(number, 1)<br>      max_count           = optional(number, 3)<br>      initial_count       = optional(number, 1)<br>      max_pods            = optional(number, 60)<br>      os_disk_size_gb     = optional(number, 128)<br>    }),<br>    gpu = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_NC6s_v3")<br>      zones                 = optional(list(string), [])<br>      node_labels = optional(map(string), {<br>        "dominodatalab.com/node-pool" = "default-gpu"<br>        "nvidia.com/gpu"              = "true"<br>      })<br>      node_os = optional(string, "AzureLinux")<br>      node_taints = optional(list(string), [<br>        "nvidia.com/gpu=true:NoExecute"<br>      ])<br>      enable_auto_scaling = optional(bool, true)<br>      min_count           = optional(number, 0)<br>      max_count           = optional(number, 1)<br>      initial_count       = optional(number, 0)<br>      max_pods            = optional(number, 30)<br>      os_disk_size_gb     = optional(number, 128)<br>    })<br>    system = object({<br>      enable_node_public_ip = optional(bool, false)<br>      vm_size               = optional(string, "Standard_DS4_v2")<br>      zones                 = optional(list(string), ["1", "2", "3"])<br>      node_labels           = optional(map(string), {})<br>      node_os               = optional(string, "AzureLinux")<br>      node_taints           = optional(list(string), [])<br>      enable_auto_scaling   = optional(bool, true)<br>      min_count             = optional(number, 1)<br>      max_count             = optional(number, 6)<br>      initial_count         = optional(number, 1)<br>      max_pods              = optional(number, 60)<br>      os_disk_size_gb       = optional(number, 128)<br>    })<br>  })</pre> | <pre>{<br>  "compute": {},<br>  "gpu": {},<br>  "platform": {},<br>  "system": {}<br>}</pre> | no |
+| <a name="input_node_pools"></a> [node\_pools](#input\_node\_pools) | default node pools | <pre>object({<br/>    compute = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_D8s_v4")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "default"<br/>      })<br/>      node_os             = optional(string, "AzureLinux")<br/>      node_taints         = optional(list(string), [])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 0)<br/>      max_count           = optional(number, 10)<br/>      initial_count       = optional(number, 1)<br/>      max_pods            = optional(number, 30)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    }),<br/>    platform = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_D8s_v4")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "platform"<br/>      })<br/>      node_os             = optional(string, "AzureLinux")<br/>      node_taints         = optional(list(string), [])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 1)<br/>      max_count           = optional(number, 3)<br/>      initial_count       = optional(number, 1)<br/>      max_pods            = optional(number, 60)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    }),<br/>    gpu = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_NC6s_v3")<br/>      zones                 = optional(list(string), [])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "default-gpu"<br/>        "nvidia.com/gpu"              = "true"<br/>      })<br/>      node_os = optional(string, "AzureLinux")<br/>      node_taints = optional(list(string), [<br/>        "nvidia.com/gpu=true:NoExecute"<br/>      ])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 0)<br/>      max_count           = optional(number, 1)<br/>      initial_count       = optional(number, 0)<br/>      max_pods            = optional(number, 30)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    })<br/>    system = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_DS4_v2")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels           = optional(map(string), {})<br/>      node_os               = optional(string, "AzureLinux")<br/>      node_taints           = optional(list(string), [])<br/>      enable_auto_scaling   = optional(bool, true)<br/>      min_count             = optional(number, 1)<br/>      max_count             = optional(number, 6)<br/>      initial_count         = optional(number, 1)<br/>      max_pods              = optional(number, 60)<br/>      os_disk_size_gb       = optional(number, 128)<br/>    })<br/>  })</pre> | <pre>{<br/>  "compute": {},<br/>  "gpu": {},<br/>  "platform": {},<br/>  "system": {}<br/>}</pre> | no |
 | <a name="input_pod_cidr"></a> [pod\_cidr](#input\_pod\_cidr) | CIDR block for Kubernetes pods, used when CNI Overlay is enabled | `string` | `"192.168.0.0/16"` | no |
 | <a name="input_private_acr_enabled"></a> [private\_acr\_enabled](#input\_private\_acr\_enabled) | Flag to determine whether to deploy a private ACR | `bool` | `false` | no |
 | <a name="input_private_cluster_enabled"></a> [private\_cluster\_enabled](#input\_private\_cluster\_enabled) | Flag to determine whether to deploy a private AKS | `bool` | `false` | no |
