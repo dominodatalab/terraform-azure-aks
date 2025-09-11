@@ -275,3 +275,9 @@ variable "private_cluster_public_fqdn_enabled" {
   type        = bool
   default     = null
 }
+
+variable "node_os_upgrade_channel" {
+  description = "Option to enable automatic node OS upgrades.  Possible values are Unmanaged, SecurityPatch, NodeImage and None."
+  type = string
+  default = "None"
+}
