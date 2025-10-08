@@ -6,7 +6,7 @@ parameters:
     type: string
 
 orbs:
-  terraform: circleci/terraform@3.2.1
+  terraform: circleci/terraform@3.6.0
 
 environment: &default_environment
   WORKSPACE: << parameters.workspace >>
