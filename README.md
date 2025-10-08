@@ -38,7 +38,7 @@ Access AKS cluster
 ## Development
 
 Please submit any feature enhancements, bug fixes, or ideas via pull requests or issues.
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -117,4 +117,4 @@ No modules.
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer url |
 | <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account) | storage account |
 | <a name="output_workload_identities"></a> [workload\_identities](#output\_workload\_identities) | service identities |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
