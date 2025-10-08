@@ -20,32 +20,11 @@ commands:
             echo export TF_VAR_deploy_id=\"${WORKSPACE}\" >> $BASH_ENV
             echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
-  install_git:
+  install_deps:
     steps:
       - run:
-          name: Install git
-          command: |
-            if command -v apt-get >/dev/null 2>&1; then
-              echo "Installing git using apt-get"
-              apt-get update && apt-get install -y git wget unzip jq && rm -rf /var/lib/apt/lists/*
-            elif command -v apk >/dev/null 2>&1; then
-              echo "Installing git using apk"
-              apk add --no-cache git wget unzip jq
-            elif command -v dnf >/dev/null 2>&1; then
-              echo "Installing git using dnf"
-              dnf install -y git wget unzip jq
-            elif command -v yum >/dev/null 2>&1; then
-              echo "Installing git using yum"
-              yum install -y git wget unzip jq
-            elif command -v tdnf >/dev/null 2>&1; then
-              echo "Installing git using tdnf"
-              tdnf install -y git wget unzip jq
-            elif command -v microdnf >/dev/null 2>&1; then
-              echo "Installing git using microdnf"
-              microdnf install -y git wget unzip jq
-            else
-              echo "No supported package manager found (apt-get/apk/dnf/yum/tdnf/microdnf)" && exit 1
-            fi
+          name: Install dependencies
+          command: tdnf install -y git awk jq unzip wget
   install_tf:
     parameters:
       terraform_version:
@@ -123,7 +102,7 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_git
+      - install_deps
       - install_tf:
           terraform_version: << parameters.terraform_version >>
       - set_env_vars
@@ -148,7 +127,7 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_git
+      - install_deps
       - install_tf:
           terraform_version: << parameters.terraform_version >>
       - set_env_vars
