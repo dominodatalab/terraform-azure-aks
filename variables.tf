@@ -278,6 +278,17 @@ variable "private_cluster_public_fqdn_enabled" {
 
 variable "node_os_upgrade_channel" {
   description = "Option to enable automatic node OS upgrades.  Possible values are Unmanaged, SecurityPatch, NodeImage and None."
-  type = string
-  default = "None"
+  type        = string
+  default     = "None"
+}
+
+variable "workspace_audit" {
+  description = "Workspace audit configuration"
+  type = object({
+    enabled                       = optional(bool, false)
+    events_container_name         = optional(string, "workspace-audit-events-working")
+    events_archive_container_name = optional(string, "workspace-audit-events-archive")
+    container_access_type         = optional(string, "private")
+  })
+  default = {}
 }

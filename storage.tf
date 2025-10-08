@@ -160,9 +160,24 @@ resource "azurerm_storage_account_network_rules" "domino_blob_rules" {
 #########################################################################
 ##################### Storage Account Containers ########################
 #########################################################################
+locals {
+  # Merge workspace audit containers with standard containers when enabled
+  all_containers = merge(
+    var.containers,
+    var.workspace_audit.enabled ? {
+      (var.workspace_audit.events_container_name) = {
+        container_access_type = var.workspace_audit.container_access_type
+      }
+      (var.workspace_audit.events_archive_container_name) = {
+        container_access_type = var.workspace_audit.container_access_type
+      }
+    } : {}
+  )
+}
+
 resource "azurerm_storage_container" "domino_containers" {
   for_each = {
-    for key, value in var.containers :
+    for key, value in local.all_containers :
     key => value
   }
 
