@@ -127,6 +127,12 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   max_pods              = each.value.node_pool_spec.max_pods
   tags                  = var.tags
 
+  upgrade_settings {
+    drain_timeout_in_minutes      = 0
+    max_surge                     = "10%"
+    node_soak_duration_in_minutes = 0
+  }
+
   lifecycle {
     ignore_changes = [node_count, max_count, tags]
   }

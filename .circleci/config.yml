@@ -6,7 +6,7 @@ parameters:
     type: string
 
 orbs:
-  terraform: circleci/terraform@3.2.1
+  terraform: circleci/terraform@3.6.0
 
 environment: &default_environment
   WORKSPACE: << parameters.workspace >>
@@ -20,11 +20,11 @@ commands:
             echo export TF_VAR_deploy_id=\"${WORKSPACE}\" >> $BASH_ENV
             echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
-  install_git:
+  install_deps:
     steps:
       - run:
-          name: Install git
-          command: apk add git
+          name: Install dependencies
+          command: tdnf install -y git awk jq unzip wget
   install_tf:
     parameters:
       terraform_version:
@@ -78,13 +78,15 @@ jobs:
 
     steps:
       - checkout
-      - install_tf
+      - install_tf:
+          terraform_version: << parameters.terraform_version >>
       - run:
           name: pre-commit
           command: |
-            curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-            curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
-            curl -L https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-linux-amd64.tar.gz | tar -C /tmp -xzf - && chmod +x /tmp/terraform-docs && sudo mv /tmp/terraform-docs /usr/local/bin
+            curl -s --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+            export TFSEC_VERSION=v1.28.14 #Pinning version toreduce GH calls to avoid rate limiting
+            curl -s --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+            curl -L --retry 10 --retry-delay 2 --retry-all-errors https://github.com/terraform-docs/terraform-docs/releases/download/v0.20.0/terraform-docs-v0.20.0-linux-amd64.tar.gz | tar -C /tmp -xzf - && chmod +x /tmp/terraform-docs && sudo mv /tmp/terraform-docs /usr/local/bin
             pip3 install checkov pre-commit
             SKIP=no-commit-to-branch pre-commit run --all-files
 
@@ -100,7 +102,9 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_tf
+      - install_deps
+      - install_tf:
+          terraform_version: << parameters.terraform_version >>
       - set_env_vars
       - tf_init_apply
       - run:
@@ -123,8 +127,9 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_git
-      - install_tf
+      - install_deps
+      - install_tf:
+          terraform_version: << parameters.terraform_version >>
       - set_env_vars
       - run:
           name: "Set module source to latest domino release"

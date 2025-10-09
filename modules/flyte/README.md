@@ -1,4 +1,4 @@
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -39,11 +39,11 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino deployment id | `string` | n/a | yes |
-| <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespaces for workload identity federation | <pre>object({<br>    compute  = optional(string, "domino-compute")<br>    platform = optional(string, "domino-platform")<br>  })</pre> | `{}` | no |
+| <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespaces for workload identity federation | <pre>object({<br/>    compute  = optional(string, "domino-compute")<br/>    platform = optional(string, "domino-platform")<br/>  })</pre> | `{}` | no |
 | <a name="input_oidc_issuer_url"></a> [oidc\_issuer\_url](#input\_oidc\_issuer\_url) | OIDC issuer url | `string` | n/a | yes |
 | <a name="input_resource_group_location"></a> [resource\_group\_location](#input\_resource\_group\_location) | Resource group location | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Resource group name | `string` | n/a | yes |
-| <a name="input_service_account_names"></a> [service\_account\_names](#input\_service\_account\_names) | Service account names for workload identity federation | <pre>object({<br>    datacatalog    = optional(string, "datacatalog")<br>    flyteadmin     = optional(string, "flyteadmin")<br>    flytepropeller = optional(string, "flytepropeller")<br>    nucleus        = optional(string, "nucleus")<br>  })</pre> | `{}` | no |
+| <a name="input_service_account_names"></a> [service\_account\_names](#input\_service\_account\_names) | Service account names for workload identity federation | <pre>object({<br/>    datacatalog    = optional(string, "datacatalog")<br/>    flyteadmin     = optional(string, "flyteadmin")<br/>    flytepropeller = optional(string, "flytepropeller")<br/>    nucleus        = optional(string, "nucleus")<br/>  })</pre> | `{}` | no |
 | <a name="input_storage_account_replication_type"></a> [storage\_account\_replication\_type](#input\_storage\_account\_replication\_type) | Storage account replication type | `string` | `"LRS"` | no |
 | <a name="input_storage_account_tier"></a> [storage\_account\_tier](#input\_storage\_account\_tier) | Storage account tier | `string` | `"Standard"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to resources | `map(string)` | `{}` | no |
@@ -58,4 +58,4 @@ No modules.
 | <a name="output_metadata_container_name"></a> [metadata\_container\_name](#output\_metadata\_container\_name) | Flyte metadata storage container name |
 | <a name="output_storage_account_key"></a> [storage\_account\_key](#output\_storage\_account\_key) | Flyte storage account key |
 | <a name="output_storage_account_name"></a> [storage\_account\_name](#output\_storage\_account\_name) | Flyte storage account name |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

@@ -16,13 +16,29 @@ resource "azurerm_storage_account" "domino" {
   }
 }
 
+locals {
+  all_containers = merge(
+    { for k, v in var.containers : k => merge(v, { name = k }) },
+    var.workspace_audit.enabled ? {
+      workspace-audit-events-working = {
+        name                  = var.workspace_audit.events_container_name
+        container_access_type = var.workspace_audit.container_access_type
+      }
+      workspace-audit-events-archive = {
+        name                  = var.workspace_audit.events_archive_container_name
+        container_access_type = var.workspace_audit.container_access_type
+      }
+    } : {}
+  )
+}
+
 resource "azurerm_storage_container" "domino_containers" {
   for_each = {
-    for key, value in var.containers :
+    for key, value in local.all_containers :
     key => value
   }
 
-  name                  = "${var.deploy_id}-${each.key}"
+  name                  = "${var.deploy_id}-${each.value.name}"
   storage_account_name  = azurerm_storage_account.domino.name
   container_access_type = each.value.container_access_type
 }
