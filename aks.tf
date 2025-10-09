@@ -185,7 +185,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   vnet_subnet_id        = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
 
   upgrade_settings {
-    max_surge = "10%"
+    drain_timeout_in_minutes      = 0
+    max_surge                     = "10%"
+    node_soak_duration_in_minutes = 0
   }
 
   lifecycle {
