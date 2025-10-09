@@ -1,6 +1,6 @@
 # private_endpoint
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -43,4 +43,4 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_ep_object"></a> [ep\_object](#output\_ep\_object) | Private Endpoint object information |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

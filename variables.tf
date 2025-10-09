@@ -298,3 +298,14 @@ variable "acr_credential_refresher_service_account" {
   type        = string
   default     = "nucleus-acr-credential-refresher"
 }
+
+variable "workspace_audit" {
+  description = "Workspace audit configuration"
+  type = object({
+    enabled                       = optional(bool, false)
+    events_container_name         = optional(string, "workspace-audit-events-working")
+    events_archive_container_name = optional(string, "workspace-audit-events-archive")
+    container_access_type         = optional(string, "private")
+  })
+  default = {}
+}

@@ -184,6 +184,10 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   tags                  = var.tags
   vnet_subnet_id        = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
 
+  upgrade_settings {
+    max_surge = "10%"
+  }
+
   lifecycle {
     ignore_changes = [node_count, max_count, tags, upgrade_settings]
   }
