@@ -82,3 +82,9 @@ resource "azurerm_role_assignment" "aks_domino_private_acr" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id
 }
+# ACR Pull from nucleus-frontend
+resource "azurerm_role_assignment" "nucleus_acr" {
+  scope                = azurerm_container_registry.domino.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.nucleus.principal_id
+}

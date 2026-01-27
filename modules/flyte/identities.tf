@@ -4,7 +4,6 @@ locals {
     flyteadmin     = azurerm_user_assigned_identity.flyte_dataplane.id
     flytepropeller = azurerm_user_assigned_identity.flyte_controlplane.id
     datacatalog    = azurerm_user_assigned_identity.flyte_controlplane.id
-    nucleus        = azurerm_user_assigned_identity.flyte_dataplane.id
   }
 }
 

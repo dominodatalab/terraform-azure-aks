@@ -79,3 +79,19 @@ resource "azurerm_federated_identity_credential" "importer" {
   parent_id           = azurerm_user_assigned_identity.hephaestus.id
   subject             = "system:serviceaccount:${var.namespaces.platform}:domino-data-importer"
 }
+# Create nucleus identity
+resource "azurerm_user_assigned_identity" "nucleus" {
+  name                = "${var.deploy_id}-nucleus"
+  location            = data.azurerm_resource_group.aks.location
+  resource_group_name = data.azurerm_resource_group.aks.name
+  tags                = var.tags
+}
+# Create nucleus identity credentials
+resource "azurerm_federated_identity_credential" "nucleus" {
+  name                = "${var.deploy_id}-nucleus"
+  resource_group_name = data.azurerm_resource_group.aks.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
+  parent_id           = azurerm_user_assigned_identity.nucleus.id
+  subject             = "system:serviceaccount:${var.namespaces.platform}:nucleus"
+}

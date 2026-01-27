@@ -32,6 +32,7 @@ output "workload_identities" {
   description = "service identities"
   value = {
     "hephaestus" = azurerm_user_assigned_identity.hephaestus
+    "nucleus"    = azurerm_user_assigned_identity.nucleus
   }
 }
 output "blob_dns_zone_name" {
