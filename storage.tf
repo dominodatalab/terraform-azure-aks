@@ -13,6 +13,7 @@ locals {
 #########################################################################
 # Create Domino Blob Storage Account
 resource "azurerm_storage_account" "domino" {
+  #checkov:skip=CKV_AZURE_244:Local users are required for storage account key access used by AKS nodes
   name                            = replace(var.deploy_id, "/[_-]/", "")
   location                        = data.azurerm_resource_group.aks.location
   resource_group_name             = data.azurerm_resource_group.aks.name
@@ -44,6 +45,7 @@ resource "azurerm_storage_account" "domino" {
 }
 # Create Domino Shared Storage Account
 resource "azurerm_storage_account" "domino_shared" {
+  #checkov:skip=CKV_AZURE_244:Local users are required for storage account key access used by AKS nodes
   name                            = "${replace(var.deploy_id, "/[_-]/", "")}${"shared"}"
   location                        = data.azurerm_resource_group.aks.location
   resource_group_name             = data.azurerm_resource_group.aks.name

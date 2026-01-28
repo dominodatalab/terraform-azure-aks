@@ -20,37 +20,75 @@ commands:
             echo export TF_VAR_deploy_id=\"${WORKSPACE}\" >> $BASH_ENV
             echo 'export TF_VAR_description="CircleCI Build for ${CIRCLE_PR_REPONAME}: ${CIRCLE_BUILD_URL}"' >> $BASH_ENV
             echo 'export WORKSPACE=azure-aks-circleci-${CIRCLE_BUILD_NUM}' >> $BASH_ENV
-  update_package_manager:
+  update_package_lists:
     steps:
       - run:
-          name: Update package manager
+          name: Update package lists
           command: |
-            yum update
-            yum upgrade --assumeyes
-  install_git_azure_cli:
+            # Update package lists before installing (only update, not upgrade)
+            if [[ $EUID == 0 ]]; then
+              SUDO=""
+            else
+              SUDO="sudo"
+            fi
+
+            if command -v tdnf &> /dev/null; then
+              # Azure Linux 3.0 (mcr.microsoft.com/azure-cli image)
+              echo "Updating tdnf package lists (Azure Linux 3.0)"
+              $SUDO tdnf update --refresh -y || true
+            elif command -v apt-get &> /dev/null; then
+              # Debian/Ubuntu (cimg/python image)
+              echo "Updating apt-get package lists (Debian/Ubuntu)"
+              $SUDO apt-get update
+            else
+              echo "No supported package manager found (tdnf or apt-get)"
+              exit 1
+            fi
+  install_package:
     parameters:
-      terraform_version:
+      package_name:
         type: string
-        default: << pipeline.parameters.terraform_version >>
     steps:
       - run:
-          name: Install git
-          command: yum install git -y
-  install_tf_azure_cli:
-    parameters:
-      terraform_version:
-        type: string
-        default: << pipeline.parameters.terraform_version >>
+          name: Install << parameters.package_name >>
+          command: |
+            if ! command -v << parameters.package_name >> &> /dev/null; then
+              # Determine if we need sudo (not running as root)
+              if [[ $EUID == 0 ]]; then
+                SUDO=""
+              else
+                SUDO="sudo"
+              fi
+
+              if command -v tdnf &> /dev/null; then
+                # Azure Linux 3.0 (mcr.microsoft.com/azure-cli image)
+                echo "Using tdnf to install << parameters.package_name >> (Azure Linux 3.0)"
+                $SUDO tdnf install -y << parameters.package_name >>
+              elif command -v apt-get &> /dev/null; then
+                # Debian/Ubuntu (cimg/python image)
+                echo "Using apt-get to install << parameters.package_name >> (Debian/Ubuntu)"
+                $SUDO apt-get install -y << parameters.package_name >>
+              else
+                echo "No supported package manager found for << parameters.package_name >>"
+                exit 1
+              fi
+            else
+              echo "<< parameters.package_name >> is already installed"
+            fi
+  install_dependencies:
     steps:
-      - run:
-          name: Install terraform & jq
-          command: yum install terraform jq -y
-  install_git:
-    steps:
-      - run:
-          name: Install git
-          command: apk add git
-  install_tf:
+      - update_package_lists
+      - install_package:
+          package_name: awk
+      - install_package:
+          package_name: curl
+      - install_package:
+          package_name: jq
+      - install_package:
+          package_name: unzip
+      - install_package:
+          package_name: wget
+  install_terraform:
     parameters:
       terraform_version:
         type: string
@@ -103,7 +141,8 @@ jobs:
 
     steps:
       - checkout
-      - install_tf
+      - install_dependencies
+      - install_terraform
       - run:
           name: pre-commit
           command: |
@@ -125,7 +164,8 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_tf_azure_cli
+      - install_dependencies
+      - install_terraform
       - set_env_vars
       - tf_init_apply
       - run:
@@ -148,8 +188,10 @@ jobs:
     environment: *default_environment
     steps:
       - checkout
-      - install_git_azure_cli
-      - install_tf_azure_cli
+      - install_dependencies
+      - install_package:
+          package_name: git
+      - install_terraform
       - set_env_vars
       - run:
           name: "Set module source to latest domino release"
