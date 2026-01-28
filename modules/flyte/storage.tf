@@ -20,6 +20,7 @@ data "azurerm_subnet" "aks_subnet" {
 #########################################################################
 # Create Domino Flyte Storage Account
 resource "azurerm_storage_account" "flyte" {
+  #checkov:skip=CKV_AZURE_244:Local users are required for storage account key access (see outputs.tf for storage_account_key)
   name                            = join("", [replace(var.deploy_id, "/[_-]/", ""), "flyte"])
   location                        = var.resource_group_location
   resource_group_name             = var.resource_group_name
