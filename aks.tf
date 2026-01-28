@@ -83,7 +83,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix_private_cluster          = var.private_cluster_enabled ? var.deploy_id : null
   private_dns_zone_id                 = var.private_cluster_enabled ? azurerm_private_dns_zone.aks_private_dns_zone[0].id : null
   private_cluster_public_fqdn_enabled = var.private_cluster_enabled ? var.private_cluster_public_fqdn_enabled : null
-  node_os_upgrade_channel             = var.node_os_upgrade_channel
+  node_os_channel_upgrade             = var.node_os_upgrade_channel # node_os_channel_upgrade defined in AzureRM 3.x but renamed to node_os_upgrade_channel in 4.0+
 
   dynamic "api_server_access_profile" {
     for_each = var.private_cluster_enabled ? [] : [1]
