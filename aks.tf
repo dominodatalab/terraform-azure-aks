@@ -185,6 +185,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   vnet_subnet_id        = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
 
   lifecycle {
-    ignore_changes = [node_count, max_count, tags]
+    ignore_changes = [node_count, max_count, tags, upgrade_settings]
   }
 }
