@@ -33,20 +33,16 @@ commands:
             fi
 
             if command -v tdnf &> /dev/null; then
-              # Azure Linux 3.0 (current Azure CLI image)
+              # Azure Linux 3.0 (mcr.microsoft.com/azure-cli image)
               echo "Updating tdnf package lists (Azure Linux 3.0)"
               $SUDO tdnf update --refresh -y || true
-            elif command -v yum &> /dev/null; then
-              # RHEL/CentOS - yum doesn't need separate update step
-              echo "Using yum (RHEL/CentOS) - no separate update needed"
             elif command -v apt-get &> /dev/null; then
-              # Debian/Ubuntu
+              # Debian/Ubuntu (cimg/python image)
               echo "Updating apt-get package lists (Debian/Ubuntu)"
               $SUDO apt-get update
-            elif command -v apk &> /dev/null; then
-              # Alpine (old Azure CLI image)
-              echo "Updating apk package lists (Alpine)"
-              $SUDO apk update
+            else
+              echo "No supported package manager found (tdnf or apt-get)"
+              exit 1
             fi
   install_package:
     parameters:
@@ -65,23 +61,13 @@ commands:
               fi
 
               if command -v tdnf &> /dev/null; then
-                # Azure Linux 3.0 (current Azure CLI image)
+                # Azure Linux 3.0 (mcr.microsoft.com/azure-cli image)
                 echo "Using tdnf to install << parameters.package_name >> (Azure Linux 3.0)"
                 $SUDO tdnf install -y << parameters.package_name >>
-              elif command -v yum &> /dev/null; then
-                # RHEL/CentOS
-                echo "Using yum to install << parameters.package_name >> (RHEL/CentOS)"
-                $SUDO yum install -y << parameters.package_name >>
               elif command -v apt-get &> /dev/null; then
-                # Debian/Ubuntu
-                # Note: apt-get update should be run once before installing multiple packages
-                # For single package installs, we update here as a fallback
+                # Debian/Ubuntu (cimg/python image)
                 echo "Using apt-get to install << parameters.package_name >> (Debian/Ubuntu)"
                 $SUDO apt-get install -y << parameters.package_name >>
-              elif command -v apk &> /dev/null; then
-                # Alpine (old Azure CLI image)
-                echo "Using apk to install << parameters.package_name >> (Alpine)"
-                $SUDO apk add --no-cache << parameters.package_name >>
               else
                 echo "No supported package manager found for << parameters.package_name >>"
                 exit 1
