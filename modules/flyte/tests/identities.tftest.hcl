@@ -52,14 +52,4 @@ run "test_identities" {
     condition     = azurerm_federated_identity_credential.this["datacatalog"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names.datacatalog}"
     error_message = "Incorrect federated identity credential subject for datacatalog"
   }
-
-  assert {
-    condition     = azurerm_federated_identity_credential.this["nucleus"].name == "${var.deploy_id}-nucleus"
-    error_message = "Incorrect federated identity credential name for nucleus"
-  }
-
-  assert {
-    condition     = azurerm_federated_identity_credential.this["nucleus"].subject == "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names.nucleus}"
-    error_message = "Incorrect federated identity credential subject for nucleus"
-  }
 }
