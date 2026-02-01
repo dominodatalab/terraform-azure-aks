@@ -281,3 +281,14 @@ variable "node_os_upgrade_channel" {
   type        = string
   default     = "None"
 }
+
+variable "acr_token_expiry_days" {
+  description = "Number of days until ACR token passwords expire. Passwords are automatically rotated hourly by AcrCredentialRefresher, so this primarily serves as a safety net. Default 365 days."
+  type        = number
+  default     = 365
+
+  validation {
+    condition     = var.acr_token_expiry_days >= 1
+    error_message = "ACR token expiry must be at least 1 day."
+  }
+}

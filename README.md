@@ -67,6 +67,9 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | Name | Type |
 |------|------|
 | [azurerm_container_registry.domino](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
+| [azurerm_container_registry_scope_map.genai_model_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_scope_map) | resource |
+| [azurerm_container_registry_token.genai_model_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_token) | resource |
+| [azurerm_federated_identity_credential.acr_credential_refresher](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_federated_identity_credential.hephaestus](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_federated_identity_credential.importer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_kubernetes_cluster.aks](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster) | resource |
@@ -82,6 +85,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_aks_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_blob_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_shared_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_role_assignment.acr_credential_refresher_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_domino_acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_domino_private_acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_domino_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -97,6 +101,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | [azurerm_storage_account_network_rules.domino_shared_rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) | resource |
 | [azurerm_storage_container.domino_containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_share.shared_store](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
+| [azurerm_user_assigned_identity.acr_credential_refresher](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.aks_assigned_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.hephaestus](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [random_id.log_analytics_workspace_name_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -110,6 +115,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_acr_token_expiry_days"></a> [acr\_token\_expiry\_days](#input\_acr\_token\_expiry\_days) | Number of days until ACR token passwords expire. Passwords are automatically rotated hourly by AcrCredentialRefresher, so this primarily serves as a safety net. Default 365 days. | `number` | `365` | no |
 | <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | additional node pools | <pre>map(object({<br>    enable_node_public_ip = optional(bool, false)<br>    vm_size               = string<br>    zones                 = list(string)<br>    node_labels           = map(string)<br>    node_os               = optional(string, "AzureLinux")<br>    node_taints           = optional(list(string), [])<br>    enable_auto_scaling   = optional(bool, true)<br>    min_count             = optional(number, 0)<br>    max_count             = number<br>    initial_count         = optional(number, 0)<br>    max_pods              = optional(number, 30)<br>    os_disk_size_gb       = optional(number, 128)<br>  }))</pre> | `{}` | no |
 | <a name="input_aks_subnet_name"></a> [aks\_subnet\_name](#input\_aks\_subnet\_name) | Subnet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_aks_vnet_name"></a> [aks\_vnet\_name](#input\_aks\_vnet\_name) | VNet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
@@ -142,6 +148,14 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Description |
 |------|-------------|
+| <a name="output_acr_credential_refresher_identity"></a> [acr\_credential\_refresher\_identity](#output\_acr\_credential\_refresher\_identity) | Managed identity for ACR credential refresher |
+| <a name="output_acr_credential_refresher_identity_client_id"></a> [acr\_credential\_refresher\_identity\_client\_id](#output\_acr\_credential\_refresher\_identity\_client\_id) | Client ID of the ACR credential refresher managed identity |
+| <a name="output_acr_credential_refresher_identity_id"></a> [acr\_credential\_refresher\_identity\_id](#output\_acr\_credential\_refresher\_identity\_id) | Resource ID of the ACR credential refresher managed identity |
+| <a name="output_acr_credential_refresher_identity_name"></a> [acr\_credential\_refresher\_identity\_name](#output\_acr\_credential\_refresher\_identity\_name) | Name of the ACR credential refresher managed identity |
+| <a name="output_acr_credential_refresher_identity_principal_id"></a> [acr\_credential\_refresher\_identity\_principal\_id](#output\_acr\_credential\_refresher\_identity\_principal\_id) | Principal ID of the ACR credential refresher managed identity |
+| <a name="output_acr_genai_model_pull_token"></a> [acr\_genai\_model\_pull\_token](#output\_acr\_genai\_model\_pull\_token) | ACR repository-scoped token for Gen AI model pulls |
+| <a name="output_acr_genai_model_pull_token_expiry"></a> [acr\_genai\_model\_pull\_token\_expiry](#output\_acr\_genai\_model\_pull\_token\_expiry) | Expiry duration in days for ACR token passwords |
+| <a name="output_acr_genai_model_pull_token_name"></a> [acr\_genai\_model\_pull\_token\_name](#output\_acr\_genai\_model\_pull\_token\_name) | Name of the ACR token for Gen AI model pulls |
 | <a name="output_aks_identity"></a> [aks\_identity](#output\_aks\_identity) | AKS managed identity |
 | <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name |
 | <a name="output_containers"></a> [containers](#output\_containers) | storage details |

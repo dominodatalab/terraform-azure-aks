@@ -43,3 +43,54 @@ output "private_cluster_enabled" {
   description = "Flag to determine if AKS is private or public"
   value       = var.private_cluster_enabled
 }
+
+# ACR Token Outputs
+output "acr_genai_model_pull_token" {
+  description = "ACR repository-scoped token for Gen AI model pulls"
+  value = {
+    name   = azurerm_container_registry_token.genai_model_pull.name
+    id     = azurerm_container_registry_token.genai_model_pull.id
+    expiry = var.acr_token_expiry_days
+  }
+}
+
+output "acr_genai_model_pull_token_name" {
+  description = "Name of the ACR token for Gen AI model pulls"
+  value       = azurerm_container_registry_token.genai_model_pull.name
+}
+
+output "acr_genai_model_pull_token_expiry" {
+  description = "Expiry duration in days for ACR token passwords"
+  value       = var.acr_token_expiry_days
+}
+
+# ACR Credential Refresher Identity Outputs
+output "acr_credential_refresher_identity" {
+  description = "Managed identity for ACR credential refresher"
+  value = {
+    client_id    = azurerm_user_assigned_identity.acr_credential_refresher.client_id
+    principal_id = azurerm_user_assigned_identity.acr_credential_refresher.principal_id
+    id           = azurerm_user_assigned_identity.acr_credential_refresher.id
+    name         = azurerm_user_assigned_identity.acr_credential_refresher.name
+  }
+}
+
+output "acr_credential_refresher_identity_client_id" {
+  description = "Client ID of the ACR credential refresher managed identity"
+  value       = azurerm_user_assigned_identity.acr_credential_refresher.client_id
+}
+
+output "acr_credential_refresher_identity_principal_id" {
+  description = "Principal ID of the ACR credential refresher managed identity"
+  value       = azurerm_user_assigned_identity.acr_credential_refresher.principal_id
+}
+
+output "acr_credential_refresher_identity_id" {
+  description = "Resource ID of the ACR credential refresher managed identity"
+  value       = azurerm_user_assigned_identity.acr_credential_refresher.id
+}
+
+output "acr_credential_refresher_identity_name" {
+  description = "Name of the ACR credential refresher managed identity"
+  value       = azurerm_user_assigned_identity.acr_credential_refresher.name
+}
