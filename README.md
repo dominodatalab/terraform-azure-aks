@@ -67,6 +67,10 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | Name | Type |
 |------|------|
 | [azurerm_container_registry.domino](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
+| [azurerm_container_registry_scope_map.genai_model_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_scope_map) | resource |
+| [azurerm_container_registry_token.genai_model_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_token) | resource |
+| [azurerm_container_registry_token_password.genai_model_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry_token_password) | resource |
+| [azurerm_federated_identity_credential.acr_credential_refresher](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_federated_identity_credential.hephaestus](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_federated_identity_credential.importer](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/federated_identity_credential) | resource |
 | [azurerm_kubernetes_cluster.aks](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster) | resource |
@@ -82,6 +86,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_aks_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_blob_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.private_dns_zone_shared_vnet_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_role_assignment.acr_credential_refresher](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_domino_acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_domino_private_acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.aks_domino_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
@@ -91,12 +96,14 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | [azurerm_role_assignment.identity_assign_pdnsz](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.identity_assign_rg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.identity_assign_vnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.acr_token_credential_generator](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 | [azurerm_storage_account.domino](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.domino_shared](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account_network_rules.domino_blob_rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) | resource |
 | [azurerm_storage_account_network_rules.domino_shared_rules](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) | resource |
 | [azurerm_storage_container.domino_containers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_storage_share.shared_store](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
+| [azurerm_user_assigned_identity.acr_credential_refresher](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.aks_assigned_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.hephaestus](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [random_id.log_analytics_workspace_name_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -110,6 +117,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_acr_genai_model_repository"></a> [acr\_genai\_model\_repository](#input\_acr\_genai\_model\_repository) | Repository path for Gen AI models in ACR. Used for repository-scoped token permissions. | `string` | `"dominodatalab/genai-model"` | no |
 | <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | additional node pools | <pre>map(object({<br>    enable_node_public_ip = optional(bool, false)<br>    vm_size               = string<br>    zones                 = list(string)<br>    node_labels           = map(string)<br>    node_os               = optional(string, "AzureLinux")<br>    node_taints           = optional(list(string), [])<br>    enable_auto_scaling   = optional(bool, true)<br>    min_count             = optional(number, 0)<br>    max_count             = number<br>    initial_count         = optional(number, 0)<br>    max_pods              = optional(number, 30)<br>    os_disk_size_gb       = optional(number, 128)<br>  }))</pre> | `{}` | no |
 | <a name="input_aks_subnet_name"></a> [aks\_subnet\_name](#input\_aks\_subnet\_name) | Subnet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_aks_vnet_name"></a> [aks\_vnet\_name](#input\_aks\_vnet\_name) | VNet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
@@ -142,6 +150,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Description |
 |------|-------------|
+| <a name="output_acr_credential_refresher"></a> [acr\_credential\_refresher](#output\_acr\_credential\_refresher) | Configuration for ACR credential refresher Helm values |
 | <a name="output_aks_identity"></a> [aks\_identity](#output\_aks\_identity) | AKS managed identity |
 | <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name |
 | <a name="output_containers"></a> [containers](#output\_containers) | storage details |

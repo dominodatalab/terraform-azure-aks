@@ -281,3 +281,9 @@ variable "node_os_upgrade_channel" {
   type        = string
   default     = "None"
 }
+
+variable "acr_genai_model_repository" {
+  description = "Repository path for Gen AI models in ACR. Used for repository-scoped token permissions."
+  type        = string
+  default     = "dominodatalab/genai-model"
+}
