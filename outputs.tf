@@ -43,3 +43,19 @@ output "private_cluster_enabled" {
   description = "Flag to determine if AKS is private or public"
   value       = var.private_cluster_enabled
 }
+
+#===============================================================================
+# ACR Credential Refresher Output
+# Provides configuration for Helm values to deploy the credential refresher
+#===============================================================================
+output "acr_credential_refresher" {
+  description = "Configuration for ACR credential refresher Helm values"
+  value = {
+    identity_client_id = azurerm_user_assigned_identity.acr_credential_refresher.client_id
+    subscription_id    = data.azurerm_subscription.current.subscription_id
+    resource_group     = data.azurerm_resource_group.aks.name
+    registry_name      = azurerm_container_registry.domino.name
+    registry_server    = azurerm_container_registry.domino.login_server
+    token_name         = azurerm_container_registry_token.genai_model_pull.name
+  }
+}
