@@ -288,7 +288,7 @@ variable "acr_genai_model_repository" {
   default     = "dominodatalab/genai-model"
 
   validation {
-    condition     = can(regex("^[a-z0-9][a-z0-9/_-]*[a-z0-9]$", var.acr_genai_model_repository)) && !can(regex("\\*", var.acr_genai_model_repository))
-    error_message = "Repository path must contain only lowercase letters, numbers, underscores, hyphens, and forward slashes. Wildcards (*) are not allowed."
+    condition     = can(regex("^[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$", var.acr_genai_model_repository))
+    error_message = "Repository path must be namespace/repo and match the path used by Nucleus."
   }
 }
