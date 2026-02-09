@@ -46,16 +46,21 @@ output "private_cluster_enabled" {
 
 #===============================================================================
 # ACR Credential Refresher Output
-# Provides configuration for Helm values to deploy the credential refresher
+# Provides configuration for Helm values to deploy the credential refresher.
+# Note: The credential refresher CronJob should run immediately after deployment
+# to generate initial credentials for workloads.
 #===============================================================================
 output "acr_credential_refresher" {
-  description = "Configuration for ACR credential refresher Helm values"
-  value = {
-    identity_client_id = azurerm_user_assigned_identity.acr_credential_refresher.client_id
+  description = "Configuration for ACR credential refresher Helm values. Only populated when enable_acr_credential_refresher is true."
+  sensitive   = true
+  value = var.enable_acr_credential_refresher ? {
+    identity_client_id = azurerm_user_assigned_identity.acr_credential_refresher[0].client_id
     subscription_id    = data.azurerm_subscription.current.subscription_id
     resource_group     = data.azurerm_resource_group.aks.name
     registry_name      = azurerm_container_registry.domino.name
     registry_server    = azurerm_container_registry.domino.login_server
-    token_name         = azurerm_container_registry_token.genai_model_pull.name
-  }
+    token_name         = azurerm_container_registry_token.genai_model_pull[0].name
+    token_username     = azurerm_container_registry_token.genai_model_pull[0].name
+    service_account    = var.acr_credential_refresher_service_account
+  } : null
 }

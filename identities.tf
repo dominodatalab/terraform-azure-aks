@@ -82,6 +82,8 @@ resource "azurerm_federated_identity_credential" "importer" {
 
 # Create ACR Credential Refresher identity
 resource "azurerm_user_assigned_identity" "acr_credential_refresher" {
+  count = var.enable_acr_credential_refresher ? 1 : 0
+
   name                = "${var.deploy_id}-acr-credential-refresher"
   resource_group_name = data.azurerm_resource_group.aks.name
   location            = data.azurerm_resource_group.aks.location
@@ -94,9 +96,11 @@ resource "azurerm_user_assigned_identity" "acr_credential_refresher" {
 
 # Grants the identity permission to call ACR generateCredentials so the CronJob can rotate token passwords
 resource "azurerm_role_assignment" "acr_credential_refresher" {
+  count = var.enable_acr_credential_refresher ? 1 : 0
+
   scope              = azurerm_container_registry.domino.id
-  role_definition_id = azurerm_role_definition.acr_token_credential_generator.role_definition_resource_id
-  principal_id       = azurerm_user_assigned_identity.acr_credential_refresher.principal_id
+  role_definition_id = azurerm_role_definition.acr_token_credential_generator[0].role_definition_resource_id
+  principal_id       = azurerm_user_assigned_identity.acr_credential_refresher[0].principal_id
 
   lifecycle {
     create_before_destroy = true
@@ -104,13 +108,18 @@ resource "azurerm_role_assignment" "acr_credential_refresher" {
 }
 
 # Allows the Kubernetes ServiceAccount to authenticate as the managed identity via Workload Identity
+# Note: The service account name must match the one used in the Helm chart deployment.
+# The credential refresher CronJob should run immediately after infrastructure provisioning
+# to generate initial credentials.
 resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
+  count = var.enable_acr_credential_refresher ? 1 : 0
+
   name                = "${var.deploy_id}-acr-credential-refresher"
   resource_group_name = data.azurerm_resource_group.aks.name
-  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher.id
+  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher[0].id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  subject             = "system:serviceaccount:${var.namespaces.platform}:nucleus-acr-credential-refresher"
+  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.acr_credential_refresher_service_account}"
 
   depends_on = [
     azurerm_kubernetes_cluster.aks

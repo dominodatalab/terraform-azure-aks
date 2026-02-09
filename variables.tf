@@ -282,8 +282,25 @@ variable "node_os_upgrade_channel" {
   default     = "None"
 }
 
+variable "enable_acr_credential_refresher" {
+  description = "Enable ACR credential refresher for Gen AI model operations. When enabled, provisions a repository-scoped token and managed identity for credential rotation."
+  type        = bool
+  default     = false
+}
+
+variable "acr_credential_refresher_service_account" {
+  description = "Kubernetes service account name for ACR credential refresher. Must match the service account name used in the Helm chart."
+  type        = string
+  default     = "nucleus-acr-credential-refresher"
+}
+
 variable "acr_genai_model_repository" {
   description = "Repository path for Gen AI models in ACR. Used for repository-scoped token permissions."
   type        = string
   default     = "dominodatalab/genai-model"
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9/_-]*[a-z0-9]$", var.acr_genai_model_repository)) && !can(regex("\\*", var.acr_genai_model_repository))
+    error_message = "Repository path must contain only lowercase letters, numbers, underscores, hyphens, and forward slashes. Wildcards (*) are not allowed."
+  }
 }
