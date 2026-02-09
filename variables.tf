@@ -292,3 +292,9 @@ variable "acr_genai_model_repository" {
     error_message = "Repository path must be namespace/repo and match the path used by Nucleus."
   }
 }
+
+variable "acr_credential_refresher_service_account" {
+  description = "Kubernetes ServiceAccount name for the ACR credential refresher (must match nucleus chart: release-fullname + '-acr-credential-refresher')."
+  type        = string
+  default     = "nucleus-acr-credential-refresher"
+}

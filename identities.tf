@@ -110,7 +110,7 @@ resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
   parent_id           = azurerm_user_assigned_identity.acr_credential_refresher.id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  subject             = "system:serviceaccount:${var.namespaces.platform}:nucleus-acr-credential-refresher"
+  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.acr_credential_refresher_service_account}"
 
   depends_on = [
     azurerm_kubernetes_cluster.aks
