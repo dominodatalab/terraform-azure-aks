@@ -286,4 +286,9 @@ variable "acr_genai_model_repository" {
   description = "Repository path for Gen AI models in ACR. Used for repository-scoped token permissions."
   type        = string
   default     = "dominodatalab/genai-model"
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9/_-]*[a-z0-9]$", var.acr_genai_model_repository)) && !can(regex("\\*", var.acr_genai_model_repository))
+    error_message = "Repository path must contain only lowercase letters, numbers, underscores, hyphens, and forward slashes. Wildcards (*) are not allowed."
+  }
 }
