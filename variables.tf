@@ -281,3 +281,31 @@ variable "node_os_upgrade_channel" {
   type        = string
   default     = "None"
 }
+
+variable "acr_genai_model_repository" {
+  description = "Repository path for Gen AI models in ACR. Used for repository-scoped token permissions."
+  type        = string
+  default     = "dominodatalab/genai-model"
+
+  validation {
+    condition     = can(regex("^[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$", var.acr_genai_model_repository))
+    error_message = "Repository path must be namespace/repo and match the path used by Nucleus."
+  }
+}
+
+variable "acr_credential_refresher_service_account" {
+  description = "Kubernetes ServiceAccount name for the ACR credential refresher (must match nucleus chart: release-fullname + '-acr-credential-refresher')."
+  type        = string
+  default     = "nucleus-acr-credential-refresher"
+}
+
+variable "workspace_audit" {
+  description = "Workspace audit configuration"
+  type = object({
+    enabled                       = optional(bool, false)
+    events_container_name         = optional(string, "workspace-audit-events-working")
+    events_archive_container_name = optional(string, "workspace-audit-events-archive")
+    container_access_type         = optional(string, "private")
+  })
+  default = {}
+}
