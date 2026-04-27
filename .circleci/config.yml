@@ -135,9 +135,11 @@ jobs:
           name: "Set module source to latest domino release"
           working_directory: tests
           command: |
-            latest_tag=$(wget -qO- "https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/releases/latest" | jq -r .tag_name)
-            if [ -z "$latest_tag" ] || [ "$latest_tag" = "null" ]; then
-              echo "Failed to fetch latest release tag from GitHub"
+            latest_tag=$(git -c 'versionsort.suffix=-' ls-remote --tags --refs --sort=-v:refname \
+              "https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git" 'v*.*.*' \
+              | head -1 | awk -F/ '{print $NF}')
+            if [ -z "$latest_tag" ]; then
+              echo "Failed to resolve latest release tag"
               exit 1
             fi
             export MOD_SOURCE="github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git?ref=${latest_tag}"
