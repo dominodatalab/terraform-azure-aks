@@ -73,10 +73,10 @@ resource "azurerm_role_assignment" "aks_domino_acr" {
 }
 # ACR Push from hepheastus
 resource "azurerm_role_assignment" "hephaestus_acr" {
-  count                = var.acr_create ? 1 : 0
+  count                = var.acr_create && var.hephaestus_create ? 1 : 0
   scope                = azurerm_container_registry.domino[0].id
   role_definition_name = "AcrPush"
-  principal_id         = azurerm_user_assigned_identity.hephaestus.principal_id
+  principal_id         = azurerm_user_assigned_identity.hephaestus[0].principal_id
 }
 # ACR Pull from private AKS nodes
 resource "azurerm_role_assignment" "aks_domino_private_acr" {

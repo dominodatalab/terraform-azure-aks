@@ -29,9 +29,9 @@ output "domino_acr" {
 }
 
 output "workload_identities" {
-  description = "service identities"
+  description = "service identities (hephaestus null when hephaestus_create=false)"
   value = {
-    "hephaestus" = azurerm_user_assigned_identity.hephaestus
+    hephaestus = var.hephaestus_create ? azurerm_user_assigned_identity.hephaestus[0] : null
   }
 }
 output "blob_dns_zone_name" {

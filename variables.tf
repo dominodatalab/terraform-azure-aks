@@ -327,3 +327,9 @@ variable "shared_storage_create" {
   type        = bool
   default     = true
 }
+
+variable "hephaestus_create" {
+  description = "Whether to create the Hephaestus image-builder managed identity and its federated credentials (hephaestus + importer). Set to false for dataplane-only deployments where image building runs on the control plane."
+  type        = bool
+  default     = true
+}
