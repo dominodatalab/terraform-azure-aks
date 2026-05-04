@@ -55,7 +55,7 @@ module "aks_cluster" {
 }
 ```
 
-The cluster, node pools, log analytics workspace, and AKS-managed identity are always created. Outputs for skipped resources return `null`; consumers must handle this.
+The cluster, node pools, log analytics workspace, and AKS-managed identity are always created. Outputs for skipped resources return `null`; consumers must handle this. The `containers` output returns an empty map (`{}`) instead of `null` so consumers can safely iterate over it.
 
 > **GPU note:** the default GPU node-pool SKU is now `Standard_NC24ads_A100_v4` (NCads_A100_v4 series). The previous default `Standard_NC6s_v3` was retired by Azure on 2025-09-30.
 
@@ -180,7 +180,7 @@ The cluster, node pools, log analytics workspace, and AKS-managed identity are a
 | <a name="output_acr_credential_refresher"></a> [acr\_credential\_refresher](#output\_acr\_credential\_refresher) | Configuration for ACR credential refresher Helm values |
 | <a name="output_aks_identity"></a> [aks\_identity](#output\_aks\_identity) | AKS managed identity |
 | <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name (null when private cluster or storage account is disabled) |
-| <a name="output_containers"></a> [containers](#output\_containers) | storage details |
+| <a name="output_containers"></a> [containers](#output\_containers) | storage details (empty map when storage\_create=false; safe for iteration) |
 | <a name="output_domino_acr"></a> [domino\_acr](#output\_domino\_acr) | Azure Container Registry details |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer url |
 | <a name="output_private_cluster_enabled"></a> [private\_cluster\_enabled](#output\_private\_cluster\_enabled) | Flag to determine if AKS is private or public |
