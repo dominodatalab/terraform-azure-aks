@@ -82,6 +82,7 @@ resource "azurerm_federated_identity_credential" "importer" {
 
 # Create ACR Credential Refresher identity
 resource "azurerm_user_assigned_identity" "acr_credential_refresher" {
+  count               = var.acr_create ? 1 : 0
   name                = "${var.deploy_id}-acr-credential-refresher"
   resource_group_name = data.azurerm_resource_group.aks.name
   location            = data.azurerm_resource_group.aks.location
@@ -94,9 +95,10 @@ resource "azurerm_user_assigned_identity" "acr_credential_refresher" {
 
 # Grants the identity permission to call ACR generateCredentials so the CronJob can rotate token passwords
 resource "azurerm_role_assignment" "acr_credential_refresher" {
-  scope              = azurerm_container_registry.domino.id
-  role_definition_id = azurerm_role_definition.acr_token_credential_generator.role_definition_resource_id
-  principal_id       = azurerm_user_assigned_identity.acr_credential_refresher.principal_id
+  count              = var.acr_create ? 1 : 0
+  scope              = azurerm_container_registry.domino[0].id
+  role_definition_id = azurerm_role_definition.acr_token_credential_generator[0].role_definition_resource_id
+  principal_id       = azurerm_user_assigned_identity.acr_credential_refresher[0].principal_id
 
   lifecycle {
     create_before_destroy = true
@@ -105,9 +107,10 @@ resource "azurerm_role_assignment" "acr_credential_refresher" {
 
 # Allows the Kubernetes ServiceAccount to authenticate as the managed identity via Workload Identity
 resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
+  count               = var.acr_create ? 1 : 0
   name                = "${var.deploy_id}-acr-credential-refresher"
   resource_group_name = data.azurerm_resource_group.aks.name
-  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher.id
+  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher[0].id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
   subject             = "system:serviceaccount:${var.namespaces.platform}:${var.acr_credential_refresher_service_account}"

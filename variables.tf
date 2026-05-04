@@ -309,3 +309,9 @@ variable "workspace_audit" {
   })
   default = {}
 }
+
+variable "acr_create" {
+  description = "Whether to create the Azure Container Registry and related resources (tokens, role assignments, ACR credential refresher identity). Set to false for dataplane-only deployments that pull images from a remote registry."
+  type        = bool
+  default     = true
+}
