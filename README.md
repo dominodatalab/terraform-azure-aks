@@ -38,6 +38,27 @@ Access AKS cluster
 ## Development
 
 Please submit any feature enhancements, bug fixes, or ideas via pull requests or issues.
+
+## Dataplane mode
+
+For dataplane-only deployments (no Domino control plane), set the four `*_create` flags to `false` to skip CP-only resources:
+
+```hcl
+module "aks_cluster" {
+  source = "github.com/dominodatalab/terraform-azure-aks?ref=v3.0.0"
+
+  cluster                = "dp-cluster-name"
+  acr_create             = false
+  storage_create         = false
+  shared_storage_create  = false
+  hephaestus_create      = false
+}
+```
+
+The cluster, node pools, log analytics workspace, and AKS-managed identity are always created. Outputs for skipped resources return `null`; consumers must handle this.
+
+> **GPU note:** the default GPU node-pool SKU is now `Standard_NC24ads_A100_v4` (NCads_A100_v4 series). The previous default `Standard_NC6s_v3` was retired by Azure on 2025-09-30.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -51,8 +72,8 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 3.45 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.8.1 |
 
 ## Modules
 
@@ -117,6 +138,7 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_acr_create"></a> [acr\_create](#input\_acr\_create) | Whether to create the Azure Container Registry and related resources (tokens, role assignments, ACR credential refresher identity). Set to false for dataplane-only deployments that pull images from a remote registry. | `bool` | `true` | no |
 | <a name="input_acr_credential_refresher_service_account"></a> [acr\_credential\_refresher\_service\_account](#input\_acr\_credential\_refresher\_service\_account) | Kubernetes ServiceAccount name for the ACR credential refresher (must match nucleus chart: release-fullname + '-acr-credential-refresher'). | `string` | `"nucleus-acr-credential-refresher"` | no |
 | <a name="input_acr_genai_model_repository"></a> [acr\_genai\_model\_repository](#input\_acr\_genai\_model\_repository) | Repository path for Gen AI models in ACR. Used for repository-scoped token permissions. | `string` | `"dominodatalab/genai-model"` | no |
 | <a name="input_additional_node_pools"></a> [additional\_node\_pools](#input\_additional\_node\_pools) | additional node pools | <pre>map(object({<br/>    enable_node_public_ip = optional(bool, false)<br/>    vm_size               = string<br/>    zones                 = list(string)<br/>    node_labels           = map(string)<br/>    node_os               = optional(string, "AzureLinux")<br/>    node_taints           = optional(list(string), [])<br/>    enable_auto_scaling   = optional(bool, true)<br/>    min_count             = optional(number, 0)<br/>    max_count             = number<br/>    initial_count         = optional(number, 0)<br/>    max_pods              = optional(number, 30)<br/>    os_disk_size_gb       = optional(number, 128)<br/>  }))</pre> | `{}` | no |
@@ -129,13 +151,14 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | <a name="input_containers"></a> [containers](#input\_containers) | storage containers to create | <pre>map(object({<br/>    container_access_type = string<br/>  }))</pre> | <pre>{<br/>  "backups": {<br/>    "container_access_type": "private"<br/>  },<br/>  "projects": {<br/>    "container_access_type": "private"<br/>  }<br/>}</pre> | no |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino Deployment ID. | `string` | n/a | yes |
 | <a name="input_dns_service_ip"></a> [dns\_service\_ip](#input\_dns\_service\_ip) | IP address assigned to the Kubernetes DNS service, used when CNI Overlay is enabled | `string` | `"100.97.0.10"` | no |
+| <a name="input_hephaestus_create"></a> [hephaestus\_create](#input\_hephaestus\_create) | Whether to create the Hephaestus image-builder managed identity and its federated credentials (hephaestus + importer). Set to false for dataplane-only deployments where image building runs on the control plane. | `bool` | `true` | no |
 | <a name="input_kubeconfig_output_path"></a> [kubeconfig\_output\_path](#input\_kubeconfig\_output\_path) | kubeconfig path | `string` | n/a | yes |
 | <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br/>    idle_timeout_in_minutes   = optional(number, 4)<br/>    managed_outbound_ip_count = number<br/>    }<br/>  )</pre> | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm\_kubernetes\_service\_versions. | `string` | `"1.34"` | no |
 | <a name="input_log_analytics_workspace_sku"></a> [log\_analytics\_workspace\_sku](#input\_log\_analytics\_workspace\_sku) | log analytics sku | `string` | `"PerGB2018"` | no |
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespace that are used for generating the service account bindings | `object({ platform = string, compute = string })` | n/a | yes |
 | <a name="input_node_os_upgrade_channel"></a> [node\_os\_upgrade\_channel](#input\_node\_os\_upgrade\_channel) | Option to enable automatic node OS upgrades.  Possible values are Unmanaged, SecurityPatch, NodeImage and None. | `string` | `"None"` | no |
-| <a name="input_node_pools"></a> [node\_pools](#input\_node\_pools) | default node pools | <pre>object({<br/>    compute = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_D8s_v4")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "default"<br/>      })<br/>      node_os             = optional(string, "AzureLinux")<br/>      node_taints         = optional(list(string), [])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 0)<br/>      max_count           = optional(number, 10)<br/>      initial_count       = optional(number, 1)<br/>      max_pods            = optional(number, 30)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    }),<br/>    platform = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_D8s_v4")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "platform"<br/>      })<br/>      node_os             = optional(string, "AzureLinux")<br/>      node_taints         = optional(list(string), [])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 1)<br/>      max_count           = optional(number, 3)<br/>      initial_count       = optional(number, 1)<br/>      max_pods            = optional(number, 60)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    }),<br/>    gpu = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_NC6s_v3")<br/>      zones                 = optional(list(string), [])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "default-gpu"<br/>        "nvidia.com/gpu"              = "true"<br/>      })<br/>      node_os = optional(string, "AzureLinux")<br/>      node_taints = optional(list(string), [<br/>        "nvidia.com/gpu=true:NoExecute"<br/>      ])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 0)<br/>      max_count           = optional(number, 1)<br/>      initial_count       = optional(number, 0)<br/>      max_pods            = optional(number, 30)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    })<br/>    system = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_DS4_v2")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels           = optional(map(string), {})<br/>      node_os               = optional(string, "AzureLinux")<br/>      node_taints           = optional(list(string), [])<br/>      enable_auto_scaling   = optional(bool, true)<br/>      min_count             = optional(number, 1)<br/>      max_count             = optional(number, 6)<br/>      initial_count         = optional(number, 1)<br/>      max_pods              = optional(number, 60)<br/>      os_disk_size_gb       = optional(number, 128)<br/>    })<br/>  })</pre> | <pre>{<br/>  "compute": {},<br/>  "gpu": {},<br/>  "platform": {},<br/>  "system": {}<br/>}</pre> | no |
+| <a name="input_node_pools"></a> [node\_pools](#input\_node\_pools) | default node pools | <pre>object({<br/>    compute = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_D8s_v4")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "default"<br/>      })<br/>      node_os             = optional(string, "AzureLinux")<br/>      node_taints         = optional(list(string), [])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 0)<br/>      max_count           = optional(number, 10)<br/>      initial_count       = optional(number, 1)<br/>      max_pods            = optional(number, 30)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    }),<br/>    platform = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_D8s_v4")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "platform"<br/>      })<br/>      node_os             = optional(string, "AzureLinux")<br/>      node_taints         = optional(list(string), [])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 1)<br/>      max_count           = optional(number, 3)<br/>      initial_count       = optional(number, 1)<br/>      max_pods            = optional(number, 60)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    }),<br/>    gpu = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_NC24ads_A100_v4")<br/>      zones                 = optional(list(string), [])<br/>      node_labels = optional(map(string), {<br/>        "dominodatalab.com/node-pool" = "default-gpu"<br/>        "nvidia.com/gpu"              = "true"<br/>      })<br/>      node_os = optional(string, "AzureLinux")<br/>      node_taints = optional(list(string), [<br/>        "nvidia.com/gpu=true:NoExecute"<br/>      ])<br/>      enable_auto_scaling = optional(bool, true)<br/>      min_count           = optional(number, 0)<br/>      max_count           = optional(number, 1)<br/>      initial_count       = optional(number, 0)<br/>      max_pods            = optional(number, 30)<br/>      os_disk_size_gb     = optional(number, 128)<br/>    })<br/>    system = object({<br/>      enable_node_public_ip = optional(bool, false)<br/>      vm_size               = optional(string, "Standard_DS4_v2")<br/>      zones                 = optional(list(string), ["1", "2", "3"])<br/>      node_labels           = optional(map(string), {})<br/>      node_os               = optional(string, "AzureLinux")<br/>      node_taints           = optional(list(string), [])<br/>      enable_auto_scaling   = optional(bool, true)<br/>      min_count             = optional(number, 1)<br/>      max_count             = optional(number, 6)<br/>      initial_count         = optional(number, 1)<br/>      max_pods              = optional(number, 60)<br/>      os_disk_size_gb       = optional(number, 128)<br/>    })<br/>  })</pre> | <pre>{<br/>  "compute": {},<br/>  "gpu": {},<br/>  "platform": {},<br/>  "system": {}<br/>}</pre> | no |
 | <a name="input_pod_cidr"></a> [pod\_cidr](#input\_pod\_cidr) | CIDR block for Kubernetes pods, used when CNI Overlay is enabled | `string` | `"192.168.0.0/16"` | no |
 | <a name="input_private_acr_enabled"></a> [private\_acr\_enabled](#input\_private\_acr\_enabled) | Flag to determine whether to deploy a private ACR | `bool` | `false` | no |
 | <a name="input_private_cluster_enabled"></a> [private\_cluster\_enabled](#input\_private\_cluster\_enabled) | Flag to determine whether to deploy a private AKS | `bool` | `false` | no |
@@ -143,8 +166,10 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 | <a name="input_registry_tier"></a> [registry\_tier](#input\_registry\_tier) | registry tier | `string` | `"Standard"` | no |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Name or id of optional pre-existing resource group to install AKS in | `string` | n/a | yes |
 | <a name="input_service_cidr"></a> [service\_cidr](#input\_service\_cidr) | CIDR block for Kubernetes services, used  when CNI Overlay is enabled | `string` | `"100.97.0.0/16"` | no |
+| <a name="input_shared_storage_create"></a> [shared\_storage\_create](#input\_shared\_storage\_create) | Whether to create the compute shared storage account, azurefile share, and supporting role assignments. Set to false for dataplane-only deployments using ephemeral block storage only. | `bool` | `true` | no |
 | <a name="input_storage_account_replication_type"></a> [storage\_account\_replication\_type](#input\_storage\_account\_replication\_type) | storage replication | `string` | `"LRS"` | no |
 | <a name="input_storage_account_tier"></a> [storage\_account\_tier](#input\_storage\_account\_tier) | storage account tier | `string` | `"Standard"` | no |
+| <a name="input_storage_create"></a> [storage\_create](#input\_storage\_create) | Whether to create the projects/backups blob storage account, containers, network rules, and private endpoints. Set to false for dataplane-only deployments where projects/backups blobs live on the control plane. | `bool` | `true` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to resources | `map(string)` | `{}` | no |
 | <a name="input_workspace_audit"></a> [workspace\_audit](#input\_workspace\_audit) | Workspace audit configuration | <pre>object({<br/>    enabled                       = optional(bool, false)<br/>    events_container_name         = optional(string, "workspace-audit-events-working")<br/>    events_archive_container_name = optional(string, "workspace-audit-events-archive")<br/>    container_access_type         = optional(string, "private")<br/>  })</pre> | `{}` | no |
 
@@ -154,12 +179,12 @@ Please submit any feature enhancements, bug fixes, or ideas via pull requests or
 |------|-------------|
 | <a name="output_acr_credential_refresher"></a> [acr\_credential\_refresher](#output\_acr\_credential\_refresher) | Configuration for ACR credential refresher Helm values |
 | <a name="output_aks_identity"></a> [aks\_identity](#output\_aks\_identity) | AKS managed identity |
-| <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name |
+| <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name (null when private cluster or storage account is disabled) |
 | <a name="output_containers"></a> [containers](#output\_containers) | storage details |
 | <a name="output_domino_acr"></a> [domino\_acr](#output\_domino\_acr) | Azure Container Registry details |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer url |
 | <a name="output_private_cluster_enabled"></a> [private\_cluster\_enabled](#output\_private\_cluster\_enabled) | Flag to determine if AKS is private or public |
 | <a name="output_shared_storage_account"></a> [shared\_storage\_account](#output\_shared\_storage\_account) | shared storage account |
 | <a name="output_storage_account"></a> [storage\_account](#output\_storage\_account) | storage account |
-| <a name="output_workload_identities"></a> [workload\_identities](#output\_workload\_identities) | service identities |
+| <a name="output_workload_identities"></a> [workload\_identities](#output\_workload\_identities) | service identities (hephaestus null when hephaestus\_create=false) |
 <!-- END_TF_DOCS -->
