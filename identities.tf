@@ -119,3 +119,21 @@ resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
     azurerm_kubernetes_cluster.aks
   ]
 }
+
+#########################################################################
+########################## State Migration ##############################
+#########################################################################
+moved {
+  from = azurerm_user_assigned_identity.acr_credential_refresher
+  to   = azurerm_user_assigned_identity.acr_credential_refresher[0]
+}
+
+moved {
+  from = azurerm_role_assignment.acr_credential_refresher
+  to   = azurerm_role_assignment.acr_credential_refresher[0]
+}
+
+moved {
+  from = azurerm_federated_identity_credential.acr_credential_refresher
+  to   = azurerm_federated_identity_credential.acr_credential_refresher[0]
+}

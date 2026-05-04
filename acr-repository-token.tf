@@ -71,3 +71,26 @@ resource "azurerm_role_definition" "acr_token_credential_generator" {
     azurerm_container_registry.domino[0].id
   ]
 }
+
+#===============================================================================
+# State Migration
+#===============================================================================
+moved {
+  from = azurerm_container_registry_scope_map.genai_model_pull
+  to   = azurerm_container_registry_scope_map.genai_model_pull[0]
+}
+
+moved {
+  from = azurerm_container_registry_token.genai_model_pull
+  to   = azurerm_container_registry_token.genai_model_pull[0]
+}
+
+moved {
+  from = azurerm_container_registry_token_password.genai_model_pull
+  to   = azurerm_container_registry_token_password.genai_model_pull[0]
+}
+
+moved {
+  from = azurerm_role_definition.acr_token_credential_generator
+  to   = azurerm_role_definition.acr_token_credential_generator[0]
+}

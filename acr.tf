@@ -85,3 +85,21 @@ resource "azurerm_role_assignment" "aks_domino_private_acr" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id
 }
+
+#########################################################################
+########################## State Migration ##############################
+#########################################################################
+moved {
+  from = azurerm_container_registry.domino
+  to   = azurerm_container_registry.domino[0]
+}
+
+moved {
+  from = azurerm_role_assignment.aks_domino_acr
+  to   = azurerm_role_assignment.aks_domino_acr[0]
+}
+
+moved {
+  from = azurerm_role_assignment.hephaestus_acr
+  to   = azurerm_role_assignment.hephaestus_acr[0]
+}
