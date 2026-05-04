@@ -10,7 +10,7 @@ output "storage_account" {
 
 output "shared_storage_account" {
   description = "shared storage account"
-  value       = azurerm_storage_account.domino_shared
+  value       = var.shared_storage_create ? azurerm_storage_account.domino_shared[0] : null
 }
 
 output "aks_identity" {

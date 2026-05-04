@@ -47,6 +47,7 @@ resource "azurerm_storage_account" "domino" {
 # Create Domino Shared Storage Account
 resource "azurerm_storage_account" "domino_shared" {
   #checkov:skip=CKV_AZURE_244:Local users are required for storage account key access used by AKS nodes
+  count                           = var.shared_storage_create ? 1 : 0
   name                            = "${replace(var.deploy_id, "/[_-]/", "")}${"shared"}"
   location                        = data.azurerm_resource_group.aks.location
   resource_group_name             = data.azurerm_resource_group.aks.name
@@ -95,13 +96,13 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_blob_
 }
 # Create a Private DNS Zone for the Storage Account shared service
 resource "azurerm_private_dns_zone" "shared_private_dns_zone" {
-  count               = local.private_shared_enabled ? 1 : 0
+  count               = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
   name                = "privatelink.file.core.windows.net"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_shared_vnet_link" {
-  count                 = local.private_shared_enabled ? 1 : 0
+  count                 = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
   name                  = "shared-vnet-dns-link"
   resource_group_name   = data.azurerm_resource_group.aks.name
   private_dns_zone_name = azurerm_private_dns_zone.shared_private_dns_zone[0].name
@@ -126,9 +127,9 @@ module "domino_blob_ep" {
 }
 # Create a private endpoint for the fileshare Storage Account
 module "domino_shared_ep" {
-  count                 = local.private_shared_enabled ? 1 : 0
+  count                 = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
   source                = "./modules/private_endpoint"
-  resource_id           = azurerm_storage_account.domino_shared.id
+  resource_id           = azurerm_storage_account.domino_shared[0].id
   nic_name              = "sa-shared-${var.deploy_id}"
   private_endpoint_name = "sa-shared-${var.deploy_id}"
   private_dns_zone      = azurerm_private_dns_zone.shared_private_dns_zone[0].name
@@ -144,8 +145,8 @@ module "domino_shared_ep" {
 #########################################################################
 # Create a storage account network rule to authorize access to shared from private endpoint
 resource "azurerm_storage_account_network_rules" "domino_shared_rules" {
-  count                      = local.private_shared_enabled ? 1 : 0
-  storage_account_id         = azurerm_storage_account.domino_shared.id
+  count                      = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
+  storage_account_id         = azurerm_storage_account.domino_shared[0].id
   default_action             = "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = [data.azurerm_subnet.aks_subnet[0].id]
@@ -190,12 +191,23 @@ resource "azurerm_storage_container" "domino_containers" {
 #########################################################################
 # Create a fileshare for private storage
 resource "azurerm_storage_share" "shared_store" {
+  count                = var.shared_storage_create ? 1 : 0
   name                 = "shared"
-  storage_account_name = azurerm_storage_account.domino_shared.name
+  storage_account_name = azurerm_storage_account.domino_shared[0].name
   quota                = 100
 }
 
 moved {
   from = azurerm_storage_account.domino
   to   = azurerm_storage_account.domino[0]
+}
+
+moved {
+  from = azurerm_storage_account.domino_shared
+  to   = azurerm_storage_account.domino_shared[0]
+}
+
+moved {
+  from = azurerm_storage_share.shared_store
+  to   = azurerm_storage_share.shared_store[0]
 }

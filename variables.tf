@@ -321,3 +321,9 @@ variable "storage_create" {
   type        = bool
   default     = true
 }
+
+variable "shared_storage_create" {
+  description = "Whether to create the compute shared storage account, azurefile share, and supporting role assignments. Set to false for dataplane-only deployments using ephemeral block storage only."
+  type        = bool
+  default     = true
+}

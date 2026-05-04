@@ -29,8 +29,8 @@ resource "azurerm_user_assigned_identity" "aks_assigned_identity" {
 }
 # Assign identity permissions on fileshare storage account
 resource "azurerm_role_assignment" "aks_file_share_contributor" {
-  count                = local.private_shared_enabled ? 1 : 0
-  scope                = azurerm_storage_account.domino_shared.id
+  count                = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
+  scope                = azurerm_storage_account.domino_shared[0].id
   role_definition_name = "Storage Account Contributor"
   principal_id         = var.private_cluster_enabled ? azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id : azurerm_kubernetes_cluster.aks.identity[0].principal_id
 }
@@ -66,7 +66,8 @@ resource "azurerm_role_assignment" "identity_assign_vnet" {
 }
 # Storage Accounts listKeys from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_shared" {
-  scope                = azurerm_storage_account.domino_shared.id
+  count                = var.shared_storage_create ? 1 : 0
+  scope                = azurerm_storage_account.domino_shared[0].id
   role_definition_name = "Storage Account Key Operator Service Role"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
@@ -136,4 +137,9 @@ moved {
 moved {
   from = azurerm_federated_identity_credential.acr_credential_refresher
   to   = azurerm_federated_identity_credential.acr_credential_refresher[0]
+}
+
+moved {
+  from = azurerm_role_assignment.aks_domino_shared
+  to   = azurerm_role_assignment.aks_domino_shared[0]
 }
