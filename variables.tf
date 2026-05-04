@@ -315,3 +315,9 @@ variable "acr_create" {
   type        = bool
   default     = true
 }
+
+variable "storage_create" {
+  description = "Whether to create the projects/backups blob storage account, containers, network rules, and private endpoints. Set to false for dataplane-only deployments where projects/backups blobs live on the control plane."
+  type        = bool
+  default     = true
+}

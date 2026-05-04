@@ -1,11 +1,11 @@
 output "containers" {
   description = "storage details"
-  value       = azurerm_storage_container.domino_containers
+  value       = var.storage_create ? azurerm_storage_container.domino_containers : null
 }
 
 output "storage_account" {
   description = "storage account"
-  value       = azurerm_storage_account.domino
+  value       = var.storage_create ? azurerm_storage_account.domino[0] : null
 }
 
 output "shared_storage_account" {

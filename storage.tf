@@ -14,6 +14,7 @@ locals {
 # Create Domino Blob Storage Account
 resource "azurerm_storage_account" "domino" {
   #checkov:skip=CKV_AZURE_244:Local users are required for storage account key access used by AKS nodes
+  count                           = var.storage_create ? 1 : 0
   name                            = replace(var.deploy_id, "/[_-]/", "")
   location                        = data.azurerm_resource_group.aks.location
   resource_group_name             = data.azurerm_resource_group.aks.name
@@ -80,13 +81,13 @@ resource "azurerm_storage_account" "domino_shared" {
 #########################################################################
 # Create a Private DNS Zone for the Storage Account Blob service
 resource "azurerm_private_dns_zone" "blob_private_dns_zone" {
-  count               = local.private_blob_enabled ? 1 : 0
+  count               = local.private_blob_enabled && var.storage_create ? 1 : 0
   name                = "privatelink.blob.core.windows.net"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_blob_vnet_link" {
-  count                 = local.private_blob_enabled ? 1 : 0
+  count                 = local.private_blob_enabled && var.storage_create ? 1 : 0
   name                  = "blob-vnet-dns-link"
   resource_group_name   = data.azurerm_resource_group.aks.name
   private_dns_zone_name = azurerm_private_dns_zone.blob_private_dns_zone[0].name
@@ -111,9 +112,9 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_share
 #########################################################################
 # Create a private endpoint for the Blob Storage Account
 module "domino_blob_ep" {
-  count                 = local.private_blob_enabled ? 1 : 0
+  count                 = local.private_blob_enabled && var.storage_create ? 1 : 0
   source                = "./modules/private_endpoint"
-  resource_id           = azurerm_storage_account.domino.id
+  resource_id           = azurerm_storage_account.domino[0].id
   nic_name              = "sa-blob-${var.deploy_id}"
   private_endpoint_name = "sa-blob-${var.deploy_id}"
   private_dns_zone      = azurerm_private_dns_zone.blob_private_dns_zone[0].name
@@ -152,8 +153,8 @@ resource "azurerm_storage_account_network_rules" "domino_shared_rules" {
 }
 # Create a storage account network rule to authorize access to blob from private endpoint
 resource "azurerm_storage_account_network_rules" "domino_blob_rules" {
-  count                      = local.private_blob_enabled ? 1 : 0
-  storage_account_id         = azurerm_storage_account.domino.id
+  count                      = local.private_blob_enabled && var.storage_create ? 1 : 0
+  storage_account_id         = azurerm_storage_account.domino[0].id
   default_action             = "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = [data.azurerm_subnet.aks_subnet[0].id]
@@ -178,13 +179,10 @@ locals {
   )
 }
 resource "azurerm_storage_container" "domino_containers" {
-  for_each = {
-    for key, value in local.all_containers :
-    key => value
-  }
+  for_each = var.storage_create ? { for key, value in local.all_containers : key => value } : {}
 
   name                  = "${var.deploy_id}-${each.value.name}"
-  storage_account_name  = azurerm_storage_account.domino.name
+  storage_account_name  = azurerm_storage_account.domino[0].name
   container_access_type = each.value.container_access_type
 }
 #########################################################################
@@ -195,4 +193,9 @@ resource "azurerm_storage_share" "shared_store" {
   name                 = "shared"
   storage_account_name = azurerm_storage_account.domino_shared.name
   quota                = 100
+}
+
+moved {
+  from = azurerm_storage_account.domino
+  to   = azurerm_storage_account.domino[0]
 }
