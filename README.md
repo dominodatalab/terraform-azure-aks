@@ -72,8 +72,8 @@ The cluster, node pools, log analytics workspace, and AKS-managed identity are a
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.8.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 3.45 |
+| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1 |
 
 ## Modules
 
