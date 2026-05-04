@@ -1,6 +1,6 @@
 output "containers" {
-  description = "storage details"
-  value       = var.storage_create ? azurerm_storage_container.domino_containers : null
+  description = "storage details (empty map when storage_create=false; safe for iteration)"
+  value       = var.storage_create ? azurerm_storage_container.domino_containers : {}
 }
 
 output "storage_account" {
