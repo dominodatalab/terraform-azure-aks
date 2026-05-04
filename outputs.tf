@@ -35,8 +35,8 @@ output "workload_identities" {
   }
 }
 output "blob_dns_zone_name" {
-  description = "blob dns zone name"
-  value       = var.private_cluster_enabled ? azurerm_private_dns_zone.blob_private_dns_zone[0].name : null
+  description = "blob dns zone name (null when private cluster or storage account is disabled)"
+  value       = var.private_cluster_enabled && var.storage_create ? azurerm_private_dns_zone.blob_private_dns_zone[0].name : null
 }
 
 output "private_cluster_enabled" {
