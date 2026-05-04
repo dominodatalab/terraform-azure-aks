@@ -111,7 +111,7 @@ variable "node_pools" {
     }),
     gpu = object({
       enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "Standard_NC6s_v3")
+      vm_size               = optional(string, "Standard_NC24ads_A100_v4")
       zones                 = optional(list(string), [])
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default-gpu"
