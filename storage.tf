@@ -180,6 +180,7 @@ locals {
   )
 }
 resource "azurerm_storage_container" "domino_containers" {
+  # checkov:skip=CKV2_AZURE_8: Application data containers (projects/backups/etc.), not activity-log storage. Access type is enforced via the var.containers schema (defaults to "private") and propagated through local.all_containers; checkov can't follow the for_each + each.value indirection through the storage_create conditional.
   for_each = var.storage_create ? { for key, value in local.all_containers : key => value } : {}
 
   name                  = "${var.deploy_id}-${each.value.name}"
