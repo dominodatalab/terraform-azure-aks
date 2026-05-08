@@ -180,7 +180,7 @@ The cluster, node pools, log analytics workspace, and AKS-managed identity are a
 | <a name="output_acr_credential_refresher"></a> [acr\_credential\_refresher](#output\_acr\_credential\_refresher) | Configuration for ACR credential refresher Helm values |
 | <a name="output_aks_identity"></a> [aks\_identity](#output\_aks\_identity) | AKS managed identity |
 | <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name (null when private cluster or storage account is disabled) |
-| <a name="output_containers"></a> [containers](#output\_containers) | storage details (empty map when storage\_create=false; safe for iteration) |
+| <a name="output_containers"></a> [containers](#output\_containers) | storage details (empty map when storage\_create=false; safe for iteration and key-lookup — type stays map(storage\_container) regardless of flag) |
 | <a name="output_domino_acr"></a> [domino\_acr](#output\_domino\_acr) | Azure Container Registry details |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer url |
 | <a name="output_private_cluster_enabled"></a> [private\_cluster\_enabled](#output\_private\_cluster\_enabled) | Flag to determine if AKS is private or public |
