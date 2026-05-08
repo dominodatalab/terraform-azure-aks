@@ -1,6 +1,6 @@
 output "containers" {
-  description = "storage details (empty map when storage_create=false; safe for iteration)"
-  value       = var.storage_create ? azurerm_storage_container.domino_containers : {}
+  description = "storage details (empty map when storage_create=false; safe for iteration and key-lookup — type stays map(storage_container) regardless of flag)"
+  value       = azurerm_storage_container.domino_containers
 }
 
 output "storage_account" {
