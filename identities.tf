@@ -3,6 +3,7 @@
 #########################################################################
 # Create Hephaestus identity
 resource "azurerm_user_assigned_identity" "hephaestus" {
+  count               = var.hephaestus_create ? 1 : 0
   name                = "hephaestus"
   location            = data.azurerm_resource_group.aks.location
   resource_group_name = data.azurerm_resource_group.aks.name
@@ -10,11 +11,12 @@ resource "azurerm_user_assigned_identity" "hephaestus" {
 }
 # Create Hephaestus identity credentials
 resource "azurerm_federated_identity_credential" "hephaestus" {
+  count               = var.hephaestus_create ? 1 : 0
   name                = "hephaestus"
   resource_group_name = data.azurerm_resource_group.aks.name
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  parent_id           = azurerm_user_assigned_identity.hephaestus.id
+  parent_id           = azurerm_user_assigned_identity.hephaestus[0].id
   subject             = "system:serviceaccount:${var.namespaces.compute}:hephaestus"
 }
 # create user assigned identity for AKS
@@ -29,8 +31,8 @@ resource "azurerm_user_assigned_identity" "aks_assigned_identity" {
 }
 # Assign identity permissions on fileshare storage account
 resource "azurerm_role_assignment" "aks_file_share_contributor" {
-  count                = local.private_shared_enabled ? 1 : 0
-  scope                = azurerm_storage_account.domino_shared.id
+  count                = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
+  scope                = azurerm_storage_account.domino_shared[0].id
   role_definition_name = "Storage Account Contributor"
   principal_id         = var.private_cluster_enabled ? azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id : azurerm_kubernetes_cluster.aks.identity[0].principal_id
 }
@@ -66,22 +68,25 @@ resource "azurerm_role_assignment" "identity_assign_vnet" {
 }
 # Storage Accounts listKeys from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_shared" {
-  scope                = azurerm_storage_account.domino_shared.id
+  count                = var.shared_storage_create ? 1 : 0
+  scope                = azurerm_storage_account.domino_shared[0].id
   role_definition_name = "Storage Account Key Operator Service Role"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
 # Data importer identity credentials
 resource "azurerm_federated_identity_credential" "importer" {
+  count               = var.hephaestus_create ? 1 : 0
   name                = "importer"
   resource_group_name = data.azurerm_resource_group.aks.name
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  parent_id           = azurerm_user_assigned_identity.hephaestus.id
+  parent_id           = azurerm_user_assigned_identity.hephaestus[0].id
   subject             = "system:serviceaccount:${var.namespaces.platform}:domino-data-importer"
 }
 
 # Create ACR Credential Refresher identity
 resource "azurerm_user_assigned_identity" "acr_credential_refresher" {
+  count               = var.acr_create ? 1 : 0
   name                = "${var.deploy_id}-acr-credential-refresher"
   resource_group_name = data.azurerm_resource_group.aks.name
   location            = data.azurerm_resource_group.aks.location
@@ -94,9 +99,10 @@ resource "azurerm_user_assigned_identity" "acr_credential_refresher" {
 
 # Grants the identity permission to call ACR generateCredentials so the CronJob can rotate token passwords
 resource "azurerm_role_assignment" "acr_credential_refresher" {
-  scope              = azurerm_container_registry.domino.id
-  role_definition_id = azurerm_role_definition.acr_token_credential_generator.role_definition_resource_id
-  principal_id       = azurerm_user_assigned_identity.acr_credential_refresher.principal_id
+  count              = var.acr_create ? 1 : 0
+  scope              = azurerm_container_registry.domino[0].id
+  role_definition_id = azurerm_role_definition.acr_token_credential_generator[0].role_definition_resource_id
+  principal_id       = azurerm_user_assigned_identity.acr_credential_refresher[0].principal_id
 
   lifecycle {
     create_before_destroy = true
@@ -105,9 +111,10 @@ resource "azurerm_role_assignment" "acr_credential_refresher" {
 
 # Allows the Kubernetes ServiceAccount to authenticate as the managed identity via Workload Identity
 resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
+  count               = var.acr_create ? 1 : 0
   name                = "${var.deploy_id}-acr-credential-refresher"
   resource_group_name = data.azurerm_resource_group.aks.name
-  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher.id
+  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher[0].id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
   subject             = "system:serviceaccount:${var.namespaces.platform}:${var.acr_credential_refresher_service_account}"
@@ -115,4 +122,42 @@ resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
   depends_on = [
     azurerm_kubernetes_cluster.aks
   ]
+}
+
+#########################################################################
+########################## State Migration ##############################
+#########################################################################
+moved {
+  from = azurerm_user_assigned_identity.acr_credential_refresher
+  to   = azurerm_user_assigned_identity.acr_credential_refresher[0]
+}
+
+moved {
+  from = azurerm_role_assignment.acr_credential_refresher
+  to   = azurerm_role_assignment.acr_credential_refresher[0]
+}
+
+moved {
+  from = azurerm_federated_identity_credential.acr_credential_refresher
+  to   = azurerm_federated_identity_credential.acr_credential_refresher[0]
+}
+
+moved {
+  from = azurerm_role_assignment.aks_domino_shared
+  to   = azurerm_role_assignment.aks_domino_shared[0]
+}
+
+moved {
+  from = azurerm_user_assigned_identity.hephaestus
+  to   = azurerm_user_assigned_identity.hephaestus[0]
+}
+
+moved {
+  from = azurerm_federated_identity_credential.hephaestus
+  to   = azurerm_federated_identity_credential.hephaestus[0]
+}
+
+moved {
+  from = azurerm_federated_identity_credential.importer
+  to   = azurerm_federated_identity_credential.importer[0]
 }

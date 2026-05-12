@@ -4,6 +4,7 @@
 # Create ACR registry for Domino images
 resource "azurerm_container_registry" "domino" {
   #checkov:skip=CKV_AZURE_237: "Ensure dedicated data endpoints are enabled."
+  count                         = var.acr_create ? 1 : 0
   name                          = replace("${data.azurerm_resource_group.aks.name}domino", "/[^a-zA-Z0-9]/", "")
   resource_group_name           = data.azurerm_resource_group.aks.name
   location                      = data.azurerm_resource_group.aks.location
@@ -31,13 +32,13 @@ resource "azurerm_container_registry" "domino" {
 #########################################################################
 # create private dns zone for acr
 resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
-  count               = var.private_acr_enabled ? 1 : 0
+  count               = var.private_acr_enabled && var.acr_create ? 1 : 0
   name                = "privatelink.azurecr.io"
   resource_group_name = data.azurerm_resource_group.aks.name
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_vnet_link" {
-  count                 = var.private_acr_enabled ? 1 : 0
+  count                 = var.private_acr_enabled && var.acr_create ? 1 : 0
   name                  = "acr-vnet-dns-link"
   resource_group_name   = data.azurerm_resource_group.aks.name
   private_dns_zone_name = azurerm_private_dns_zone.acr_private_dns_zone[0].name
@@ -48,9 +49,9 @@ resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_v
 #########################################################################
 # Create a private endpoint for the ACR
 module "domino_acr_ep" {
-  count                 = var.private_acr_enabled ? 1 : 0
+  count                 = var.private_acr_enabled && var.acr_create ? 1 : 0
   source                = "./modules/private_endpoint"
-  resource_id           = azurerm_container_registry.domino.id
+  resource_id           = azurerm_container_registry.domino[0].id
   nic_name              = "acr-${var.deploy_id}"
   private_endpoint_name = "acr-${var.deploy_id}"
   private_dns_zone      = azurerm_private_dns_zone.acr_private_dns_zone[0].name
@@ -65,20 +66,40 @@ module "domino_acr_ep" {
 #########################################################################
 # ACR Pull from AKS nodes
 resource "azurerm_role_assignment" "aks_domino_acr" {
-  scope                = azurerm_container_registry.domino.id
+  count                = var.acr_create ? 1 : 0
+  scope                = azurerm_container_registry.domino[0].id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
 }
 # ACR Push from hepheastus
 resource "azurerm_role_assignment" "hephaestus_acr" {
-  scope                = azurerm_container_registry.domino.id
+  count                = var.acr_create && var.hephaestus_create ? 1 : 0
+  scope                = azurerm_container_registry.domino[0].id
   role_definition_name = "AcrPush"
-  principal_id         = azurerm_user_assigned_identity.hephaestus.principal_id
+  principal_id         = azurerm_user_assigned_identity.hephaestus[0].principal_id
 }
 # ACR Pull from private AKS nodes
 resource "azurerm_role_assignment" "aks_domino_private_acr" {
-  count                = var.private_cluster_enabled ? 1 : 0
-  scope                = azurerm_container_registry.domino.id
+  count                = var.private_cluster_enabled && var.acr_create ? 1 : 0
+  scope                = azurerm_container_registry.domino[0].id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_user_assigned_identity.aks_assigned_identity[0].principal_id
+}
+
+#########################################################################
+########################## State Migration ##############################
+#########################################################################
+moved {
+  from = azurerm_container_registry.domino
+  to   = azurerm_container_registry.domino[0]
+}
+
+moved {
+  from = azurerm_role_assignment.aks_domino_acr
+  to   = azurerm_role_assignment.aks_domino_acr[0]
+}
+
+moved {
+  from = azurerm_role_assignment.hephaestus_acr
+  to   = azurerm_role_assignment.hephaestus_acr[0]
 }

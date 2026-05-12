@@ -111,7 +111,7 @@ variable "node_pools" {
     }),
     gpu = object({
       enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "Standard_NC6s_v3")
+      vm_size               = optional(string, "Standard_NC24ads_A100_v4")
       zones                 = optional(list(string), [])
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default-gpu"
@@ -308,4 +308,28 @@ variable "workspace_audit" {
     container_access_type         = optional(string, "private")
   })
   default = {}
+}
+
+variable "acr_create" {
+  description = "Whether to create the Azure Container Registry and related resources (tokens, role assignments, ACR credential refresher identity). Set to false for dataplane-only deployments that pull images from a remote registry."
+  type        = bool
+  default     = true
+}
+
+variable "storage_create" {
+  description = "Whether to create the projects/backups blob storage account, containers, network rules, and private endpoints. Set to false for dataplane-only deployments where projects/backups blobs live on the control plane."
+  type        = bool
+  default     = true
+}
+
+variable "shared_storage_create" {
+  description = "Whether to create the compute shared storage account, azurefile share, and supporting role assignments. Set to false for dataplane-only deployments using ephemeral block storage only."
+  type        = bool
+  default     = true
+}
+
+variable "hephaestus_create" {
+  description = "Whether to create the Hephaestus image-builder managed identity and its federated credentials (hephaestus + importer). Set to false for dataplane-only deployments where image building runs on the control plane."
+  type        = bool
+  default     = true
 }
