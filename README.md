@@ -57,6 +57,41 @@ module "aks_cluster" {
 
 The cluster, node pools, log analytics workspace, and AKS-managed identity are always created. Outputs for skipped resources return `null`; consumers must handle this. The `containers` output returns an empty map (`{}`) instead of `null` so consumers can safely iterate over it.
 
+#### DNS zone and workload identities for external-dns / cert-manager
+
+AKS DP deployments that own their own public DNS zone can provision the zone, and the two workload identities (external-dns and cert-manager) in the same apply:
+
+```hcl
+module "aks_cluster" {
+  source = "github.com/dominodatalab/terraform-azure-aks?ref=v3.1.0"
+
+  deploy_id             = "dp01"
+  resource_group        = azurerm_resource_group.dp.id
+  kubeconfig_output_path = "${path.cwd}/kubeconfig"
+  namespaces            = { platform = "domino-platform", compute = "domino-compute" }
+
+  # CP-only resources off for DP
+  acr_create            = false
+  storage_create        = false
+  shared_storage_create = false
+  hephaestus_create     = false
+
+  # DNS zone + workload identities
+  dns_zone_create  = true
+  dns_zone_name    = "dp01.cp.az.domino.tech"
+  external_dns_create = true
+  cert_manager_create = true
+}
+```
+
+`dns_zone_create=false` (the default) produces zero new resources for these four flags. When `dns_zone_create=true`, `dns_zone_name` must be a non-empty FQDN — the module raises a precondition error otherwise.
+
+`external_dns_create` and `cert_manager_create` each gate a UAMI + DNS Zone Contributor role assignment + federated identity credential. The FIC subject strings are:
+- external-dns: `system:serviceaccount:<namespaces.platform>:<external_dns_service_account>`
+- cert-manager: `system:serviceaccount:cert-manager:<cert_manager_service_account>`
+
+Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return `null` when their respective create flag is `false`.
+
 > **GPU note:** the default GPU node-pool SKU is now `Standard_NC24ads_A100_v4` (NCads_A100_v4 series). The previous default `Standard_NC6s_v3` was retired by Azure on 2025-09-30.
 
 <!-- BEGIN_TF_DOCS -->

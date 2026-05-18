@@ -333,3 +333,39 @@ variable "hephaestus_create" {
   type        = bool
   default     = true
 }
+
+variable "dns_zone_create" {
+  description = "Whether to create a public Azure DNS zone for this dataplane. Set to true for AKS DP deployments that own their own DNS zone."
+  type        = bool
+  default     = false
+}
+
+variable "dns_zone_name" {
+  description = "FQDN of the Azure DNS zone to create (e.g. dp01.cp.az.domino.tech). Required when dns_zone_create=true."
+  type        = string
+  default     = ""
+}
+
+variable "external_dns_create" {
+  description = "Whether to create the external-dns managed identity and DNS Zone Contributor role assignment. Requires dns_zone_create=true."
+  type        = bool
+  default     = false
+}
+
+variable "cert_manager_create" {
+  description = "Whether to create the cert-manager managed identity and DNS Zone Contributor role assignment. Requires dns_zone_create=true."
+  type        = bool
+  default     = false
+}
+
+variable "external_dns_service_account" {
+  description = "Kubernetes ServiceAccount name for external-dns (must match the chart release SA name)."
+  type        = string
+  default     = "external-dns"
+}
+
+variable "cert_manager_service_account" {
+  description = "Kubernetes ServiceAccount name for cert-manager controller (must match the chart release SA name)."
+  type        = string
+  default     = "cert-manager"
+}
