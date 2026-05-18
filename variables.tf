@@ -350,12 +350,20 @@ variable "external_dns_create" {
   description = "Whether to create the external-dns managed identity and DNS Zone Contributor role assignment. Requires dns_zone_create=true."
   type        = bool
   default     = false
+  validation {
+    condition     = !var.external_dns_create || var.dns_zone_create
+    error_message = "external_dns_create requires dns_zone_create=true."
+  }
 }
 
 variable "cert_manager_create" {
   description = "Whether to create the cert-manager managed identity and DNS Zone Contributor role assignment. Requires dns_zone_create=true."
   type        = bool
   default     = false
+  validation {
+    condition     = !var.cert_manager_create || var.dns_zone_create
+    error_message = "cert_manager_create requires dns_zone_create=true."
+  }
 }
 
 variable "external_dns_service_account" {
