@@ -19,6 +19,7 @@
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_aks"></a> [aks](#module\_aks) | ./.. | n/a |
+| <a name="module_aks_dp_dns"></a> [aks\_dp\_dns](#module\_aks\_dp\_dns) | ./.. | n/a |
 
 ## Resources
 

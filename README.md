@@ -114,6 +114,7 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_dns_zone"></a> [dns\_zone](#module\_dns\_zone) | ./modules/dns-zone | n/a |
 | <a name="module_domino_acr_ep"></a> [domino\_acr\_ep](#module\_domino\_acr\_ep) | ./modules/private_endpoint | n/a |
 | <a name="module_domino_blob_ep"></a> [domino\_blob\_ep](#module\_domino\_blob\_ep) | ./modules/private_endpoint | n/a |
 | <a name="module_domino_shared_ep"></a> [domino\_shared\_ep](#module\_domino\_shared\_ep) | ./modules/private_endpoint | n/a |
@@ -181,11 +182,17 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 | <a name="input_aks_vnet_name"></a> [aks\_vnet\_name](#input\_aks\_vnet\_name) | VNet name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_aks_vnet_rg_name"></a> [aks\_vnet\_rg\_name](#input\_aks\_vnet\_rg\_name) | VNet Resource Groupe name for ACR/AKS, required when either private\_acr\_enabled or private\_cluster\_enabled is set to true. | `string` | `null` | no |
 | <a name="input_api_server_authorized_ip_ranges"></a> [api\_server\_authorized\_ip\_ranges](#input\_api\_server\_authorized\_ip\_ranges) | The IP ranges to whitelist for incoming traffic to the masters | `list(string)` | `null` | no |
+| <a name="input_cert_manager_create"></a> [cert\_manager\_create](#input\_cert\_manager\_create) | Whether to create the cert-manager managed identity and DNS Zone Contributor role assignment. Requires dns\_zone\_create=true. | `bool` | `false` | no |
+| <a name="input_cert_manager_service_account"></a> [cert\_manager\_service\_account](#input\_cert\_manager\_service\_account) | Kubernetes ServiceAccount name for cert-manager controller (must match the chart release SA name). | `string` | `"cert-manager"` | no |
 | <a name="input_cluster_sku_tier"></a> [cluster\_sku\_tier](#input\_cluster\_sku\_tier) | The Domino cluster SKU (defaults to Free) | `string` | `null` | no |
 | <a name="input_cni_overlay_enabled"></a> [cni\_overlay\_enabled](#input\_cni\_overlay\_enabled) | Flag to determine whether to use overlay network settings | `bool` | `false` | no |
 | <a name="input_containers"></a> [containers](#input\_containers) | storage containers to create | <pre>map(object({<br/>    container_access_type = string<br/>  }))</pre> | <pre>{<br/>  "backups": {<br/>    "container_access_type": "private"<br/>  },<br/>  "projects": {<br/>    "container_access_type": "private"<br/>  }<br/>}</pre> | no |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino Deployment ID. | `string` | n/a | yes |
 | <a name="input_dns_service_ip"></a> [dns\_service\_ip](#input\_dns\_service\_ip) | IP address assigned to the Kubernetes DNS service, used when CNI Overlay is enabled | `string` | `"100.97.0.10"` | no |
+| <a name="input_dns_zone_create"></a> [dns\_zone\_create](#input\_dns\_zone\_create) | Whether to create a public Azure DNS zone for this dataplane. Set to true for AKS DP deployments that own their own DNS zone. | `bool` | `false` | no |
+| <a name="input_dns_zone_name"></a> [dns\_zone\_name](#input\_dns\_zone\_name) | FQDN of the Azure DNS zone to create (e.g. dp01.cp.az.domino.tech). Required when dns\_zone\_create=true. | `string` | `""` | no |
+| <a name="input_external_dns_create"></a> [external\_dns\_create](#input\_external\_dns\_create) | Whether to create the external-dns managed identity and DNS Zone Contributor role assignment. Requires dns\_zone\_create=true. | `bool` | `false` | no |
+| <a name="input_external_dns_service_account"></a> [external\_dns\_service\_account](#input\_external\_dns\_service\_account) | Kubernetes ServiceAccount name for external-dns (must match the chart release SA name). | `string` | `"external-dns"` | no |
 | <a name="input_hephaestus_create"></a> [hephaestus\_create](#input\_hephaestus\_create) | Whether to create the Hephaestus image-builder managed identity and its federated credentials (hephaestus + importer). Set to false for dataplane-only deployments where image building runs on the control plane. | `bool` | `true` | no |
 | <a name="input_kubeconfig_output_path"></a> [kubeconfig\_output\_path](#input\_kubeconfig\_output\_path) | kubeconfig path | `string` | n/a | yes |
 | <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br/>    idle_timeout_in_minutes   = optional(number, 4)<br/>    managed_outbound_ip_count = number<br/>    }<br/>  )</pre> | `null` | no |
@@ -215,8 +222,11 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 | <a name="output_acr_credential_refresher"></a> [acr\_credential\_refresher](#output\_acr\_credential\_refresher) | Configuration for ACR credential refresher Helm values |
 | <a name="output_aks_identity"></a> [aks\_identity](#output\_aks\_identity) | AKS managed identity |
 | <a name="output_blob_dns_zone_name"></a> [blob\_dns\_zone\_name](#output\_blob\_dns\_zone\_name) | blob dns zone name (null when private cluster or storage account is disabled) |
+| <a name="output_cert_manager_identity"></a> [cert\_manager\_identity](#output\_cert\_manager\_identity) | Workload identity for cert-manager (null when cert\_manager\_create=false) |
 | <a name="output_containers"></a> [containers](#output\_containers) | storage details (empty map when storage\_create=false; safe for iteration and key-lookup — type stays map(storage\_container) regardless of flag) |
+| <a name="output_dns_zone"></a> [dns\_zone](#output\_dns\_zone) | DP Azure DNS zone details (null when dns\_zone\_create=false) |
 | <a name="output_domino_acr"></a> [domino\_acr](#output\_domino\_acr) | Azure Container Registry details |
+| <a name="output_external_dns_identity"></a> [external\_dns\_identity](#output\_external\_dns\_identity) | Workload identity for external-dns (null when external\_dns\_create=false) |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer url |
 | <a name="output_private_cluster_enabled"></a> [private\_cluster\_enabled](#output\_private\_cluster\_enabled) | Flag to determine if AKS is private or public |
 | <a name="output_shared_storage_account"></a> [shared\_storage\_account](#output\_shared\_storage\_account) | shared storage account |
