@@ -62,7 +62,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_cert_manager_create"></a> [cert\_manager\_create](#input\_cert\_manager\_create) | Create the cert-manager UAMI, DNS Zone Contributor assignment, and federated credential. | `bool` | `false` | no |
-| <a name="input_cert_manager_service_account"></a> [cert\_manager\_service\_account](#input\_cert\_manager\_service\_account) | Kubernetes ServiceAccount name for cert-manager controller. | `string` | `"cert-manager"` | no |
+| <a name="input_cert_manager_service_account"></a> [cert\_manager\_service\_account](#input\_cert\_manager\_service\_account) | Kubernetes ServiceAccount name for cert-manager controller. Must match the SA created<br/>by the cert-manager helm release running in `namespaces.platform` — otherwise the<br/>federated identity credential subject and the pod's projected token won't align and<br/>AAD token exchange fails with AADSTS700213. | `string` | `"cert-manager"` | no |
 | <a name="input_deploy_id"></a> [deploy\_id](#input\_deploy\_id) | Domino deployment ID — used as a name prefix for managed identities. | `string` | n/a | yes |
 | <a name="input_external_dns_create"></a> [external\_dns\_create](#input\_external\_dns\_create) | Create the external-dns UAMI, DNS Zone Contributor assignment, and federated credential. | `bool` | `false` | no |
 | <a name="input_external_dns_service_account"></a> [external\_dns\_service\_account](#input\_external\_dns\_service\_account) | Kubernetes ServiceAccount name for external-dns. | `string` | `"external-dns"` | no |
