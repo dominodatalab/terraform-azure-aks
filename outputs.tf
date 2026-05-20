@@ -59,3 +59,18 @@ output "acr_credential_refresher" {
     token_name         = azurerm_container_registry_token.genai_model_pull[0].name
   } : null
 }
+
+output "dns_zone" {
+  description = "DP Azure DNS zone details (null when dns_zone_create=false)"
+  value       = try(module.dns_zone[0].zone, null)
+}
+
+output "external_dns_identity" {
+  description = "Workload identity for external-dns (null when external_dns_create=false)"
+  value       = try(module.dns_zone[0].external_dns_identity, null)
+}
+
+output "cert_manager_identity" {
+  description = "Workload identity for cert-manager (null when cert_manager_create=false)"
+  value       = try(module.dns_zone[0].cert_manager_identity, null)
+}

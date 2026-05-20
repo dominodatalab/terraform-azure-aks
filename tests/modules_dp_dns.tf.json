@@ -1,0 +1,24 @@
+{
+  "module": {
+    "aks_dp_dns": {
+      "source": "./..",
+      "deploy_id": "${var.deploy_id}",
+      "resource_group": "${azurerm_resource_group.ci.id}",
+      "api_server_authorized_ip_ranges": "${var.api_server_authorized_ip_ranges}",
+      "tags": "${var.tags}",
+      "namespaces": {
+        "platform": "domino-platform",
+        "compute": "domino-compute"
+      },
+      "kubeconfig_output_path": "${path.cwd}/kubeconfig-dp",
+      "acr_create": false,
+      "storage_create": false,
+      "shared_storage_create": false,
+      "hephaestus_create": false,
+      "dns_zone_create": true,
+      "dns_zone_name": "${var.deploy_id}.cp.az.domino.tech",
+      "external_dns_create": true,
+      "cert_manager_create": true
+    }
+  }
+}
