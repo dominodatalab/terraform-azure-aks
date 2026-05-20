@@ -53,7 +53,12 @@ variable "cert_manager_create" {
 }
 
 variable "cert_manager_service_account" {
-  description = "Kubernetes ServiceAccount name for cert-manager controller."
+  description = <<-EOT
+    Kubernetes ServiceAccount name for cert-manager controller. Must match the SA created
+    by the cert-manager helm release running in `namespaces.platform` — otherwise the
+    federated identity credential subject and the pod's projected token won't align and
+    AAD token exchange fails with AADSTS700213.
+  EOT
   type        = string
   default     = "cert-manager"
 }
