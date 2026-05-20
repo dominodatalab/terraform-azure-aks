@@ -107,8 +107,9 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 3.45 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.117.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.9.0 |
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
@@ -164,6 +165,7 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 | [azurerm_user_assigned_identity.aks_assigned_identity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_user_assigned_identity.hephaestus](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [random_id.log_analytics_workspace_name_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [terraform_data.dns_zone_preconditions](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [azurerm_kubernetes_service_versions.selected](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/kubernetes_service_versions) | data source |
 | [azurerm_resource_group.aks](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 | [azurerm_subnet.aks_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subnet) | data source |
