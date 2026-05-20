@@ -55,5 +55,5 @@ resource "azurerm_federated_identity_credential" "cert_manager" {
   parent_id           = azurerm_user_assigned_identity.cert_manager[0].id
   audience            = ["api://AzureADTokenExchange"]
   issuer              = var.oidc_issuer_url
-  subject             = "system:serviceaccount:cert-manager:${var.cert_manager_service_account}"
+  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.cert_manager_service_account}"
 }

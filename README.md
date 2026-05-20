@@ -88,7 +88,7 @@ module "aks_cluster" {
 
 `external_dns_create` and `cert_manager_create` each gate a UAMI + DNS Zone Contributor role assignment + federated identity credential. The FIC subject strings are:
 - external-dns: `system:serviceaccount:<namespaces.platform>:<external_dns_service_account>`
-- cert-manager: `system:serviceaccount:cert-manager:<cert_manager_service_account>`
+- cert-manager: `system:serviceaccount:<namespaces.platform>:<cert_manager_service_account>`
 
 Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return `null` when their respective create flag is `false`.
 
