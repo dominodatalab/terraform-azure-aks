@@ -2,7 +2,7 @@
   "module": {
     "aks_dp_dns": {
       "source": "./..",
-      "deploy_id": "${var.deploy_id}",
+      "deploy_id": "${var.deploy_id}-dp",
       "resource_group": "${azurerm_resource_group.ci.id}",
       "api_server_authorized_ip_ranges": "${var.api_server_authorized_ip_ranges}",
       "tags": "${var.tags}",
