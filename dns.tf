@@ -1,8 +1,4 @@
-# Coherence checks for the new DNS / identity flags. `terraform_data` runs preconditions
-# at plan time without producing real resources. Using `precondition` (TF 1.2+) rather
-# than cross-variable `validation` (TF 1.9+) so CI on TF 1.7.4 doesn't fail (see commit
-# cb7dbd2 — `validation` blocks with multi-variable conditions were removed for that
-# reason).
+# Cross-variable validation needs TF 1.9+; CI is on 1.7.4, so do the checks via preconditions.
 resource "terraform_data" "dns_zone_preconditions" {
   lifecycle {
     precondition {
