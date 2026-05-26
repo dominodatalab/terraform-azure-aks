@@ -99,7 +99,7 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.4.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.45 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.1 |
 
