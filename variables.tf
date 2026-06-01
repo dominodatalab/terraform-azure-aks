@@ -344,6 +344,11 @@ variable "dns_zone_name" {
   description = "FQDN of the Azure DNS zone to create (e.g. dp01.cp.az.domino.tech). Required when dns_zone_create=true."
   type        = string
   default     = ""
+
+  validation {
+    condition     = var.dns_zone_name == "" || can(regex("^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$", var.dns_zone_name))
+    error_message = "dns_zone_name must be a lowercase FQDN with at least two labels (e.g. \"example.com\"). No uppercase, leading/trailing dots, underscores, or whitespace."
+  }
 }
 
 variable "external_dns_create" {
