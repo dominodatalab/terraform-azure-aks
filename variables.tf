@@ -78,41 +78,41 @@ variable "node_pools" {
   description = "default node pools"
   type = object({
     compute = object({
-      enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "Standard_D8s_v4")
-      zones                 = optional(list(string), ["1", "2", "3"])
+      node_public_ip_enabled = optional(bool, false)
+      vm_size                = optional(string, "Standard_D8s_v4")
+      zones                  = optional(list(string), ["1", "2", "3"])
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default"
       })
-      node_os             = optional(string, "AzureLinux3")
-      node_taints         = optional(list(string), [])
-      enable_auto_scaling = optional(bool, true)
-      min_count           = optional(number, 0)
-      max_count           = optional(number, 10)
-      initial_count       = optional(number, 1)
-      max_pods            = optional(number, 30)
-      os_disk_size_gb     = optional(number, 128)
+      node_os              = optional(string, "AzureLinux3")
+      node_taints          = optional(list(string), [])
+      auto_scaling_enabled = optional(bool, true)
+      min_count            = optional(number, 0)
+      max_count            = optional(number, 10)
+      initial_count        = optional(number, 1)
+      max_pods             = optional(number, 30)
+      os_disk_size_gb      = optional(number, 128)
     }),
     platform = object({
-      enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "Standard_D8s_v4")
-      zones                 = optional(list(string), ["1", "2", "3"])
+      node_public_ip_enabled = optional(bool, false)
+      vm_size                = optional(string, "Standard_D8s_v4")
+      zones                  = optional(list(string), ["1", "2", "3"])
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "platform"
       })
-      node_os             = optional(string, "AzureLinux3")
-      node_taints         = optional(list(string), [])
-      enable_auto_scaling = optional(bool, true)
-      min_count           = optional(number, 1)
-      max_count           = optional(number, 3)
-      initial_count       = optional(number, 1)
-      max_pods            = optional(number, 60)
-      os_disk_size_gb     = optional(number, 128)
+      node_os              = optional(string, "AzureLinux3")
+      node_taints          = optional(list(string), [])
+      auto_scaling_enabled = optional(bool, true)
+      min_count            = optional(number, 1)
+      max_count            = optional(number, 3)
+      initial_count        = optional(number, 1)
+      max_pods             = optional(number, 60)
+      os_disk_size_gb      = optional(number, 128)
     }),
     gpu = object({
-      enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "Standard_NC24ads_A100_v4")
-      zones                 = optional(list(string), [])
+      node_public_ip_enabled = optional(bool, false)
+      vm_size                = optional(string, "Standard_NC24ads_A100_v4")
+      zones                  = optional(list(string), [])
       node_labels = optional(map(string), {
         "dominodatalab.com/node-pool" = "default-gpu"
         "nvidia.com/gpu"              = "true"
@@ -121,26 +121,26 @@ variable "node_pools" {
       node_taints = optional(list(string), [
         "nvidia.com/gpu=true:NoExecute"
       ])
-      enable_auto_scaling = optional(bool, true)
-      min_count           = optional(number, 0)
-      max_count           = optional(number, 1)
-      initial_count       = optional(number, 0)
-      max_pods            = optional(number, 30)
-      os_disk_size_gb     = optional(number, 128)
+      auto_scaling_enabled = optional(bool, true)
+      min_count            = optional(number, 0)
+      max_count            = optional(number, 1)
+      initial_count        = optional(number, 0)
+      max_pods             = optional(number, 30)
+      os_disk_size_gb      = optional(number, 128)
     })
     system = object({
-      enable_node_public_ip = optional(bool, false)
-      vm_size               = optional(string, "Standard_DS4_v2")
-      zones                 = optional(list(string), ["1", "2", "3"])
-      node_labels           = optional(map(string), {})
-      node_os               = optional(string, "AzureLinux3")
-      node_taints           = optional(list(string), [])
-      enable_auto_scaling   = optional(bool, true)
-      min_count             = optional(number, 1)
-      max_count             = optional(number, 6)
-      initial_count         = optional(number, 1)
-      max_pods              = optional(number, 60)
-      os_disk_size_gb       = optional(number, 128)
+      node_public_ip_enabled = optional(bool, false)
+      vm_size                = optional(string, "Standard_DS4_v2")
+      zones                  = optional(list(string), ["1", "2", "3"])
+      node_labels            = optional(map(string), {})
+      node_os                = optional(string, "AzureLinux3")
+      node_taints            = optional(list(string), [])
+      auto_scaling_enabled   = optional(bool, true)
+      min_count              = optional(number, 1)
+      max_count              = optional(number, 6)
+      initial_count          = optional(number, 1)
+      max_pods               = optional(number, 60)
+      os_disk_size_gb        = optional(number, 128)
     })
   })
   default = {
@@ -154,18 +154,18 @@ variable "node_pools" {
 variable "additional_node_pools" {
   description = "additional node pools"
   type = map(object({
-    enable_node_public_ip = optional(bool, false)
-    vm_size               = string
-    zones                 = list(string)
-    node_labels           = map(string)
-    node_os               = optional(string, "AzureLinux3")
-    node_taints           = optional(list(string), [])
-    enable_auto_scaling   = optional(bool, true)
-    min_count             = optional(number, 0)
-    max_count             = number
-    initial_count         = optional(number, 0)
-    max_pods              = optional(number, 30)
-    os_disk_size_gb       = optional(number, 128)
+    node_public_ip_enabled = optional(bool, false)
+    vm_size                = string
+    zones                  = list(string)
+    node_labels            = map(string)
+    node_os                = optional(string, "AzureLinux3")
+    node_taints            = optional(list(string), [])
+    auto_scaling_enabled   = optional(bool, true)
+    min_count              = optional(number, 0)
+    max_count              = number
+    initial_count          = optional(number, 0)
+    max_pods               = optional(number, 30)
+    os_disk_size_gb        = optional(number, 128)
   }))
   default = {}
 }

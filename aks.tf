@@ -95,10 +95,12 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name                         = "system"
     only_critical_addons_enabled = true
+    node_public_ip_enabled       = var.node_pools.system.node_public_ip_enabled
     node_labels                  = var.node_pools.system.node_labels
     vm_size                      = var.node_pools.system.vm_size
     zones                        = var.node_pools.system.zones
     os_disk_size_gb              = var.node_pools.system.os_disk_size_gb
+    auto_scaling_enabled         = var.node_pools.system.auto_scaling_enabled
     orchestrator_version         = data.azurerm_kubernetes_service_versions.selected.latest_version
     min_count                    = var.node_pools.system.min_count
     max_count                    = var.node_pools.system.max_count
@@ -163,22 +165,24 @@ resource "azurerm_kubernetes_cluster" "aks" {
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   for_each = { for ng in local.zonal_node_pools : "${ng.node_pool_name}${ng.node_pool_zone}" => ng }
 
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  name                  = each.key
-  node_count            = each.value.node_pool_spec.initial_count
-  vm_size               = each.value.node_pool_spec.vm_size
-  zones                 = [each.value.node_pool_zone]
-  os_disk_size_gb       = each.value.node_pool_spec.os_disk_size_gb
-  os_type               = "Linux"
-  os_sku                = each.value.node_pool_spec.node_os
-  node_labels           = each.value.node_pool_spec.node_labels
-  node_taints           = each.value.node_pool_spec.node_taints
-  orchestrator_version  = azurerm_kubernetes_cluster.aks.kubernetes_version
-  min_count             = each.value.node_pool_spec.min_count
-  max_count             = each.value.node_pool_spec.max_count
-  max_pods              = each.value.node_pool_spec.max_pods
-  tags                  = var.tags
-  vnet_subnet_id        = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
+  node_public_ip_enabled = each.value.node_pool_spec.node_public_ip_enabled
+  kubernetes_cluster_id  = azurerm_kubernetes_cluster.aks.id
+  name                   = each.key
+  node_count             = each.value.node_pool_spec.initial_count
+  vm_size                = each.value.node_pool_spec.vm_size
+  zones                  = [each.value.node_pool_zone]
+  os_disk_size_gb        = each.value.node_pool_spec.os_disk_size_gb
+  os_type                = "Linux"
+  os_sku                 = each.value.node_pool_spec.node_os
+  node_labels            = each.value.node_pool_spec.node_labels
+  node_taints            = each.value.node_pool_spec.node_taints
+  auto_scaling_enabled   = each.value.node_pool_spec.auto_scaling_enabled
+  orchestrator_version   = azurerm_kubernetes_cluster.aks.kubernetes_version
+  min_count              = each.value.node_pool_spec.min_count
+  max_count              = each.value.node_pool_spec.max_count
+  max_pods               = each.value.node_pool_spec.max_pods
+  tags                   = var.tags
+  vnet_subnet_id         = (var.private_acr_enabled || var.private_cluster_enabled) ? data.azurerm_subnet.aks_subnet[0].id : null
 
   upgrade_settings {
     drain_timeout_in_minutes      = 0

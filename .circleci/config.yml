@@ -84,9 +84,8 @@ jobs:
           name: pre-commit
           command: |
             curl -s --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-            export TFSEC_VERSION=v1.28.14 #Pinning version toreduce GH calls to avoid rate limiting
-            curl -s --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
             curl -L --retry 10 --retry-delay 2 --retry-all-errors https://github.com/terraform-docs/terraform-docs/releases/download/v0.21.0/terraform-docs-v0.21.0-linux-amd64.tar.gz | tar -C /tmp -xzf - && chmod +x /tmp/terraform-docs && sudo mv /tmp/terraform-docs /usr/local/bin
+            curl -sfL --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
             pip3 install checkov pre-commit
             SKIP=no-commit-to-branch pre-commit run --all-files
 
@@ -147,6 +146,10 @@ jobs:
             echo "Setting module source to: ${MOD_SOURCE}"
             mv modules.tf.json modules.ori
             jq --arg mod "$MOD_SOURCE" -e '.module.aks.source=$mod' modules.ori > modules.tf.json
+            cp main.tf main.tf.ori
+            sed -i 's/version\s*=\s*"~> [0-9]\+\.[0-9]\+"/version = ">= 3.0"/' main.tf
+            echo "Relaxed provider constraints for old module compatibility:"
+            grep 'version' main.tf
       - tf_init_apply
       - run:
           name: "Upgrade module by applying this commit"
@@ -154,6 +157,7 @@ jobs:
           command: |
             echo "Testing terraform module upgrade"
             cp modules.ori modules.tf.json
+            cp main.tf.ori main.tf
             terraform init --reconfigure --upgrade
             terraform validate
             # https://github.com/hashicorp/terraform-provider-azurerm/issues/21805
