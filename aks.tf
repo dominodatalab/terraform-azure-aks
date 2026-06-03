@@ -83,7 +83,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   dns_prefix_private_cluster          = var.private_cluster_enabled ? var.deploy_id : null
   private_dns_zone_id                 = var.private_cluster_enabled ? azurerm_private_dns_zone.aks_private_dns_zone[0].id : null
   private_cluster_public_fqdn_enabled = var.private_cluster_enabled ? var.private_cluster_public_fqdn_enabled : null
-  node_os_channel_upgrade             = var.node_os_upgrade_channel # node_os_channel_upgrade defined in AzureRM 3.x but renamed to node_os_upgrade_channel in 4.0+
+  node_os_upgrade_channel             = var.node_os_upgrade_channel
 
   dynamic "api_server_access_profile" {
     for_each = var.private_cluster_enabled ? [] : [1]
@@ -95,12 +95,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name                         = "system"
     only_critical_addons_enabled = true
-    enable_node_public_ip        = var.node_pools.system.enable_node_public_ip
     node_labels                  = var.node_pools.system.node_labels
     vm_size                      = var.node_pools.system.vm_size
     zones                        = var.node_pools.system.zones
     os_disk_size_gb              = var.node_pools.system.os_disk_size_gb
-    enable_auto_scaling          = var.node_pools.system.enable_auto_scaling
     orchestrator_version         = data.azurerm_kubernetes_service_versions.selected.latest_version
     min_count                    = var.node_pools.system.min_count
     max_count                    = var.node_pools.system.max_count
@@ -165,7 +163,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
 resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   for_each = { for ng in local.zonal_node_pools : "${ng.node_pool_name}${ng.node_pool_zone}" => ng }
 
-  enable_node_public_ip = each.value.node_pool_spec.enable_node_public_ip
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   name                  = each.key
   node_count            = each.value.node_pool_spec.initial_count
@@ -176,7 +173,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   os_sku                = each.value.node_pool_spec.node_os
   node_labels           = each.value.node_pool_spec.node_labels
   node_taints           = each.value.node_pool_spec.node_taints
-  enable_auto_scaling   = each.value.node_pool_spec.enable_auto_scaling
   orchestrator_version  = azurerm_kubernetes_cluster.aks.kubernetes_version
   min_count             = each.value.node_pool_spec.min_count
   max_count             = each.value.node_pool_spec.max_count

@@ -14,10 +14,6 @@ resource "azurerm_container_registry" "domino" {
   public_network_access_enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true) ? false : true
   zone_redundancy_enabled       = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
 
-  retention_policy {
-    enabled = (var.registry_tier == "Premium" || var.private_acr_enabled == true)
-  }
-
   tags = var.tags
 
   dynamic "network_rule_set" {
