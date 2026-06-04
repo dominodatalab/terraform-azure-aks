@@ -6,20 +6,19 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.45 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.67 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 3.45 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.67 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_aks"></a> [aks](#module\_aks) | ./.. | n/a |
-| <a name="module_aks_dp_dns"></a> [aks\_dp\_dns](#module\_aks\_dp\_dns) | ./.. | n/a |
 
 ## Resources
 
@@ -37,5 +36,9 @@
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_cert_manager_identity"></a> [cert\_manager\_identity](#output\_cert\_manager\_identity) | Workload identity for cert-manager |
+| <a name="output_dns_zone"></a> [dns\_zone](#output\_dns\_zone) | DP Azure DNS zone details |
+| <a name="output_external_dns_identity"></a> [external\_dns\_identity](#output\_external\_dns\_identity) | Workload identity for external-dns |
 <!-- END_TF_DOCS -->
