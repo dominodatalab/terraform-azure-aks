@@ -147,7 +147,7 @@ jobs:
             mv modules.tf.json modules.ori
             jq --arg mod "$MOD_SOURCE" -e '.module.aks.source=$mod' modules.ori > modules.tf.json
             cp main.tf main.tf.ori
-            sed -i 's/version\s*=\s*"~> [0-9]\+\.[0-9]\+"/version = ">= 3.0"/' main.tf
+            sed -E -i 's/version = "~> [0-9]+\.[0-9]+"/version = ">= 3.0"/' main.tf
             echo "Relaxed provider constraints for old module compatibility:"
             grep 'version' main.tf
       - tf_init_apply
