@@ -3,13 +3,27 @@
 #########################################################################
 # locals for nodepools configuration
 locals {
+  gpu_labels = { "nvidia.com/gpu" = "true" }
+  gpu_taints = ["nvidia.com/gpu=true:NoExecute"]
+
   node_pools = { for k, v in merge(var.node_pools, var.additional_node_pools) : k => v if k != "system" }
+
+  # GPU count per vm_size in this region, from Azure's own SKU capabilities (not a static family list).
+  vm_size_gpu_counts = {
+    for sku in data.azapi_resource_list.vm_size_skus.output.skus :
+    sku.name => tonumber(coalesce(sku.gpus, "0"))
+  }
+  node_pool_is_gpu = {
+    for name, spec in local.node_pools :
+    name => spec.gpu || try(local.vm_size_gpu_counts[spec.vm_size], 0) > 0
+  }
   zonal_node_pools = flatten([for name, spec in local.node_pools : [
     for zone in spec.zones :
     {
       node_pool_zone = zone
       node_pool_name = name
       node_pool_spec = spec
+      is_gpu         = local.node_pool_is_gpu[name]
     }
     ]
   ])
@@ -34,6 +48,17 @@ data "azurerm_virtual_network" "aks_vnet" {
   count               = (var.private_acr_enabled || var.private_cluster_enabled) ? 1 : 0
   name                = var.aks_vnet_name
   resource_group_name = var.aks_vnet_rg_name
+}
+# Retrieve GPU capability (capabilities[].GPUs) for every VM size available in this region
+data "azapi_resource_list" "vm_size_skus" {
+  type      = "Microsoft.Compute/skus@2021-07-01"
+  parent_id = data.azurerm_subscription.current.id
+  query_parameters = {
+    "$filter" = ["location eq '${data.azurerm_resource_group.aks.location}'"]
+  }
+  response_export_values = {
+    "skus" = "value[?resourceType=='virtualMachines'].{name: name, gpus: capabilities[?name=='GPUs'].value | [0]}"
+  }
 }
 #########################################################################
 ########################### Private DNS Zone ############################
@@ -174,8 +199,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   os_disk_size_gb        = each.value.node_pool_spec.os_disk_size_gb
   os_type                = "Linux"
   os_sku                 = each.value.node_pool_spec.node_os
-  node_labels            = each.value.node_pool_spec.node_labels
-  node_taints            = each.value.node_pool_spec.node_taints
+  node_labels            = each.value.is_gpu ? merge(local.gpu_labels, each.value.node_pool_spec.node_labels) : each.value.node_pool_spec.node_labels
+  node_taints            = each.value.is_gpu ? distinct(concat(local.gpu_taints, each.value.node_pool_spec.node_taints)) : each.value.node_pool_spec.node_taints
+  gpu_driver             = each.value.is_gpu ? "Install" : null
   auto_scaling_enabled   = each.value.node_pool_spec.auto_scaling_enabled
   orchestrator_version   = azurerm_kubernetes_cluster.aks.kubernetes_version
   min_count              = each.value.node_pool_spec.min_count
