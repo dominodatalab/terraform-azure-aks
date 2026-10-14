@@ -23,13 +23,12 @@ resource "azurerm_role_assignment" "external_dns" {
 }
 
 resource "azurerm_federated_identity_credential" "external_dns" {
-  count               = var.external_dns_create ? 1 : 0
-  name                = "${var.deploy_id}-external-dns"
-  resource_group_name = var.resource_group_name
-  parent_id           = azurerm_user_assigned_identity.external_dns[0].id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = var.oidc_issuer_url
-  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.external_dns_service_account}"
+  count                     = var.external_dns_create ? 1 : 0
+  name                      = "${var.deploy_id}-external-dns"
+  user_assigned_identity_id = azurerm_user_assigned_identity.external_dns[0].id
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = var.oidc_issuer_url
+  subject                   = "system:serviceaccount:${var.namespaces.platform}:${var.external_dns_service_account}"
 }
 
 # cert-manager identity and DNS Zone Contributor assignment
@@ -49,11 +48,10 @@ resource "azurerm_role_assignment" "cert_manager" {
 }
 
 resource "azurerm_federated_identity_credential" "cert_manager" {
-  count               = var.cert_manager_create ? 1 : 0
-  name                = "${var.deploy_id}-cert-manager"
-  resource_group_name = var.resource_group_name
-  parent_id           = azurerm_user_assigned_identity.cert_manager[0].id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = var.oidc_issuer_url
-  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.cert_manager_service_account}"
+  count                     = var.cert_manager_create ? 1 : 0
+  name                      = "${var.deploy_id}-cert-manager"
+  user_assigned_identity_id = azurerm_user_assigned_identity.cert_manager[0].id
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = var.oidc_issuer_url
+  subject                   = "system:serviceaccount:${var.namespaces.platform}:${var.cert_manager_service_account}"
 }

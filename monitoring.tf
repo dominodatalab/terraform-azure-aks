@@ -68,9 +68,4 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
   enabled_log {
     category = "kube-scheduler"
   }
-
-  metric {
-    category = "AllMetrics"
-    enabled  = false
-  }
 }

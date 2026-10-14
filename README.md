@@ -95,9 +95,9 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 > **GPU note:** the default GPU node-pool SKU is now `Standard_NC24ads_A100_v4` (NCads_A100_v4 series). The previous default `Standard_NC6s_v3` was retired by Azure on 2025-09-30.
 
 > **Kubernetes & OS notes:**
-> - Default Kubernetes version is now `1.35`. To use `1.34`, set `kubernetes_version = "1.34"` explicitly.
-> - Default node OS is now `AzureLinux3`. AzureLinux 2.0 support ends 2026-03-31; migrate to `AzureLinux3` before that date or upgrade to a newer Kubernetes version that defaults to it.
-> - Containerd 1.x support ends with Kubernetes 1.35. Upgrade to containerd 2.0+ before upgrading to Kubernetes 1.36.
+> - Default Kubernetes version is now `1.36`. To stay on `1.35`, set `kubernetes_version = "1.35"` explicitly.
+> - Default node OS is now `AzureLinux3`. AzureLinux 2.0 node images are removed 2026-10-31; use `AzureLinux3`.
+> - This module requires `azurerm ~> 5.9`, so the caller's root module must allow azurerm 5.x. azurerm 5.x defaults that changed are pinned to 4.x behaviour.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -105,17 +105,17 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.4.0 |
-| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | ~> 2.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 4.67 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.1 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | ~> 2.13 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 5.9 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.9 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | ~> 2.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.67 |
-| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.1 |
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | ~> 2.13 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 5.9 |
+| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.9 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
@@ -206,7 +206,7 @@ Outputs `dns_zone`, `external_dns_identity`, and `cert_manager_identity` return 
 | <a name="input_hephaestus_create"></a> [hephaestus\_create](#input\_hephaestus\_create) | Whether to create the Hephaestus image-builder managed identity and its federated credentials (hephaestus + importer). Set to false for dataplane-only deployments where image building runs on the control plane. | `bool` | `true` | no |
 | <a name="input_kubeconfig_output_path"></a> [kubeconfig\_output\_path](#input\_kubeconfig\_output\_path) | kubeconfig path | `string` | n/a | yes |
 | <a name="input_kubernetes_nat_gateway"></a> [kubernetes\_nat\_gateway](#input\_kubernetes\_nat\_gateway) | Managed NAT Gateway configuration | <pre>object({<br/>    idle_timeout_in_minutes   = optional(number, 4)<br/>    managed_outbound_ip_count = number<br/>    }<br/>  )</pre> | `null` | no |
-| <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm\_kubernetes\_service\_versions. | `string` | `"1.35"` | no |
+| <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Optional Kubernetes version to provision. Allows partial input (e.g. 1.18) which is then chosen from azurerm\_kubernetes\_service\_versions. | `string` | `"1.36"` | no |
 | <a name="input_log_analytics_workspace_sku"></a> [log\_analytics\_workspace\_sku](#input\_log\_analytics\_workspace\_sku) | log analytics sku | `string` | `"PerGB2018"` | no |
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | Namespace that are used for generating the service account bindings | `object({ platform = string, compute = string })` | n/a | yes |
 | <a name="input_node_os_upgrade_channel"></a> [node\_os\_upgrade\_channel](#input\_node\_os\_upgrade\_channel) | Option to enable automatic node OS upgrades.  Possible values are Unmanaged, SecurityPatch, NodeImage and None. | `string` | `"None"` | no |

@@ -11,13 +11,12 @@ resource "azurerm_user_assigned_identity" "hephaestus" {
 }
 # Create Hephaestus identity credentials
 resource "azurerm_federated_identity_credential" "hephaestus" {
-  count               = var.hephaestus_create ? 1 : 0
-  name                = "hephaestus"
-  resource_group_name = data.azurerm_resource_group.aks.name
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  parent_id           = azurerm_user_assigned_identity.hephaestus[0].id
-  subject             = "system:serviceaccount:${var.namespaces.compute}:hephaestus"
+  count                     = var.hephaestus_create ? 1 : 0
+  name                      = "hephaestus"
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = azurerm_kubernetes_cluster.aks.oidc_issuer_url
+  user_assigned_identity_id = azurerm_user_assigned_identity.hephaestus[0].id
+  subject                   = "system:serviceaccount:${var.namespaces.compute}:hephaestus"
 }
 # create user assigned identity for AKS
 resource "azurerm_user_assigned_identity" "aks_assigned_identity" {
@@ -75,13 +74,12 @@ resource "azurerm_role_assignment" "aks_domino_shared" {
 }
 # Data importer identity credentials
 resource "azurerm_federated_identity_credential" "importer" {
-  count               = var.hephaestus_create ? 1 : 0
-  name                = "importer"
-  resource_group_name = data.azurerm_resource_group.aks.name
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  parent_id           = azurerm_user_assigned_identity.hephaestus[0].id
-  subject             = "system:serviceaccount:${var.namespaces.platform}:domino-data-importer"
+  count                     = var.hephaestus_create ? 1 : 0
+  name                      = "importer"
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = azurerm_kubernetes_cluster.aks.oidc_issuer_url
+  user_assigned_identity_id = azurerm_user_assigned_identity.hephaestus[0].id
+  subject                   = "system:serviceaccount:${var.namespaces.platform}:domino-data-importer"
 }
 
 # Create ACR Credential Refresher identity
@@ -111,13 +109,12 @@ resource "azurerm_role_assignment" "acr_credential_refresher" {
 
 # Allows the Kubernetes ServiceAccount to authenticate as the managed identity via Workload Identity
 resource "azurerm_federated_identity_credential" "acr_credential_refresher" {
-  count               = var.acr_create ? 1 : 0
-  name                = "${var.deploy_id}-acr-credential-refresher"
-  resource_group_name = data.azurerm_resource_group.aks.name
-  parent_id           = azurerm_user_assigned_identity.acr_credential_refresher[0].id
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = azurerm_kubernetes_cluster.aks.oidc_issuer_url
-  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.acr_credential_refresher_service_account}"
+  count                     = var.acr_create ? 1 : 0
+  name                      = "${var.deploy_id}-acr-credential-refresher"
+  user_assigned_identity_id = azurerm_user_assigned_identity.acr_credential_refresher[0].id
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = azurerm_kubernetes_cluster.aks.oidc_issuer_url
+  subject                   = "system:serviceaccount:${var.namespaces.platform}:${var.acr_credential_refresher_service_account}"
 
   depends_on = [
     azurerm_kubernetes_cluster.aks

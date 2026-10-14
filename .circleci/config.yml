@@ -145,7 +145,8 @@ jobs:
             echo "Latest published release tag is: ${latest_tag}"
             echo "Setting module source to: ${MOD_SOURCE}"
             mv modules.tf.json modules.ori
-            jq --arg mod "$MOD_SOURCE" -e '.module.aks.source=$mod' modules.ori > modules.tf.json
+            export FLYTE_SOURCE="github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}.git//modules/flyte?ref=${latest_tag}"
+            jq --arg mod "$MOD_SOURCE" --arg flyte "$FLYTE_SOURCE" -e '.module.aks.source=$mod | .module.flyte.source=$flyte' modules.ori > modules.tf.json
             cp main.tf main.tf.ori
             sed -E -i 's/version = "~> [0-9]+\.[0-9]+"/version = ">= 3.0"/' main.tf
             echo "Relaxed provider constraints for old module compatibility:"
@@ -160,8 +161,21 @@ jobs:
             cp main.tf.ori main.tf
             terraform init --reconfigure --upgrade
             terraform validate
+            # Fail if the upgrade would delete or replace any managed resource; only apply the checked plan
+            plan_check_apply() {
+              terraform plan -out=upgrade.tfplan || exit 1
+              terraform show -json upgrade.tfplan > upgrade.json || exit 1
+              if ! jq -e '[.resource_changes[] | select(.mode=="managed") | select(.change.actions | index("delete"))] | length == 0' upgrade.json; then
+                echo "Upgrade would delete or replace resources:"
+                jq -r '.resource_changes[] | select(.mode=="managed") | select(.change.actions | index("delete")) | "\(.address) \(.change.actions)"' upgrade.json
+                exit 1
+              fi
+              terraform apply upgrade.tfplan
+            }
             # https://github.com/hashicorp/terraform-provider-azurerm/issues/21805
-            terraform apply --auto-approve || terraform apply --auto-approve
+            plan_check_apply || plan_check_apply
+            # Fail on a perpetual diff after upgrade
+            terraform plan -detailed-exitcode
       - tf_destroy
       - tf_ws_delete
 

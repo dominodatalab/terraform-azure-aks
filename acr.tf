@@ -24,6 +24,12 @@ resource "azurerm_container_registry" "domino" {
       default_action = "Deny"
     }
   }
+
+  # azurerm 5.x no longer treats encryption as Computed (absent means disabled);
+  # ignoring it keeps the 4.x behaviour of not touching what the service reports
+  lifecycle {
+    ignore_changes = [encryption]
+  }
 }
 #########################################################################
 ########################## Private DNS Zone #############################
@@ -36,11 +42,10 @@ resource "azurerm_private_dns_zone" "acr_private_dns_zone" {
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_acr_vnet_link" {
-  count                 = var.private_acr_enabled && var.acr_create ? 1 : 0
-  name                  = "acr-vnet-dns-link"
-  resource_group_name   = data.azurerm_resource_group.aks.name
-  private_dns_zone_name = azurerm_private_dns_zone.acr_private_dns_zone[0].name
-  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
+  count               = var.private_acr_enabled && var.acr_create ? 1 : 0
+  name                = "acr-vnet-dns-link"
+  private_dns_zone_id = azurerm_private_dns_zone.acr_private_dns_zone[0].id
+  virtual_network_id  = data.azurerm_virtual_network.aks_vnet[0].id
 }
 #########################################################################
 ########################## Private EndPoint #############################
