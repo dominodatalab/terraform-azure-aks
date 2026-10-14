@@ -83,7 +83,8 @@ jobs:
       - run:
           name: pre-commit
           command: |
-            curl -s --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+            # tflint removed its install script upstream (terraform-linters/tflint#2607)
+            curl -fsSL --retry 10 --retry-delay 2 --retry-all-errors -o /tmp/tflint.zip https://github.com/terraform-linters/tflint/releases/download/v0.64.0/tflint_linux_amd64.zip && python3 -m zipfile -e /tmp/tflint.zip /tmp && chmod +x /tmp/tflint && sudo mv /tmp/tflint /usr/local/bin
             curl -L --retry 10 --retry-delay 2 --retry-all-errors https://github.com/terraform-docs/terraform-docs/releases/download/v0.21.0/terraform-docs-v0.21.0-linux-amd64.tar.gz | tar -C /tmp -xzf - && chmod +x /tmp/terraform-docs && sudo mv /tmp/terraform-docs /usr/local/bin
             curl -sfL --retry 10 --retry-delay 2 --retry-all-errors https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
             pip3 install checkov pre-commit
