@@ -2,7 +2,7 @@ version: 2.1
 
 parameters:
   terraform_version:
-    default: "1.7.4"
+    default: "1.13.5"
     type: string
 
 orbs:
