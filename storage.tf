@@ -18,8 +18,8 @@ resource "azurerm_storage_account" "domino" {
   name                            = replace(var.deploy_id, "/[_-]/", "")
   location                        = data.azurerm_resource_group.aks.location
   resource_group_name             = data.azurerm_resource_group.aks.name
-  public_network_access_enabled   = local.private_blob_enabled ? false : null
-  allow_nested_items_to_be_public = local.private_blob_enabled ? false : null
+  public_network_access           = local.private_blob_enabled ? "Disabled" : null
+  allow_nested_items_to_be_public = local.private_blob_enabled ? false : true
   local_user_enabled              = local.private_blob_enabled ? false : null
   account_kind                    = "StorageV2"
   account_tier                    = var.storage_account_tier
@@ -51,8 +51,8 @@ resource "azurerm_storage_account" "domino_shared" {
   name                            = "${replace(var.deploy_id, "/[_-]/", "")}${"shared"}"
   location                        = data.azurerm_resource_group.aks.location
   resource_group_name             = data.azurerm_resource_group.aks.name
-  public_network_access_enabled   = local.private_shared_enabled ? false : null
-  allow_nested_items_to_be_public = local.private_shared_enabled ? false : null
+  public_network_access           = local.private_shared_enabled ? "Disabled" : null
+  allow_nested_items_to_be_public = local.private_shared_enabled ? false : true
   local_user_enabled              = local.private_shared_enabled ? false : null
   account_kind                    = "StorageV2"
   account_tier                    = var.storage_account_tier
@@ -88,11 +88,10 @@ resource "azurerm_private_dns_zone" "blob_private_dns_zone" {
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_blob_vnet_link" {
-  count                 = local.private_blob_enabled && var.storage_create ? 1 : 0
-  name                  = "blob-vnet-dns-link"
-  resource_group_name   = data.azurerm_resource_group.aks.name
-  private_dns_zone_name = azurerm_private_dns_zone.blob_private_dns_zone[0].name
-  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
+  count               = local.private_blob_enabled && var.storage_create ? 1 : 0
+  name                = "blob-vnet-dns-link"
+  private_dns_zone_id = azurerm_private_dns_zone.blob_private_dns_zone[0].id
+  virtual_network_id  = data.azurerm_virtual_network.aks_vnet[0].id
 }
 # Create a Private DNS Zone for the Storage Account shared service
 resource "azurerm_private_dns_zone" "shared_private_dns_zone" {
@@ -102,11 +101,10 @@ resource "azurerm_private_dns_zone" "shared_private_dns_zone" {
 }
 # link the dns private zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_shared_vnet_link" {
-  count                 = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
-  name                  = "shared-vnet-dns-link"
-  resource_group_name   = data.azurerm_resource_group.aks.name
-  private_dns_zone_name = azurerm_private_dns_zone.shared_private_dns_zone[0].name
-  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
+  count               = local.private_shared_enabled && var.shared_storage_create ? 1 : 0
+  name                = "shared-vnet-dns-link"
+  private_dns_zone_id = azurerm_private_dns_zone.shared_private_dns_zone[0].id
+  virtual_network_id  = data.azurerm_virtual_network.aks_vnet[0].id
 }
 #########################################################################
 ########################## Private EndPoint #############################
@@ -184,7 +182,7 @@ resource "azurerm_storage_container" "domino_containers" {
   for_each = var.storage_create ? { for key, value in local.all_containers : key => value } : {}
 
   name                  = "${var.deploy_id}-${each.value.name}"
-  storage_account_name  = azurerm_storage_account.domino[0].name
+  storage_account_id    = azurerm_storage_account.domino[0].id
   container_access_type = each.value.container_access_type
 }
 #########################################################################
@@ -192,10 +190,10 @@ resource "azurerm_storage_container" "domino_containers" {
 #########################################################################
 # Create a fileshare for private storage
 resource "azurerm_storage_share" "shared_store" {
-  count                = var.shared_storage_create ? 1 : 0
-  name                 = "shared"
-  storage_account_name = azurerm_storage_account.domino_shared[0].name
-  quota                = 100
+  count              = var.shared_storage_create ? 1 : 0
+  name               = "shared"
+  storage_account_id = azurerm_storage_account.domino_shared[0].id
+  quota              = 100
 }
 
 moved {

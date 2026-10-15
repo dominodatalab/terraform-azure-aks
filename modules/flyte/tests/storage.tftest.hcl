@@ -3,6 +3,16 @@ mock_provider "azurerm" {}
 run "test_storage" {
   command = plan
 
+  # azurerm 5.x storage containers reference the account by id (storage_account_name was removed),
+  # so the storage account needs a known id at plan time for the id comparisons below.
+  override_resource {
+    target          = azurerm_storage_account.flyte
+    override_during = plan
+    values = {
+      id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.Storage/storageAccounts/test12345flyte"
+    }
+  }
+
   assert {
     condition     = azurerm_storage_account.flyte.name == "test12345flyte"
     error_message = "Incorrect Flyte storage account name"
@@ -44,8 +54,8 @@ run "test_storage" {
   }
 
   assert {
-    condition     = azurerm_storage_container.flyte_metadata.storage_account_name == azurerm_storage_account.flyte.name
-    error_message = "Incorrect storage account name for flyte-metadata storage container"
+    condition     = azurerm_storage_container.flyte_metadata.storage_account_id == azurerm_storage_account.flyte.id
+    error_message = "Incorrect storage account id for flyte-metadata storage container"
   }
 
   assert {
@@ -54,7 +64,7 @@ run "test_storage" {
   }
 
   assert {
-    condition     = azurerm_storage_container.flyte_data.storage_account_name == azurerm_storage_account.flyte.name
-    error_message = "Incorrect storage account name for flyte-data storage container"
+    condition     = azurerm_storage_container.flyte_data.storage_account_id == azurerm_storage_account.flyte.id
+    error_message = "Incorrect storage account id for flyte-data storage container"
   }
 }

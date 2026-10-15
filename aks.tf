@@ -71,11 +71,10 @@ resource "azurerm_private_dns_zone" "aks_private_dns_zone" {
 }
 # link the dns provate zone to the AKS VNET
 resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_zone_aks_vnet_link" {
-  count                 = var.private_cluster_enabled ? 1 : 0
-  name                  = "aks-vnet-dns-link"
-  resource_group_name   = data.azurerm_resource_group.aks.name
-  private_dns_zone_name = azurerm_private_dns_zone.aks_private_dns_zone[0].name
-  virtual_network_id    = data.azurerm_virtual_network.aks_vnet[0].id
+  count               = var.private_cluster_enabled ? 1 : 0
+  name                = "aks-vnet-dns-link"
+  private_dns_zone_id = azurerm_private_dns_zone.aks_private_dns_zone[0].id
+  virtual_network_id  = data.azurerm_virtual_network.aks_vnet[0].id
   depends_on = [
     azurerm_private_dns_zone.aks_private_dns_zone
   ]
@@ -115,6 +114,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     content {
       authorized_ip_ranges = var.api_server_authorized_ip_ranges
     }
+  }
+
+  node_provisioning_profile {
+    mode = "Manual"
   }
 
   default_node_pool {

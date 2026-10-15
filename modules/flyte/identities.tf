@@ -23,11 +23,10 @@ resource "azurerm_user_assigned_identity" "flyte_dataplane" {
 }
 
 resource "azurerm_federated_identity_credential" "this" {
-  for_each            = local.federated_identity_mapping
-  name                = "${var.deploy_id}-${each.key}"
-  resource_group_name = var.resource_group_name
-  audience            = ["api://AzureADTokenExchange"]
-  issuer              = var.oidc_issuer_url
-  parent_id           = each.value
-  subject             = "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names[each.key]}"
+  for_each                  = local.federated_identity_mapping
+  name                      = "${var.deploy_id}-${each.key}"
+  audience                  = ["api://AzureADTokenExchange"]
+  issuer                    = var.oidc_issuer_url
+  user_assigned_identity_id = each.value
+  subject                   = "system:serviceaccount:${var.namespaces.platform}:${var.service_account_names[each.key]}"
 }

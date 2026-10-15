@@ -31,8 +31,8 @@ resource "azurerm_storage_account" "flyte" {
   min_tls_version                 = "TLS1_2"
   tags                            = var.tags
   is_hns_enabled                  = true
-  public_network_access_enabled   = local.private_flyte_enabled ? false : null
-  allow_nested_items_to_be_public = local.private_flyte_enabled ? false : null
+  public_network_access           = local.private_flyte_enabled ? "Disabled" : null
+  allow_nested_items_to_be_public = local.private_flyte_enabled ? false : true
   local_user_enabled              = local.private_flyte_enabled ? false : null
 
   blob_properties {
@@ -65,13 +65,13 @@ resource "azurerm_storage_account" "flyte" {
 #########################################################################
 resource "azurerm_storage_container" "flyte_metadata" {
   name                  = "${var.deploy_id}-flyte-metadata"
-  storage_account_name  = azurerm_storage_account.flyte.name
+  storage_account_id    = azurerm_storage_account.flyte.id
   container_access_type = "private"
 }
 
 resource "azurerm_storage_container" "flyte_data" {
   name                  = "${var.deploy_id}-flyte-data"
-  storage_account_name  = azurerm_storage_account.flyte.name
+  storage_account_id    = azurerm_storage_account.flyte.id
   container_access_type = "private"
 }
 #########################################################################
@@ -87,8 +87,7 @@ data "azurerm_private_dns_zone" "blob_dns_zone" {
 resource "azurerm_private_dns_a_record" "flyte_a_record" {
   count               = local.private_flyte_enabled ? 1 : 0
   name                = "flyte"
-  zone_name           = data.azurerm_private_dns_zone.blob_dns_zone[0].name
-  resource_group_name = var.resource_group_name
+  private_dns_zone_id = data.azurerm_private_dns_zone.blob_dns_zone[0].id
   ttl                 = 300
   records             = [module.domino_flyte_ep[0].ep_object.private_service_connection[0].private_ip_address]
   depends_on          = [module.domino_flyte_ep]
