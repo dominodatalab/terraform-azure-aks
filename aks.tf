@@ -219,7 +219,4 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
     node_soak_duration_in_minutes = 0
   }
 
-  lifecycle {
-    ignore_changes = [node_count, max_count, tags, upgrade_settings]
-  }
 }
