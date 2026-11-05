@@ -220,6 +220,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   }
 
   lifecycle {
-    ignore_changes = [node_count, max_count, tags, upgrade_settings]
+    ignore_changes = [node_count, tags, upgrade_settings]
   }
 }
