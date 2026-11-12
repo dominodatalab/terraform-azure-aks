@@ -62,6 +62,10 @@ resource "azurerm_monitor_diagnostic_setting" "control_plane" {
   }
 
   enabled_log {
+    category = "kube-audit-admin"
+  }
+
+  enabled_log {
     category = "kube-controller-manager"
   }
 
