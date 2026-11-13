@@ -88,7 +88,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ignore_changes = [
       tags,
       default_node_pool[0].node_count,
-      default_node_pool[0].max_count,
       default_node_pool[0].tags,
       default_node_pool[0].upgrade_settings,
       # VM Size changes cause recreation of the entire cluster
