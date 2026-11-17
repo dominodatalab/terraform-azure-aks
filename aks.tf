@@ -150,6 +150,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   auto_scaler_profile {
     balance_similar_node_groups = true
+    expander                    = "least-waste"
   }
 
   network_profile {
