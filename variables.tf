@@ -93,6 +93,7 @@ variable "node_pools" {
       max_pods             = optional(number, 30)
       os_disk_size_gb      = optional(number, 128)
       gpu                  = optional(bool, false)
+      spot                 = optional(bool, false)
     }),
     platform = object({
       node_public_ip_enabled = optional(bool, false)
@@ -110,6 +111,7 @@ variable "node_pools" {
       max_pods             = optional(number, 60)
       os_disk_size_gb      = optional(number, 128)
       gpu                  = optional(bool, false)
+      spot                 = optional(bool, false)
     }),
     gpu = object({
       node_public_ip_enabled = optional(bool, false)
@@ -130,6 +132,7 @@ variable "node_pools" {
       max_pods             = optional(number, 30)
       os_disk_size_gb      = optional(number, 128)
       gpu                  = optional(bool, false)
+      spot                 = optional(bool, false)
     })
     system = object({
       node_public_ip_enabled = optional(bool, false)
@@ -171,6 +174,7 @@ variable "additional_node_pools" {
     max_pods               = optional(number, 30)
     os_disk_size_gb        = optional(number, 128)
     gpu                    = optional(bool, false)
+    spot                   = optional(bool, false)
   }))
   default = {}
 }

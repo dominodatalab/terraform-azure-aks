@@ -204,6 +204,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
   node_labels            = each.value.is_gpu ? merge(local.gpu_labels, each.value.node_pool_spec.node_labels) : each.value.node_pool_spec.node_labels
   node_taints            = each.value.is_gpu ? distinct(concat(local.gpu_taints, each.value.node_pool_spec.node_taints)) : each.value.node_pool_spec.node_taints
   gpu_driver             = each.value.is_gpu ? "Install" : null
+  priority               = each.value.node_pool_spec.spot ? "Spot" : "Regular"
+  eviction_policy        = each.value.node_pool_spec.spot ? "Delete" : null
+  spot_max_price         = each.value.node_pool_spec.spot ? -1 : null
   auto_scaling_enabled   = each.value.node_pool_spec.auto_scaling_enabled
   orchestrator_version   = azurerm_kubernetes_cluster.aks.kubernetes_version
   min_count              = each.value.node_pool_spec.min_count
@@ -214,7 +217,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "aks" {
 
   upgrade_settings {
     drain_timeout_in_minutes      = 0
-    max_surge                     = "10%"
+    max_surge                     = each.value.node_pool_spec.spot ? null : "10%"
     node_soak_duration_in_minutes = 0
   }
 
